@@ -1,0 +1,7 @@
+#[build]
+#target = "x86_64-unknown-linux-gnu"
+#
+#[target.x86_64-unknown-linux-gnu]
+#rustflags = [
+#    "-L", "/home/antoniosalsi/projects/pocket-web-backend/target/x86_64-unknown-linux-gnu/debug/build/pocket-web-backend-f088a8f81bfa8816/out/build"
+#]
