@@ -10,6 +10,10 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 message(STATUS "PROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR}")
 message(STATUS "CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}")
 
+add_definitions(-DPOCKET_ENABLE_LOG)
+add_definitions(-DPOCKET_ENABLE_AES)
+add_definitions(-DPOCKET_MAX_BUFFER_RESPONSE_SIZE=10485760)
+
 include_directories(pocket-lib/inc)
 include_directories(pocket-lib/pocket-controllers/inc)
 include_directories(pocket-lib/pocket-daos/inc)
