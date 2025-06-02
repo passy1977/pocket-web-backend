@@ -17,7 +17,7 @@
 *
 ***************************************************************************/
 
-#include "pocket/field_controller.hpp"
+#include "pocket/field_controller.h"
 
 field_controller_t* pocket_field_controller_init() {
     return nullptr;

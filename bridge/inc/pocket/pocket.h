@@ -20,13 +20,15 @@
 #ifndef POCKET_BRIDGE_H
 #define POCKET_BRIDGE_H
 
+#include "constants.h"
+
+#include <stdbool.h>
+#include <stdlib.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "pocket/constants.h"
-
-#include <stdlib.h>
 
 typedef struct
 {

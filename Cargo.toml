@@ -5,5 +5,5 @@ edition = "2024"
 
 [build-dependencies]
 cmake = "0.1.54"
-[dependencies]
 bindgen = "0.71.1"
+

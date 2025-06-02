@@ -20,12 +20,15 @@
 #ifndef POCKET_BRIDGE_FIELD_H
 #define POCKET_BRIDGE_FIELD_H
 
+#include <stdint.h>
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-#include <stdint.h>
+
 
 typedef struct
 {
@@ -41,7 +44,7 @@ typedef struct
  bool is_hidden;
  bool synchronized;
  bool deleted;
- uint64_t timestamp_creation = 0;
+ uint64_t timestamp_creation;
 } pocket_field_t;
 
 pocket_field_t pocket_field_new();

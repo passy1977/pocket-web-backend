@@ -20,14 +20,15 @@
 #ifndef POCKET_BRIDGE_FIELD_CONTROLLER_H
 #define POCKET_BRIDGE_FIELD_CONTROLLER_H
 
+#include "constants.h"
+#include "field.h"
+
+#include <stdint.h>
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "pocket/constants.h"
-#include "pocket/field.h"
-
-#include <stdint.h>
 
 typedef struct
 {

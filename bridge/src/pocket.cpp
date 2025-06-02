@@ -22,13 +22,6 @@
 
 #include "pocket/globals.hpp"
 
-extern "C" {
-fn pippo()
-{
-pocket::debug("--->","test");
-}
-}
-
 pocket_t* pocket_init()
 {
     return nullptr;
