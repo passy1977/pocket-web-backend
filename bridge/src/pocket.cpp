@@ -22,12 +22,12 @@
 
 #include "pocket/globals.hpp"
 
-pocket_t* pocket_init()
+pocket_t* pocket_init(void)
 {
     return nullptr;
 }
 
-pocket_t* pocket_shared()
+pocket_t* pocket_shared(void)
 {
 
     return nullptr;

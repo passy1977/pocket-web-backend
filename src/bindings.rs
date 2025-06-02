@@ -1506,3 +1506,81 @@ unsafe extern "C" {
         group_id: i64,
     ) -> *mut pocket_field_t;
 }
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct pocket_group_t {
+    pub _id: u32,
+    pub server_id: u32,
+    pub user_id: u32,
+    pub group_id: u32,
+    pub server_group_id: u32,
+    pub group_field_id: u32,
+    pub server_group_field_id: u32,
+    pub title: *mut ::std::os::raw::c_char,
+    pub icon: *mut ::std::os::raw::c_char,
+    pub note: *mut ::std::os::raw::c_char,
+    pub value: *mut ::std::os::raw::c_char,
+    pub is_hidden: bool,
+    pub synchronized: bool,
+    pub deleted: bool,
+    pub timestamp_creation: u64,
+}
+#[allow(clippy::unnecessary_operation, clippy::identity_op)]
+const _: () = {
+    ["Size of pocket_group_t"][::std::mem::size_of::<pocket_group_t>() - 80usize];
+    ["Alignment of pocket_group_t"][::std::mem::align_of::<pocket_group_t>() - 8usize];
+    ["Offset of field: pocket_group_t::_id"][::std::mem::offset_of!(pocket_group_t, _id) - 0usize];
+    ["Offset of field: pocket_group_t::server_id"]
+        [::std::mem::offset_of!(pocket_group_t, server_id) - 4usize];
+    ["Offset of field: pocket_group_t::user_id"]
+        [::std::mem::offset_of!(pocket_group_t, user_id) - 8usize];
+    ["Offset of field: pocket_group_t::group_id"]
+        [::std::mem::offset_of!(pocket_group_t, group_id) - 12usize];
+    ["Offset of field: pocket_group_t::server_group_id"]
+        [::std::mem::offset_of!(pocket_group_t, server_group_id) - 16usize];
+    ["Offset of field: pocket_group_t::group_field_id"]
+        [::std::mem::offset_of!(pocket_group_t, group_field_id) - 20usize];
+    ["Offset of field: pocket_group_t::server_group_field_id"]
+        [::std::mem::offset_of!(pocket_group_t, server_group_field_id) - 24usize];
+    ["Offset of field: pocket_group_t::title"]
+        [::std::mem::offset_of!(pocket_group_t, title) - 32usize];
+    ["Offset of field: pocket_group_t::icon"]
+        [::std::mem::offset_of!(pocket_group_t, icon) - 40usize];
+    ["Offset of field: pocket_group_t::note"]
+        [::std::mem::offset_of!(pocket_group_t, note) - 48usize];
+    ["Offset of field: pocket_group_t::value"]
+        [::std::mem::offset_of!(pocket_group_t, value) - 56usize];
+    ["Offset of field: pocket_group_t::is_hidden"]
+        [::std::mem::offset_of!(pocket_group_t, is_hidden) - 64usize];
+    ["Offset of field: pocket_group_t::synchronized"]
+        [::std::mem::offset_of!(pocket_group_t, synchronized) - 65usize];
+    ["Offset of field: pocket_group_t::deleted"]
+        [::std::mem::offset_of!(pocket_group_t, deleted) - 66usize];
+    ["Offset of field: pocket_group_t::timestamp_creation"]
+        [::std::mem::offset_of!(pocket_group_t, timestamp_creation) - 72usize];
+};
+unsafe extern "C" {
+    pub fn pocket_group_init() -> *mut pocket_group_t;
+}
+unsafe extern "C" {
+    pub fn pocket_group_init_with_id(
+        id: u32,
+        server_id: u32,
+        user_id: u32,
+        group_id: u32,
+        server_group_id: u32,
+        group_field_id: u32,
+        server_group_field_id: u32,
+        title: *const ::std::os::raw::c_char,
+        icon: *const ::std::os::raw::c_char,
+        note: *const ::std::os::raw::c_char,
+        value: *const ::std::os::raw::c_char,
+        is_hidden: bool,
+        synchronized: bool,
+        deleted: bool,
+        timestamp_creation: u64,
+    ) -> *mut pocket_group_t;
+}
+unsafe extern "C" {
+    pub fn pocket_group_free(group: *mut pocket_group_t);
+}

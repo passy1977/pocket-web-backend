@@ -19,7 +19,7 @@
 
 #include "pocket/field_controller.h"
 
-field_controller_t* pocket_field_controller_init() {
+field_controller_t* pocket_field_controller_init(void) {
     return nullptr;
 }
 

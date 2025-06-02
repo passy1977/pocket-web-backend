@@ -33,6 +33,9 @@ fn main() {
         .header("bridge/inc/pocket/pocket.h")
         .header("bridge/inc/pocket/field.h")
         .header("bridge/inc/pocket/field_controller.h")
+        .header("bridge/inc/pocket/group.h")
+
+        .clang_arg("-Ibridge/inc")
         
         // Tell cargo to invalidate the built crate whenever any of the
         // included header files changed.

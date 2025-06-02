@@ -20,8 +20,8 @@
 #ifndef POCKET_BRIDGE_FIELD_CONTROLLER_H
 #define POCKET_BRIDGE_FIELD_CONTROLLER_H
 
-#include "constants.h"
-#include "field.h"
+#include "pocket/constants.h"
+#include "pocket/field.h"
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -35,7 +35,7 @@ typedef struct
 
 } field_controller_t;
 
-field_controller_t* pocket_field_controller_init();
+field_controller_t* pocket_field_controller_init(void);
 void pocket_field_controller_initialize(field_controller_t* self);
 
 pocket_field_t** pocket_field_controller_get_list_field(field_controller_t* self, int64_t group_id, const char* search);

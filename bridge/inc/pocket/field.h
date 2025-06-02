@@ -27,9 +27,6 @@
 extern "C" {
 #endif
 
-
-
-
 typedef struct
 {
  int64_t id;

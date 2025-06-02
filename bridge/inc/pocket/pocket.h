@@ -20,7 +20,7 @@
 #ifndef POCKET_BRIDGE_H
 #define POCKET_BRIDGE_H
 
-#include "constants.h"
+#include "pocket/constants.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -40,8 +40,8 @@ typedef struct
 
 } pocket_t;
 
-pocket_t* pocket_init();
-pocket_t* pocket_shared();
+pocket_t* pocket_init(void);
+pocket_t* pocket_shared(void);
 
 pocket_stat_t pocket_initialize(pocket_t* self, const char* base_path, const char* config_json, const char* passwd);
 pocket_stat_t pocket_login(pocket_t* self, const char* email, const char* passwd);
