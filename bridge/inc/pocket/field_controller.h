@@ -32,7 +32,7 @@ extern "C" {
 
 typedef struct
 {
-
+    bool reachability;
 } field_controller_t;
 
 field_controller_t* pocket_field_controller_init(void);

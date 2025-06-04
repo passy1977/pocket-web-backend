@@ -1438,7 +1438,7 @@ const _: () = {
         [::std::mem::offset_of!(pocket_field_t, timestamp_creation) - 80usize];
 };
 unsafe extern "C" {
-    pub fn pocket_field_new() -> pocket_field_t;
+    pub fn pocket_field_new() -> *mut pocket_field_t;
 }
 unsafe extern "C" {
     pub fn pocket_field_new_with_args(
@@ -1455,7 +1455,7 @@ unsafe extern "C" {
         synchronized: bool,
         deleted: bool,
         timestamp_creation: u64,
-    ) -> pocket_field_t;
+    ) -> *mut pocket_field_t;
 }
 unsafe extern "C" {
     pub fn pocket_field_is_null(field: *const pocket_field_t) -> bool;
@@ -1465,11 +1465,15 @@ unsafe extern "C" {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct field_controller_t {}
+pub struct field_controller_t {
+    pub reachability: bool,
+}
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of field_controller_t"][::std::mem::size_of::<field_controller_t>() - 0usize];
+    ["Size of field_controller_t"][::std::mem::size_of::<field_controller_t>() - 1usize];
     ["Alignment of field_controller_t"][::std::mem::align_of::<field_controller_t>() - 1usize];
+    ["Offset of field: field_controller_t::reachability"]
+        [::std::mem::offset_of!(field_controller_t, reachability) - 0usize];
 };
 unsafe extern "C" {
     pub fn pocket_field_controller_init() -> *mut field_controller_t;
@@ -1509,7 +1513,7 @@ unsafe extern "C" {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct pocket_group_t {
-    pub _id: u32,
+    pub id: u32,
     pub server_id: u32,
     pub user_id: u32,
     pub group_id: u32,
@@ -1529,7 +1533,7 @@ pub struct pocket_group_t {
 const _: () = {
     ["Size of pocket_group_t"][::std::mem::size_of::<pocket_group_t>() - 80usize];
     ["Alignment of pocket_group_t"][::std::mem::align_of::<pocket_group_t>() - 8usize];
-    ["Offset of field: pocket_group_t::_id"][::std::mem::offset_of!(pocket_group_t, _id) - 0usize];
+    ["Offset of field: pocket_group_t::id"][::std::mem::offset_of!(pocket_group_t, id) - 0usize];
     ["Offset of field: pocket_group_t::server_id"]
         [::std::mem::offset_of!(pocket_group_t, server_id) - 4usize];
     ["Offset of field: pocket_group_t::user_id"]
@@ -1583,4 +1587,213 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn pocket_group_free(group: *mut pocket_group_t);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct pocket_group_field_t {
+    pub new_insertion: bool,
+    pub id: u32,
+    pub server_id: u32,
+    pub group_id: u32,
+    pub server_group_id: u32,
+    pub title: *mut ::std::os::raw::c_char,
+    pub is_hidden: bool,
+    pub synchronized: bool,
+    pub deleted: bool,
+    pub timestamp_creation: u64,
+}
+#[allow(clippy::unnecessary_operation, clippy::identity_op)]
+const _: () = {
+    ["Size of pocket_group_field_t"][::std::mem::size_of::<pocket_group_field_t>() - 48usize];
+    ["Alignment of pocket_group_field_t"][::std::mem::align_of::<pocket_group_field_t>() - 8usize];
+    ["Offset of field: pocket_group_field_t::new_insertion"]
+        [::std::mem::offset_of!(pocket_group_field_t, new_insertion) - 0usize];
+    ["Offset of field: pocket_group_field_t::id"]
+        [::std::mem::offset_of!(pocket_group_field_t, id) - 4usize];
+    ["Offset of field: pocket_group_field_t::server_id"]
+        [::std::mem::offset_of!(pocket_group_field_t, server_id) - 8usize];
+    ["Offset of field: pocket_group_field_t::group_id"]
+        [::std::mem::offset_of!(pocket_group_field_t, group_id) - 12usize];
+    ["Offset of field: pocket_group_field_t::server_group_id"]
+        [::std::mem::offset_of!(pocket_group_field_t, server_group_id) - 16usize];
+    ["Offset of field: pocket_group_field_t::title"]
+        [::std::mem::offset_of!(pocket_group_field_t, title) - 24usize];
+    ["Offset of field: pocket_group_field_t::is_hidden"]
+        [::std::mem::offset_of!(pocket_group_field_t, is_hidden) - 32usize];
+    ["Offset of field: pocket_group_field_t::synchronized"]
+        [::std::mem::offset_of!(pocket_group_field_t, synchronized) - 33usize];
+    ["Offset of field: pocket_group_field_t::deleted"]
+        [::std::mem::offset_of!(pocket_group_field_t, deleted) - 34usize];
+    ["Offset of field: pocket_group_field_t::timestamp_creation"]
+        [::std::mem::offset_of!(pocket_group_field_t, timestamp_creation) - 40usize];
+};
+unsafe extern "C" {
+    pub fn pocket_group_field_init() -> *mut pocket_group_field_t;
+}
+unsafe extern "C" {
+    pub fn pocket_group_field_init_with_id(
+        id: u32,
+        server_id: u32,
+        user_id: u32,
+        group_id: u32,
+        server_group_id: u32,
+        title: *const ::std::os::raw::c_char,
+        is_hidden: bool,
+        synchronized: bool,
+        deleted: bool,
+        timestamp_creation: u64,
+    ) -> *mut pocket_group_field_t;
+}
+unsafe extern "C" {
+    pub fn pocket_group_field_free(group_field: *mut pocket_group_field_t);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct pocket_group_controller_t {
+    pub reachability: bool,
+}
+#[allow(clippy::unnecessary_operation, clippy::identity_op)]
+const _: () = {
+    ["Size of pocket_group_controller_t"]
+        [::std::mem::size_of::<pocket_group_controller_t>() - 1usize];
+    ["Alignment of pocket_group_controller_t"]
+        [::std::mem::align_of::<pocket_group_controller_t>() - 1usize];
+    ["Offset of field: pocket_group_controller_t::reachability"]
+        [::std::mem::offset_of!(pocket_group_controller_t, reachability) - 0usize];
+};
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct pocket_show_list_t {
+    pub fields: *mut *mut pocket_group_field_t,
+    pub count: usize,
+}
+#[allow(clippy::unnecessary_operation, clippy::identity_op)]
+const _: () = {
+    ["Size of pocket_show_list_t"][::std::mem::size_of::<pocket_show_list_t>() - 16usize];
+    ["Alignment of pocket_show_list_t"][::std::mem::align_of::<pocket_show_list_t>() - 8usize];
+    ["Offset of field: pocket_show_list_t::fields"]
+        [::std::mem::offset_of!(pocket_show_list_t, fields) - 0usize];
+    ["Offset of field: pocket_show_list_t::count"]
+        [::std::mem::offset_of!(pocket_show_list_t, count) - 8usize];
+};
+unsafe extern "C" {
+    pub fn pocket_group_controller_init() -> *mut pocket_group_controller_t;
+}
+unsafe extern "C" {
+    pub fn pocket_group_controller_initialize(controller: *mut pocket_group_controller_t);
+}
+unsafe extern "C" {
+    pub fn pocket_get_list_group(
+        controller: *mut pocket_group_controller_t,
+        groupId: u32,
+        search: *const ::std::os::raw::c_char,
+        count: *mut ::std::os::raw::c_int,
+    ) -> *mut *mut pocket_group_t;
+}
+unsafe extern "C" {
+    pub fn pocket_count_child(group: *const pocket_group_t) -> i32;
+}
+unsafe extern "C" {
+    pub fn pocket_del_group(
+        controller: *mut pocket_group_controller_t,
+        group: *const pocket_group_t,
+    ) -> pocket_stat_t;
+}
+unsafe extern "C" {
+    pub fn pocket_persist_group(
+        controller: *mut pocket_group_controller_t,
+        group: *const pocket_group_t,
+    ) -> pocket_stat_t;
+}
+unsafe extern "C" {
+    pub fn pocket_get_group(
+        controller: *mut pocket_group_controller_t,
+        groupId: u32,
+    ) -> *mut pocket_group_t;
+}
+unsafe extern "C" {
+    pub fn pocket_get_last_id_group_field() -> u32;
+}
+unsafe extern "C" {
+    pub fn pocket_data_export(fullPathFileExport: *const ::std::os::raw::c_char) -> bool;
+}
+unsafe extern "C" {
+    pub fn pocket_data_import(fullPathFileImport: *const ::std::os::raw::c_char) -> bool;
+}
+unsafe extern "C" {
+    pub fn pocket_data_import_legacy(fullPathFileImport: *const ::std::os::raw::c_char) -> bool;
+}
+unsafe extern "C" {
+    pub fn pocket_clean_show_list(controller: *mut pocket_group_controller_t);
+}
+unsafe extern "C" {
+    pub fn pocket_fill_show_list(
+        controller: *mut pocket_group_controller_t,
+        group: *const pocket_group_t,
+        insert: bool,
+    );
+}
+unsafe extern "C" {
+    pub fn pocket_get_show_list() -> *mut pocket_show_list_t;
+}
+unsafe extern "C" {
+    pub fn pocket_add_to_show_list(
+        controller: *mut pocket_group_controller_t,
+        groupField: *const pocket_group_field_t,
+    ) -> bool;
+}
+unsafe extern "C" {
+    pub fn pocket_del_from_show_list(
+        controller: *mut pocket_group_controller_t,
+        idGroupField: u32,
+    ) -> bool;
+}
+unsafe extern "C" {
+    pub fn pocket_size_show_list(controller: *const pocket_group_controller_t) -> u8;
+}
+pub const user_stat_t_USER_STAT_NOT_ACTIVE: user_stat_t = 1;
+pub const user_stat_t_USER_STAT_ACTIVE: user_stat_t = 0;
+pub const user_stat_t_USER_STAT_DELETED: user_stat_t = 2;
+pub const user_stat_t_USER_STAT_INVALIDATED: user_stat_t = 3;
+pub type user_stat_t = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct pocket_user_t {
+    pub id: u32,
+    pub email: *mut ::std::os::raw::c_char,
+    pub name: *mut ::std::os::raw::c_char,
+    pub passwd: *mut ::std::os::raw::c_char,
+    pub status: user_stat_t,
+    pub timestamp_last_update: u64,
+}
+#[allow(clippy::unnecessary_operation, clippy::identity_op)]
+const _: () = {
+    ["Size of pocket_user_t"][::std::mem::size_of::<pocket_user_t>() - 48usize];
+    ["Alignment of pocket_user_t"][::std::mem::align_of::<pocket_user_t>() - 8usize];
+    ["Offset of field: pocket_user_t::id"][::std::mem::offset_of!(pocket_user_t, id) - 0usize];
+    ["Offset of field: pocket_user_t::email"]
+        [::std::mem::offset_of!(pocket_user_t, email) - 8usize];
+    ["Offset of field: pocket_user_t::name"][::std::mem::offset_of!(pocket_user_t, name) - 16usize];
+    ["Offset of field: pocket_user_t::passwd"]
+        [::std::mem::offset_of!(pocket_user_t, passwd) - 24usize];
+    ["Offset of field: pocket_user_t::status"]
+        [::std::mem::offset_of!(pocket_user_t, status) - 32usize];
+    ["Offset of field: pocket_user_t::timestamp_last_update"]
+        [::std::mem::offset_of!(pocket_user_t, timestamp_last_update) - 40usize];
+};
+unsafe extern "C" {
+    pub fn pocket_user_init() -> *mut pocket_user_t;
+}
+unsafe extern "C" {
+    pub fn pocket_user_init_with_id(
+        id: u32,
+        email: *const ::std::os::raw::c_char,
+        name: *const ::std::os::raw::c_char,
+        passwd: *const ::std::os::raw::c_char,
+        timestamp_last_update: u64,
+        status: user_stat_t,
+    ) -> *mut pocket_user_t;
+}
+unsafe extern "C" {
+    pub fn pocket_user_free(user: *mut pocket_user_t);
 }

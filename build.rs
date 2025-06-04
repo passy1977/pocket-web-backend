@@ -34,6 +34,8 @@ fn main() {
         .header("bridge/inc/pocket/field.h")
         .header("bridge/inc/pocket/field_controller.h")
         .header("bridge/inc/pocket/group.h")
+        .header("bridge/inc/pocket/group_controller.h")
+        .header("bridge/inc/pocket/user.h")
 
         .clang_arg("-Ibridge/inc")
         

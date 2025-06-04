@@ -17,8 +17,10 @@
  *
  ***************************************************************************/
 
-#ifndef POCKET_BRIDGE_GROUP_CONTROLLER_H
-#define POCKET_BRIDGE_GROUP_CONTROLLER_H
+#ifndef POCKET_BRIDGE_GROUP_H
+#define POCKET_BRIDGE_GROUP_H
+
+#include "pocket/group.h"
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -28,7 +30,7 @@ extern "C" {
 #endif
 
 typedef struct {
-    uint32_t _id;
+    uint32_t id;
     uint32_t server_id;
     uint32_t user_id;
     uint32_t group_id;
@@ -69,4 +71,4 @@ void pocket_group_free(pocket_group_t *group);
 }
 #endif
 
-#endif //POCKET_BRIDGE_GROUP_CONTROLLER_H
+#endif //POCKET_BRIDGE_GROUP_H

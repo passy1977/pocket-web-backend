@@ -44,8 +44,8 @@ typedef struct
  uint64_t timestamp_creation;
 } pocket_field_t;
 
-pocket_field_t pocket_field_new();
-pocket_field_t pocket_field_new_with_args( int64_t id,
+pocket_field_t* pocket_field_new();
+pocket_field_t* pocket_field_new_with_args( int64_t id,
  int64_t server_id,
  int64_t user_id,
  int64_t group_id,

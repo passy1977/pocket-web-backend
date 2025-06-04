@@ -27,9 +27,9 @@
 
 using namespace std;
 
-pocket_field_t pocket_field_new()
+pocket_field_t* pocket_field_new()
 {
- return {
+ auto field = new(nothrow) pocket_field_t{
   .id = 0,
   .server_id = 0,
   .user_id = 0,
@@ -43,44 +43,43 @@ pocket_field_t pocket_field_new()
   .synchronized = false,
   .deleted = false,
   .timestamp_creation = 0
- };
+};
+ if (field == nullptr) return nullptr;
+
+ return field;
 }
 
-pocket_field_t pocket_field_new_with_args(int64_t id, int64_t server_id, int64_t user_id, int64_t group_id,
+pocket_field_t* pocket_field_new_with_args(int64_t id, int64_t server_id, int64_t user_id, int64_t group_id,
  int64_t server_group_id, int64_t group_field_id, int64_t server_group_field_id, const char* title, const char* value,
  bool is_hidden,  bool synchronized, bool deleted, uint64_t timestamp_creation)
 {
- pocket_field_t ret {
-  .id = id,
-  .server_id = server_id,
-  .user_id = user_id,
-  .group_id = group_id,
-  .server_group_id = server_group_id,
-  .group_field_id = group_field_id,
-  .server_group_field_id = server_group_field_id,
-  .is_hidden = is_hidden,
-  .synchronized = synchronized,
-  .deleted = deleted,
-  .timestamp_creation = timestamp_creation
- };
+ auto field = pocket_field_new();
+ if (field == nullptr) return nullptr;
 
- ret.title = new(nothrow) char[strlen(title)+1];
- if (ret.title == nullptr)
+ field->id = id;
+ field->server_id = server_id;
+ field->user_id = user_id;
+ field->group_id = group_id;
+ field->server_group_id = server_group_id;
+ field->group_field_id = group_field_id;
+ field->server_group_field_id = server_group_field_id;
+
+ field->title = strdup(title);
+ if (field->title == nullptr) return nullptr;
+
+ field->value = strdup(value);
+ if (field->value == nullptr)
  {
-  memset(&ret, '\0', sizeof(ret));
-  return ret;
+  pocket_field_free(field);
+  return field;
  }
- strcpy(ret.title, title);
 
- ret.value = new(nothrow) char[strlen(value)+1];;
- if (ret.value == nullptr)
- {
-  memset(&ret, '\0', sizeof(ret));
-  return ret;
- }
- strcpy(ret.value, value);
+ field->is_hidden = is_hidden;
+ field->synchronized = synchronized;
+ field->deleted = deleted;
+ field->timestamp_creation = timestamp_creation;
 
- return ret;
+ return field;
 }
 
 inline bool pocket_field_is_null(const pocket_field_t* field)

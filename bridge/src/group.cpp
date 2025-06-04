@@ -21,26 +21,31 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <new>
 
-pocket_group_t* pocket_group_init() {
-    pocket_group_t *group = (pocket_group_t *)malloc(sizeof(pocket_group_t));
+using namespace std;
+
+pocket_group_t* pocket_group_init()
+{
+    auto group = new(nothrow) pocket_group_t {
+        .id = 0,
+        .server_id = 0,
+        .user_id = 0,
+        .group_id = 0,
+        .server_group_id = 0,
+        .group_field_id = 0,
+        .server_group_field_id = 0,
+        .title = nullptr,
+        .icon = nullptr,
+        .note = nullptr,
+        .value = nullptr,
+        .is_hidden = false,
+        .synchronized = false,
+        .deleted = false,
+        .timestamp_creation = 0
+    };
     if (!group) return nullptr;
 
-    group->_id = 0;
-    group->server_id = 0;
-    group->user_id = 0;
-    group->group_id = 0;
-    group->server_group_id = 0;
-    group->group_field_id = 0;
-    group->server_group_field_id = 0;
-    group->title = nullptr;
-    group->icon = nullptr;
-    group->note = nullptr;
-    group->value = nullptr;
-    group->is_hidden = false;
-    group->synchronized = false;
-    group->deleted = false;
-    group->timestamp_creation = 0;
 
     return group;
 }
@@ -59,11 +64,12 @@ pocket_group_t* pocket_group_init_with_id(uint32_t id,
                                           bool is_hidden,
                                           bool synchronized,
                                           bool deleted,
-                                          uint64_t timestamp_creation) {
-    pocket_group_t *group = (pocket_group_t *)malloc(sizeof(pocket_group_t));
+                                          uint64_t timestamp_creation)
+{
+    auto group = new(nothrow) pocket_group_t;
     if (!group) return nullptr;
 
-    group->_id = id;
+    group->id = id;
     group->server_id = server_id;
     group->user_id = user_id;
     group->group_id = group_id;
@@ -71,18 +77,13 @@ pocket_group_t* pocket_group_init_with_id(uint32_t id,
     group->group_field_id = group_field_id;
     group->server_group_field_id = server_group_field_id;
 
-    // Copia sicura delle stringhe
     group->title = strdup(title);
     group->icon = strdup(icon);
     group->note = strdup(note);
-    group->value = strdup(value);
 
-    if (!group->title || !group->icon || !group->note || !group->value) {
-        free(group->title);
-        free(group->icon);
-        free(group->note);
-        free(group->value);
-        free(group);
+    if (!group->title || !group->icon || !group->note)
+    {
+        pocket_group_free(group);
         return nullptr;
     }
 
@@ -94,12 +95,28 @@ pocket_group_t* pocket_group_init_with_id(uint32_t id,
     return group;
 }
 
-void pocket_group_free(pocket_group_t *group) {
-    if (group) {
-        free(group->title);
-        free(group->icon);
-        free(group->note);
-        free(group->value);
-        free(group);
+void pocket_group_free(pocket_group_t *group)
+{
+    if (group)
+    {
+        if (group->title)
+        {
+            delete group->title;
+            group->title = nullptr;
+        }
+
+        if (group->icon)
+        {
+            delete group->icon;
+            group->icon = nullptr;
+        }
+
+        if (group->note)
+        {
+            delete group->note;
+            group->note = nullptr;
+        }
+
+        delete group;
     }
 }
