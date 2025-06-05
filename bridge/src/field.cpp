@@ -89,6 +89,7 @@ inline bool pocket_field_is_null(const pocket_field_t* field)
 
 void pocket_field_free(pocket_field_t* field)
 {
+
  if (field == nullptr)
  {
   return;
@@ -96,15 +97,17 @@ void pocket_field_free(pocket_field_t* field)
 
  if (field->title)
  {
-  free(field->title);
+  delete  field->title;
   field->title = nullptr;
  }
 
  if (field->value)
  {
-  free(field->value);
+  delete field->value;
   field->value = nullptr;
  }
+
+ delete field;
 
 }
 

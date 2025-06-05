@@ -1,60 +1,40 @@
-use std::ffi::CStr;
-use crate::bindings::{pocket_field_new};
+use crate::bindings::{exit, pocket_field_free, pocket_field_new};
 
 mod constants;
 
+#[allow(
+    dead_code,
+)]
 mod models;
 
 #[allow(
-    dead_code, 
-    non_upper_case_globals, 
-    non_camel_case_types, 
+    dead_code,
+    non_upper_case_globals,
+    non_camel_case_types,
     non_snake_case,
     unused_imports,
     improper_ctypes
 )]
 mod bindings;
 
+
 fn main() {
     unsafe {
-        let pippo = pocket_field_new();
+        let pocket_field = pocket_field_new();
 
-        // Dereferenzia il puntatore per accedere ai campi della struttura
-        if !pippo.is_null() {
-            let field = *pippo; // dereference using `&*`
-
-            // Sicurezza del puntatore per title e value
-            let title: Option<String> = if !field.title.is_null() {
-                CStr::from_ptr(field.title).to_string_lossy().into_owned()
-                    .into()
-            } else {
-                None
+        if !pocket_field.is_null() {
+            let mut pocket_field_wrap = match (*pocket_field).to_field() {
+                None => exit(1),
+                Some(wrap) => wrap
             };
+            pocket_field_free(pocket_field);
 
-            let value: Option<String> = if !field.value.is_null() {
-                CStr::from_ptr(field.value).to_string_lossy().into_owned()
-                    .into()
-            } else {
-                None
-            };
+            pocket_field_wrap.title = Some("test".to_string());
+            pocket_field_wrap.value = Some("ciao ciao".to_string());
 
-            // Stampa la proprietà deleted
-            println!("Hello, world! {:?}", field.deleted);
+            let back = pocket_field_wrap.to_pocket_field_t();
+            pocket_field_free(back);
 
-            // Stampa i valori title e value se non sono nullo
-            if let Some(title_str) = title {
-                println!("Title: {}", title_str);
-            } else {
-                println!("Title is null");
-            }
-
-            if let Some(value_str) = value {
-                println!("Value: {}", value_str);
-            } else {
-                println!("Value is null");
-            }
-        } else {
-            eprintln!("pocket_field_new() returned a null pointer!");
         }
     }
 }
