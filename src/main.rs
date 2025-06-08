@@ -1,4 +1,5 @@
-use crate::bindings::{exit, pocket_field_free, pocket_field_new};
+use crate::services::data::Data;
+use crate::services::cli::Cli;
 
 mod constants;
 
@@ -16,25 +17,10 @@ mod models;
     improper_ctypes
 )]
 mod bindings;
-
+mod socket;
+mod services;
+mod utils;
 
 fn main() {
-    unsafe {
-        let pocket_field = pocket_field_new();
-
-        if !pocket_field.is_null() {
-            let mut pocket_field_wrap = match (*pocket_field).to_field() {
-                None => exit(1),
-                Some(wrap) => wrap
-            };
-            pocket_field_free(pocket_field);
-
-            pocket_field_wrap.title = Some("test".to_string());
-            pocket_field_wrap.value = Some("ciao ciao".to_string());
-
-            let back = pocket_field_wrap.to_pocket_field_t();
-            pocket_field_free(back);
-
-        }
-    }
+    let data = Data::init();
 }
