@@ -8,7 +8,8 @@ use warp::{
     ws::{Message, Ws},
     Filter,
 };
-use crate::socket::ws_conn;
+use crate::services::data::Data;
+use crate::socket::{ws_conn};
 
 #[derive(Debug, Clone)]
 /// Defines the structure for connected websocket client
@@ -29,7 +30,12 @@ pub fn with_clients(clients: Clients) -> impl Filter<Extract = (Clients,), Error
 }
 
 /// Function to run the websocket server on given IP address and Port number
-pub async fn start(ip_addr: Ipv4Addr, port: u16, ssl_cert: &str,  ssl_key: &str) {
+pub async fn start(data: &Data) {
+
+    let ip_addr: Ipv4Addr = data.ip.parse().unwrap();
+
+    // ws_server::start(ip_addr, data.port, &data.ssl_cert, &data.ssl_key).await;
+    
     // Creating new instance of the "Clients" type
     let clients: Clients = Arc::new(Mutex::new(HashMap::new()));
 
@@ -48,15 +54,15 @@ pub async fn start(ip_addr: Ipv4Addr, port: u16, ssl_cert: &str,  ssl_key: &str)
     // Adding a CORS filter that allows any origin
     let routes = ws_route.with(warp::cors().allow_any_origin());
 
-    println!("Starting server @ {}:{}", ip_addr, port);
+    println!("Starting server @ {}:{}", ip_addr, data.port);
 
     // Running the Warp server on given IP address and Port number
     //warp::serve(routes).run((ip_addr, port)).await;
     warp::serve(routes)
         .tls()
-        .cert_path(ssl_cert)
-        .key_path(ssl_key)
-        .run((ip_addr, port)).await;
+        .cert_path(&data.ssl_cert)
+        .key_path(&data.ssl_key)
+        .run((ip_addr, data.port)).await;
 }
 
 /// Handler function to receive the HashMap of clients, and pass this to the client_connection function in the ws module
