@@ -1,5 +1,4 @@
 use crate::services::data::Data;
-use crate::socket::ws_server::start;
 
 mod constants;
 
@@ -17,16 +16,17 @@ mod models;
     improper_ctypes
 )]
 mod bindings;
-mod socket;
 mod services;
 mod utils;
-
-//openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout ssl_privkey.pem -out ssl_cert.pem
+mod traits;
+mod controllers;
+mod rests;
+//https://medium.com/@AlexanderObregon/building-restful-apis-with-rust-and-warp-70a6159fd804
 
 #[tokio::main]
 async fn main() {
     match Data::init() {
-        Ok(data) => start(&data).await,
+        Ok(data) => {},
         Err(err) => panic!("{}", err)
     };
 }

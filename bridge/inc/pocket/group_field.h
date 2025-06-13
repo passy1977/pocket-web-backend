@@ -25,10 +25,11 @@
 
 typedef struct {
     bool new_insertion;
-    uint32_t id;
-    uint32_t server_id;
-    uint32_t group_id;
-    uint32_t server_group_id;
+    int64_t id;
+    int64_t server_id;
+    int64_t user_id;
+    int64_t group_id;
+    int64_t server_group_id;
     char* title;
     bool is_hidden;
     bool synchronized;
@@ -37,11 +38,11 @@ typedef struct {
 } pocket_group_field_t;
 
 pocket_group_field_t* pocket_group_field_init(void);
-pocket_group_field_t* pocket_group_field_init_with_id(uint32_t id,
-                                                      uint32_t server_id,
-                                                      uint32_t user_id,
-                                                      uint32_t group_id,
-                                                      uint32_t server_group_id,
+pocket_group_field_t* pocket_group_field_init_with_id(int64_t id,
+                                                      int64_t server_id,
+                                                      int64_t user_id,
+                                                      int64_t group_id,
+                                                      int64_t server_group_id,
                                                       const char *title,
                                                       bool is_hidden,
                                                       bool synchronized,

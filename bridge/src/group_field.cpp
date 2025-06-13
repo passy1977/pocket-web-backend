@@ -43,11 +43,11 @@ pocket_group_field_t* pocket_group_field_init() {
     return group_field;
 }
 
-pocket_group_field_t* pocket_group_field_init_with_id(uint32_t id,
-                                                      uint32_t server_id,
-                                                      uint32_t user_id,
-                                                      uint32_t group_id,
-                                                      uint32_t server_group_id,
+pocket_group_field_t* pocket_group_field_init_with_id(int64_t id,
+                                                      int64_t server_id,
+                                                      int64_t user_id,
+                                                      int64_t group_id,
+                                                      int64_t server_group_id,
                                                       const char *title,
                                                       bool is_hidden,
                                                       bool synchronized,
@@ -58,6 +58,7 @@ pocket_group_field_t* pocket_group_field_init_with_id(uint32_t id,
 
     group_field->new_insertion = false;
     group_field->id = id;
+    group_field->user_id = user_id;
     group_field->server_id = server_id;
     group_field->group_id = group_id;
     group_field->server_group_id = server_group_id;

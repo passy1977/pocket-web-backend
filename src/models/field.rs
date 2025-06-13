@@ -1,5 +1,6 @@
 use crate::bindings::{free, pocket_field_new_with_args, pocket_field_t};
 use std::ffi::{c_void, CStr, CString};
+use serde::{Deserialize, Serialize};
 
 impl pocket_field_t {
 
@@ -44,6 +45,7 @@ impl pocket_field_t {
 }
 
 #[warn(dead_code)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Field {
     pub id: i64,
     pub server_id: i64,
@@ -118,20 +120,8 @@ impl Field {
 
             ret
         };
-
-
-        return ret;
+        
+        ret
     }
 }
 
-
-pub struct FieldController {
-
-}
-
-impl FieldController {
-
-    pub fn new() -> Self {
-        Self {}
-    }
-}

@@ -19,7 +19,7 @@ pub struct Cli {
 }
 
 impl Cli {
-    pub fn update(data : &mut Data) {
+    pub fn update(data: &mut Data) {
         let cli = Cli::parse();
 
         if let Some(ip) = cli.ip.as_ref() {
@@ -30,7 +30,7 @@ impl Cli {
                 }    
             }
         }
-
+        
         if let Some(port) = cli.port.as_ref() {
             if data.port != *port {
                 data.port = *port;

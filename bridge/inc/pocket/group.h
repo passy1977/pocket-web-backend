@@ -30,17 +30,16 @@ extern "C" {
 #endif
 
 typedef struct {
-    uint32_t id;
-    uint32_t server_id;
-    uint32_t user_id;
-    uint32_t group_id;
-    uint32_t server_group_id;
-    uint32_t group_field_id;
-    uint32_t server_group_field_id;
+    int64_t id;
+    int64_t server_id;
+    int64_t user_id;
+    int64_t group_id;
+    int64_t server_group_id;
+    int64_t group_field_id;
+    int64_t server_group_field_id;
     char* title; // Usare char* o un altro tipo stringa C appropriato
     char* icon;
     char* note;
-    char* value;
     bool is_hidden;
     bool synchronized;
     bool deleted;
@@ -49,18 +48,14 @@ typedef struct {
 
 pocket_group_t* pocket_group_init(void);
 
-pocket_group_t* pocket_group_init_with_id(uint32_t id,
-                                          uint32_t server_id,
-                                          uint32_t user_id,
-                                          uint32_t group_id,
-                                          uint32_t server_group_id,
-                                          uint32_t group_field_id,
-                                          uint32_t server_group_field_id,
+pocket_group_t* pocket_group_init_with_id(int64_t id,
+                                          int64_t server_id,
+                                          int64_t user_id,
+                                          int64_t group_id,
+                                          int64_t server_group_id,
                                           const char *title,
                                           const char *icon,
                                           const char *note,
-                                          const char *value,
-                                          bool is_hidden,
                                           bool synchronized,
                                           bool deleted,
                                           uint64_t timestamp_creation);
