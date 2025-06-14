@@ -1,9 +1,9 @@
 use std::{error, fmt};
 
-pub type Result<T, E = &'static str> = std::result::Result<T, E>;
+pub(crate) type Result<T, E = &'static str> = std::result::Result<T, E>;
 
 #[derive(Debug, PartialEq, Eq)]
-pub enum Error {
+pub(crate)  enum Error {
     Undefine,
     Msg(String)
 }

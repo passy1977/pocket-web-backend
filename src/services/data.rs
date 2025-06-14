@@ -1,4 +1,4 @@
-use crate::constants::{data::*, socket::*};
+use crate::constants::{data::*, conf::*, jwt::{JWT_AUD, JWT_ISS}};
 use crate::utils::Result;
 use crate::services::cli::Cli;
 use std::path::{Path, PathBuf};
@@ -13,20 +13,18 @@ pub struct Data {
     #[serde(skip_serializing, skip_deserializing)]
     file_data_path: PathBuf,
 
-    /// Ip where WebSocket listen
+    /// IP address on which the server listens
     pub ip: String,
 
     /// Connection port
     pub port: u16,
 
-    ///Path and filename where find ssl cert
-    pub ssl_cert: String,
+    pub jwt_iss: String,
 
-    ///Path and filename where find key cert
-    pub ssl_key: String,
-
+    pub jwt_aud: String,
+    
     #[serde(skip_serializing, skip_deserializing)]
-    pub update : bool
+    pub(super) update : bool
     
 }
 
@@ -69,8 +67,8 @@ impl Data {
             file_data_path,
             ip: IP.to_string(),
             port: PORT,
-            ssl_cert: SSL_CERT.to_string(),
-            ssl_key: SSL_KEY.to_string(),
+            jwt_iss: JWT_ISS.to_string(),
+            jwt_aud: JWT_AUD.to_string(),
             update: false
         };
         
@@ -101,8 +99,8 @@ impl Data {
 
         self.ip = data.ip;
         self.port = data.port;
-        self.ssl_cert = data.ssl_cert;
-        self.ssl_key = data.ssl_key;
+        self.jwt_aud = data.jwt_aud;
+        self.jwt_iss = data.jwt_iss;
         self.update = false;
 
         Ok(())

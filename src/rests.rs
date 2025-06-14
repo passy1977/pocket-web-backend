@@ -1,1 +1,2 @@
-pub(crate) mod put_handler;
+pub(crate) mod handlers;
+pub(crate) mod server;

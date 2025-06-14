@@ -1,3 +1,10 @@
+use warp::Filter;
+use std::net::{AddrParseError, Ipv4Addr};
+use std::str::FromStr;
+use warp::http::Method;
+use crate::constants::DATA;
+use crate::rests::server;
+use crate::rests::server::start;
 use crate::services::data::Data;
 
 mod constants;
@@ -25,8 +32,18 @@ mod rests;
 
 #[tokio::main]
 async fn main() {
-    match Data::init() {
-        Ok(data) => {},
+    let data = match Data::init() {
+        Ok(data) => data,
         Err(err) => panic!("{}", err)
     };
+    
+    let ip = match Ipv4Addr::from_str(data.ip.as_ref()) {
+        Ok(ip) => ip,
+        Err(_) => panic!("Invalid IP Address provided!")
+    };
+
+    unsafe { DATA = Some(data); }
+    
+    start(ip, 8080).await;
+
 }
