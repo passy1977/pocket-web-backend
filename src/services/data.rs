@@ -1,4 +1,4 @@
-use crate::constants::{data::*, conf::*, jwt::{JWT_AUD, JWT_ISS}};
+use crate::constants::{data::*, conf::*, jwt::{JWT_AUD, JWT_ISS, SECRET}};
 use crate::utils::Result;
 use crate::services::cli::Cli;
 use std::path::{Path, PathBuf};
@@ -6,6 +6,7 @@ use std::{env, fs};
 use std::fs::File;
 use std::io::{self, Read, Write};
 use serde::{Deserialize, Serialize};
+
 
 #[derive(Serialize, Deserialize)]
 pub struct Data {
@@ -23,9 +24,10 @@ pub struct Data {
 
     pub jwt_aud: String,
     
+    pub jwt_secret: String,
+
     #[serde(skip_serializing, skip_deserializing)]
     pub(super) update : bool
-    
 }
 
 
@@ -69,10 +71,12 @@ impl Data {
             port: PORT,
             jwt_iss: JWT_ISS.to_string(),
             jwt_aud: JWT_AUD.to_string(),
+            jwt_secret: SECRET.to_string(),
             update: false
         };
         
         if let Err(e) = ret.load() {
+            ret.update = true;
             eprintln!("Error loading data: {e}");
         }
 
@@ -101,6 +105,7 @@ impl Data {
         self.port = data.port;
         self.jwt_aud = data.jwt_aud;
         self.jwt_iss = data.jwt_iss;
+        self.jwt_secret = data.jwt_secret;
         self.update = false;
 
         Ok(())

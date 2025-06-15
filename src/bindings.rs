@@ -1755,7 +1755,7 @@ pub type user_stat_t = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct pocket_user_t {
-    pub id: u32,
+    pub id: i64,
     pub email: *mut ::std::os::raw::c_char,
     pub name: *mut ::std::os::raw::c_char,
     pub passwd: *mut ::std::os::raw::c_char,

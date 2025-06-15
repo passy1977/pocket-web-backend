@@ -10,31 +10,19 @@ pub struct Claims {
     pub sub: String,
     pub company: String,
     pub exp: usize,
-    pub jwt_iss: String,
-    pub jwt_aud: String,
-}
-
-
-impl Claims {
-
-    pub fn new() -> Self {
-        Self {
-            sub: "".to_string(),
-            company: "".to_string(),
-            exp: 0,
-            jwt_iss: "".to_string(),
-            jwt_aud: "".to_string(),
-        }
-    }
+    pub iss: String,
+    pub aud: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct DataTransport {
     pub path: String,
+    pub title: String,
     pub jwt: Option<String>,
-    pub groups: Vec<Group>,
-    pub group_fields: Vec<GroupField>,
-    pub fields: Vec<Field>,
+    pub groups: Option<Vec<Group>>,
+    pub group_fields: Option<Vec<GroupField>>,
+    pub fields: Option<Vec<Field>>,
+    pub data: Option<String>,
 }
 
 impl FromStr for DataTransport {
@@ -49,13 +37,15 @@ impl FromStr for DataTransport {
 }
 
 impl DataTransport {
-    pub fn new() -> Self {
+    pub fn default() -> Self {
         Self {
             path: "".to_string(),
+            title: "".to_string(),
             jwt: None,
-            groups: vec![],
-            group_fields: vec![],
-            fields: vec![],
+            groups: None,
+            group_fields: None,
+            fields: None,
+            data: None
         }
     }
     

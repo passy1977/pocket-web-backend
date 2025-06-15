@@ -2,12 +2,14 @@ use crate::services::data::Data;
 
 pub(crate) mod conf {
     pub const IP: &str = "127.0.0.1";
-    pub const PORT :u16 = 10010;
+    pub const PORT :u16 = 8080;
 }
 
 pub(crate) mod jwt {
     pub const JWT_ISS: &str = "http://localhost:8080/";
     pub const JWT_AUD:  &str = "http://localhost:8000";
+    
+    pub const SECRET:  &str = "verysecretsecret";
 }
 
 pub(crate)  mod data {

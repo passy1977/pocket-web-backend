@@ -1,4 +1,3 @@
-use warp::Filter;
 use warp::reject::Reject;
 use crate::models::rest::DataTransport;
 
@@ -19,7 +18,7 @@ pub async fn get_post(request: DataTransport) -> Result<impl warp::Reply, warp::
     // For simplicity, let's say we are returning a static post
 
 
-    let ret = DataTransport::new();
+    let ret = DataTransport::default();
 
 
     Ok(warp::reply::json(&ret))

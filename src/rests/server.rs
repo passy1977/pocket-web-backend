@@ -2,7 +2,7 @@ use std::net::Ipv4Addr;
 use warp::Filter;
 use warp::http::Method;
 use crate::models::rest::DataTransport;
-use crate::rests::handlers::{get_post, login};
+use crate::rests::handlers::{login};
 
 
 
@@ -22,6 +22,12 @@ pub async fn start(ip : Ipv4Addr, port :  u16) {
             "Origin",
             "Access-Control-Request-Method",
             "Access-Control-Request-Headers",
+            "Access-Control-Allow-Origin",
+            "X-Api-Key",
+            "X-Requested-With",
+            "Content-Type", 
+            "Accept", 
+            "Authorization"
         ])
         .allow_methods(&[Method::PUT, Method::DELETE, Method::POST, Method::GET])
         .build();

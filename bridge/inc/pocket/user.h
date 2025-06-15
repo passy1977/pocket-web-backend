@@ -36,7 +36,7 @@ typedef enum {
 } user_stat_t;
 
 typedef struct {
-    uint32_t id;
+    int64_t id;
     char* email; // Usare char* o un altro tipo stringa C appropriato
     char* name;
     char* passwd;
