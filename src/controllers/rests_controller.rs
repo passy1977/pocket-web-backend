@@ -1,14 +1,16 @@
+use actix_web::HttpResponse;
+use actix_web::web::Json;
 use jsonwebtoken::{encode, EncodingKey, Header};
 use crate::constants::{DATA, jwt::SECRET};
-use crate::models::rest::{Claims, DataTransport};
+use crate::models::rests::{Claims, DataTransport};
 use crate::services::data::Data;
 use crate::utils::Result;
 
-pub fn login(request: DataTransport) -> Result<DataTransport> {
+pub fn login(request: Json<DataTransport>) -> HttpResponse {
     
     let data = unsafe {
         match (&raw const DATA).read() {
-            None => return Err("DATA not ready".into()),
+            None => return HttpResponse::InternalServerError().body("DATA not ready"),
             Some(data) => data
         }
     };
@@ -23,14 +25,14 @@ pub fn login(request: DataTransport) -> Result<DataTransport> {
 
     let jwt = match encode(&Header::default(), &claims, &EncodingKey::from_secret(data.jwt_secret.as_bytes())) {
         Ok(token) => Some(token),
-        Err(err) => return Err("Impossible generate d token".into())
+        Err(err) => return HttpResponse::InternalServerError().body("Impossible generate d token")
     };
-    
-    
-    Ok(DataTransport {
+
+    HttpResponse::Ok().json(DataTransport {
         path: "/registration".to_string(),
         title: "Registration".to_string(),
         jwt,
         ..DataTransport::default()
     })
+    
 }

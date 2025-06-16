@@ -1,3 +1,4 @@
 pub(crate) mod data;
 pub(crate) mod cli;
-mod session;
+pub(crate) mod session;
+pub(crate) mod rest;

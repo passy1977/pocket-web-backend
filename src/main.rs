@@ -1,10 +1,6 @@
-use warp::Filter;
-use std::net::{AddrParseError, Ipv4Addr};
-use std::str::FromStr;
-use warp::http::Method;
+use actix_web::{App, HttpServer};
 use crate::constants::DATA;
-use crate::rests::server;
-use crate::rests::server::start;
+use crate::controllers::rests_controller::login;
 use crate::services::data::Data;
 
 mod constants;
@@ -27,24 +23,27 @@ mod services;
 mod utils;
 mod traits;
 mod controllers;
-mod rests;
 //https://medium.com/@AlexanderObregon/building-restful-apis-with-rust-and-warp-70a6159fd804
 
-#[tokio::main]
-async fn main() {
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
     let data = match Data::init() {
         Ok(data) => data,
         Err(err) => panic!("{}", err)
     };
     
     let port = data.port;
-    let ip = match Ipv4Addr::from_str(data.ip.as_ref()) {
-        Ok(ip) => ip,
-        Err(_) => panic!("Invalid IP Address provided!")
-    };
+    let ip = data.ip.clone();
+        
 
     unsafe { DATA = Some(data); }
+
+    println!("Starting server at http://{ip}:{port}");
     
-    start(ip, port).await;
+    HttpServer::new(|| {
+        App::new().service(login) 
+    }).bind((ip, port))?
+        .run()
+        .await
 
 }
