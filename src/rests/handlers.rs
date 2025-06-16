@@ -1,3 +1,5 @@
+use warp::{header, Reply};
+use warp::http::StatusCode;
 use warp::reject::Reject;
 use crate::models::rest::DataTransport;
 
@@ -27,7 +29,12 @@ pub async fn get_post(request: DataTransport) -> Result<impl warp::Reply, warp::
 pub(super) async fn login(request: DataTransport) -> Result<impl warp::Reply, warp::Rejection> {
 
     match crate::controllers::rests_controller::login(request) {
-        Ok(response) => Ok(warp::reply::json(&response)),
+        Ok(response) => {
+
+            Ok(warp::reply::with_header(warp::reply::json(&response),  "content-type", "application/json"))
+            
+            //Ok(warp::reply::json(&response))
+        }
         Err(err) =>  Err(warp::reject::custom(FailureReason { reason: err }))
     }
     

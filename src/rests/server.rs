@@ -12,24 +12,10 @@ fn json_body() -> impl Filter<Extract = (DataTransport,), Error = warp::Rejectio
     warp::body::content_length_limit(1_024 * 10).and(warp::body::json())
 }
 
-pub async fn start(ip : Ipv4Addr, port :  u16) {
-    let cors = warp::cors()
-        .allow_any_origin()
-        .allow_headers(vec![
-            "User-Agent",
-            "Sec-Fetch-Mode",
-            "Referer",
-            "Origin",
-            "Access-Control-Request-Method",
-            "Access-Control-Request-Headers",
-            "Access-Control-Allow-Origin",
-            "X-Api-Key",
-            "X-Requested-With",
-            "Content-Type", 
-            "Accept", 
-            "Authorization"
-        ])
-        .allow_methods(&[Method::PUT, Method::DELETE, Method::POST, Method::GET])
+pub async fn start(ip : Ipv4Addr, port : u16) {
+    let cors = warp::cors().allow_any_origin()
+        .allow_headers(vec!["Access-Control-Allow-Headers", "Access-Control-Request-Method", "Access-Control-Request-Headers", "Origin", "Accept", "X-Requested-With", "Content-Type"])
+        .allow_methods(&[Method::GET, Method::POST, Method::PUT, Method::PATCH, Method::DELETE, Method::OPTIONS, Method::HEAD])
         .build();
 
 

@@ -37,6 +37,7 @@ async fn main() {
         Err(err) => panic!("{}", err)
     };
     
+    let port = data.port;
     let ip = match Ipv4Addr::from_str(data.ip.as_ref()) {
         Ok(ip) => ip,
         Err(_) => panic!("Invalid IP Address provided!")
@@ -44,6 +45,6 @@ async fn main() {
 
     unsafe { DATA = Some(data); }
     
-    start(ip, 8080).await;
+    start(ip, port).await;
 
 }
