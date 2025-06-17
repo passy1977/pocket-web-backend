@@ -1,3 +1,6 @@
 [submodule "bridge/pocket-lib"]
 	path = bridge/pocket-lib
 	url = https://github.com/passy1977/pocket-lib.git
+[submodule "statics"]
+	path = statics
+	url = https://github.com/passy1977/pocket-web-frontend.git

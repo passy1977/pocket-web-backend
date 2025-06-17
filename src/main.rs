@@ -1,7 +1,6 @@
-use actix_web::{App, HttpServer};
 use crate::constants::DATA;
-use crate::controllers::rests_controller::login;
 use crate::services::data::Data;
+use crate::services::http_server::server;
 
 mod constants;
 
@@ -38,12 +37,7 @@ async fn main() -> std::io::Result<()> {
 
     unsafe { DATA = Some(data); }
 
-    println!("Starting server at http://{ip}:{port}");
     
-    HttpServer::new(|| {
-        App::new().service(login) 
-    }).bind((ip, port))?
-        .run()
-        .await
-
+    
+    server::start(ip, port).await
 }
