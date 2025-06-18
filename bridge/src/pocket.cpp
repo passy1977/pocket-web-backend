@@ -20,17 +20,30 @@
 
 #include "pocket/pocket.h"
 
-#include "pocket/globals.hpp"
+#include <cstring>
 
-pocket_t* pocket_init(void)
+#include "pocket/globals.hpp"
+#include <new>
+using namespace std;
+
+
+pocket_t* pocket_new(void)
 {
-    return nullptr;
+    const auto pocket = new(nothrow) pocket_t;
+    if (pocket == nullptr)
+    {
+        return nullptr;
+    }
+
+    memset(pocket, 0, sizeof(pocket_t));
+
+    return pocket;
 }
 
-pocket_t* pocket_shared(void)
+void pocket_free(const pocket_t* pocket)
 {
-
-    return nullptr;
+    if (pocket == nullptr) return;
+    delete pocket;
 }
 
 pocket_stat_t pocket_initialize(pocket_t* self, const char* base_path, const char* config_json,

@@ -1305,11 +1305,18 @@ unsafe extern "C" {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct pocket_session_t {}
+pub struct pocket_session_t {
+    pub session: *mut ::std::os::raw::c_void,
+    pub aes: *mut ::std::os::raw::c_void,
+}
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of pocket_session_t"][::std::mem::size_of::<pocket_session_t>() - 0usize];
-    ["Alignment of pocket_session_t"][::std::mem::align_of::<pocket_session_t>() - 1usize];
+    ["Size of pocket_session_t"][::std::mem::size_of::<pocket_session_t>() - 16usize];
+    ["Alignment of pocket_session_t"][::std::mem::align_of::<pocket_session_t>() - 8usize];
+    ["Offset of field: pocket_session_t::session"]
+        [::std::mem::offset_of!(pocket_session_t, session) - 0usize];
+    ["Offset of field: pocket_session_t::aes"]
+        [::std::mem::offset_of!(pocket_session_t, aes) - 8usize];
 };
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -1320,10 +1327,10 @@ const _: () = {
     ["Alignment of pocket_t"][::std::mem::align_of::<pocket_t>() - 1usize];
 };
 unsafe extern "C" {
-    pub fn pocket_init() -> *mut pocket_t;
+    pub fn pocket_new() -> *mut pocket_t;
 }
 unsafe extern "C" {
-    pub fn pocket_shared() -> *mut pocket_t;
+    pub fn pocket_free(pocket: *const pocket_t);
 }
 unsafe extern "C" {
     pub fn pocket_initialize(

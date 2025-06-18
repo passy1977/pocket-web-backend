@@ -3,6 +3,25 @@ use crate::models::rests::{Claims, DataTransport};
 use actix_web::web::Json;
 use actix_web::HttpResponse;
 use jsonwebtoken::{encode, EncodingKey, Header};
+use ulid::Ulid;
+use crate::bindings::pocket_field_new;
+use crate::services::session::{Sessions, Session};
+
+pub fn hello_controller() -> HttpResponse {
+    
+    Sessions::share().add_session(Session{
+        user_id: "".to_string(),
+        jwt: "".to_string(),
+        timestamp_last_update: 0,
+    });
+    
+    HttpResponse::Ok().json(DataTransport {
+        path: "/login".to_string(),
+        title: "Login".to_string(),
+        ..DataTransport::default()
+    })
+    
+}
 
 pub fn login_controller(_: Json<DataTransport>) -> HttpResponse {
     
@@ -14,8 +33,6 @@ pub fn login_controller(_: Json<DataTransport>) -> HttpResponse {
     };
     
     let claims = Claims {
-        sub: "".to_string(),
-        company: "".to_string(),
         exp: 0,
         iss: data.jwt_iss.clone(),
         aud: data.jwt_aud.clone(),
@@ -27,8 +44,8 @@ pub fn login_controller(_: Json<DataTransport>) -> HttpResponse {
     };
 
     HttpResponse::Ok().json(DataTransport {
-        path: "/registration".to_string(),
-        title: "Registration".to_string(),
+        path: "/home".to_string(),
+        title: "Home".to_string(),
         jwt,
         ..DataTransport::default()
     })

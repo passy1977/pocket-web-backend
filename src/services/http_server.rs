@@ -1,8 +1,8 @@
-use crate::controllers::rests_controller::login_controller;
+use crate::controllers::rests_controller::{hello_controller, login_controller};
 use crate::models::rests::DataTransport;
-use actix_web::{web,  Responder};
-pub async fn hello(info: web::Json<DataTransport>) -> impl Responder {
-    login_controller(info)
+use actix_web::{web, HttpResponse, Responder};
+pub async fn hello() -> impl Responder {
+    hello_controller()
 }
 
 pub async fn login(info: web::Json<DataTransport>) -> impl Responder {
@@ -10,19 +10,19 @@ pub async fn login(info: web::Json<DataTransport>) -> impl Responder {
 }
 
 pub async fn registration(info: web::Json<DataTransport>) -> impl Responder {
-    login_controller(info)
+    HttpResponse::Forbidden().finish()
 }
 
 pub async fn main(info: web::Json<DataTransport>) -> impl Responder {
-    login_controller(info)
+    HttpResponse::Forbidden().finish()
 }
 
 pub async fn field_detail(info: web::Json<DataTransport>) -> impl Responder {
-    login_controller(info)
+    HttpResponse::Forbidden().finish()
 }
 
 pub async fn group_detail(info: web::Json<DataTransport>) -> impl Responder {
-    login_controller(info)
+    HttpResponse::Forbidden().finish()
 }
 
 
@@ -40,14 +40,13 @@ pub mod server {
         HttpServer::new(|| {
             App::new()
                 .wrap(Cors::permissive())
+                .route("/v5/pocket/hello", web::get().to(hello))
+                .route("/v5/pocket/login", web::post().to(login))
+                .route("/v5/pocket/registration", web::post().to(registration))
+                .route("/v5/pocket/main", web::post().to(main))
+                .route("/v5/pocket/field_detail", web::post().to(field_detail))
+                .route("/v5/pocket/group_detail", web::post().to(group_detail))
                 .service(fs::Files::new("/", "./statics").index_file("index.html"))
-                    .route("/hello", web::post().to(hello))
-                    .route("/login", web::post().to(login))
-                    .route("/registration", web::post().to(registration))
-                    .route("/main", web::post().to(main))
-                    .route("/field_detail", web::post().to(field_detail))
-                    .route("/group_detail", web::post().to(group_detail))
-            
             })
             .bind((ip, port))?
             .run()

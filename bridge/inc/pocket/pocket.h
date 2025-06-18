@@ -32,7 +32,8 @@ extern "C" {
 
 typedef struct
 {
-
+    void* session;
+    void* aes;
 } pocket_session_t;
 
 typedef struct
@@ -40,8 +41,8 @@ typedef struct
 
 } pocket_t;
 
-pocket_t* pocket_init(void);
-pocket_t* pocket_shared(void);
+pocket_t* pocket_new(void);
+void pocket_free(const pocket_t* pocket);
 
 pocket_stat_t pocket_initialize(pocket_t* self, const char* base_path, const char* config_json, const char* passwd);
 pocket_stat_t pocket_login(pocket_t* self, const char* email, const char* passwd);

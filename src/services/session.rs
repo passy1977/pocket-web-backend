@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
+use crate::bindings::pocket_t;
 
 #[derive(Clone)]
 pub struct Session {
@@ -7,7 +8,7 @@ pub struct Session {
     pub user_id: String,
 
     pub jwt: String,
-
+    
     pub timestamp_last_update: u64
 }
 
@@ -25,7 +26,7 @@ impl Sessions {
     }
 
     // Public method to get the singleton instance
-    pub fn instance() -> Arc<Self> {
+    pub fn share() -> Arc<Self> {
         static INSTANCE: once_cell::sync::Lazy<Arc<Sessions>> = once_cell::sync::Lazy::new(|| {
             Arc::new(Sessions::new())
         });
