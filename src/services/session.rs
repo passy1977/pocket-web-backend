@@ -1,19 +1,53 @@
+use crate::bindings::{pocket_free, pocket_new, pocket_t};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use crate::bindings::pocket_t;
+use std::time::{SystemTime, UNIX_EPOCH};
+use ulid::Ulid;
 
 #[derive(Clone)]
 pub struct Session {
     /// Unique identifier (ulid) for users who are using the client
-    pub user_id: String,
+    pub session_id: String,
 
-    pub jwt: String,
+    pub jwt: Option<String>,
+    
+    pub pocket: *mut pocket_t,
     
     pub timestamp_last_update: u64
 }
 
+unsafe impl Send for Sessions {}
+unsafe impl Sync for Sessions {}
+
+impl Session {
+    pub fn new() -> Session {
+        Self {
+            session_id: Ulid::new().to_string(),
+            jwt: None,
+            pocket: unsafe { pocket_new() },
+            timestamp_last_update: match SystemTime::now().duration_since(UNIX_EPOCH) {
+                Ok(duration) => duration.as_secs(), 
+                Err(_) => 0
+            }
+        }
+    }
+    
+    pub fn update_timestamp_last_update(&mut self)  {
+        self.timestamp_last_update = match SystemTime::now().duration_since(UNIX_EPOCH) {
+            Ok(duration) => duration.as_secs(),
+            Err(_) => 0
+        };
+    }
+
+    pub fn free(&mut self) {
+        unsafe {
+            pocket_free(self.pocket);
+        }
+    }
+}
+
 pub struct Sessions {
-    sessions: Mutex<HashMap<String, Session>>, // Using a HashMap to store sessions by user_id
+    sessions: Mutex<HashMap<String, Session>>, // Using a HashMap to store sessions by session_id
 }
 
 
@@ -35,20 +69,20 @@ impl Sessions {
     }
 
     // Method to add a session
-    pub fn add_session(&self, session: Session) {
+    pub fn add(&self, session: Session) {
         let mut sessions = self.sessions.lock().unwrap();
-        sessions.insert(session.user_id.clone(), session);
+        sessions.insert(session.session_id.clone(), session);
     }
 
-    // Method to get a session by user_id
-    pub fn get_session(&self, user_id: &str) -> Option<Session> {
+    // Method to get a session by session_id
+    pub fn get(&self, session_id: &str) -> Option<Session> {
         let sessions = self.sessions.lock().unwrap();
-        sessions.get(user_id).cloned()
+        sessions.get(session_id).cloned()
     }
 
-    // Method to remove a session by user_id
-    pub fn remove_session(&self, user_id: &str) {
+    // Method to remove a session by session_id
+    pub fn remove(&self, session_id: &str) {
         let mut sessions = self.sessions.lock().unwrap();
-        sessions.remove(user_id);
+        sessions.remove(session_id);
     }
 }

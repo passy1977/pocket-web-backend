@@ -7,6 +7,7 @@ use crate::models::group_field::GroupField;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
+    pub sub: String,
     pub exp: usize,
     pub iss: String,
     pub aud: String,
@@ -16,7 +17,7 @@ pub struct Claims {
 pub struct DataTransport {
     pub path: String,
     pub title: String,
-    pub lid: Option<String>,
+    pub session_id: String,
     pub jwt: Option<String>,
     pub groups: Option<Vec<Group>>,
     pub group_fields: Option<Vec<GroupField>>,
@@ -40,7 +41,7 @@ impl DataTransport {
         Self {
             path: "".to_string(),
             title: "".to_string(),
-            lid: None,
+            session_id: "".to_string(),
             jwt: None,
             groups: None,
             group_fields: None,

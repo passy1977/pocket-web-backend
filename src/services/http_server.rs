@@ -5,23 +5,23 @@ pub async fn hello() -> impl Responder {
     hello_controller()
 }
 
-pub async fn login(info: web::Json<DataTransport>) -> impl Responder {
-    login_controller(info)
+pub async fn login(data_transport: web::Json<DataTransport>) -> impl Responder {
+    login_controller(data_transport)
 }
 
-pub async fn registration(info: web::Json<DataTransport>) -> impl Responder {
+pub async fn registration(_info: web::Json<DataTransport>) -> impl Responder {
     HttpResponse::Forbidden().finish()
 }
 
-pub async fn main(info: web::Json<DataTransport>) -> impl Responder {
+pub async fn main(_info: web::Json<DataTransport>) -> impl Responder {
     HttpResponse::Forbidden().finish()
 }
 
-pub async fn field_detail(info: web::Json<DataTransport>) -> impl Responder {
+pub async fn field_detail(_info: web::Json<DataTransport>) -> impl Responder {
     HttpResponse::Forbidden().finish()
 }
 
-pub async fn group_detail(info: web::Json<DataTransport>) -> impl Responder {
+pub async fn group_detail(_info: web::Json<DataTransport>) -> impl Responder {
     HttpResponse::Forbidden().finish()
 }
 
