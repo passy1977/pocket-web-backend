@@ -1,5 +1,6 @@
 use crate::bindings::{pocket_free, pocket_new, pocket_t};
 use std::collections::HashMap;
+use std::ptr::null_mut;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 use ulid::Ulid;
@@ -40,9 +41,7 @@ impl Session {
     }
 
     pub fn free(&mut self) {
-        unsafe {
-            pocket_free(self.pocket);
-        }
+        unsafe { pocket_free(self.pocket); }
     }
 }
 
@@ -83,6 +82,16 @@ impl Sessions {
     // Method to remove a session by session_id
     pub fn remove(&self, session_id: &str) {
         let mut sessions = self.sessions.lock().unwrap();
-        sessions.remove(session_id);
+        
+        if let Some(session) = sessions.get(session_id) {
+            
+            unsafe {
+                if session.pocket != null_mut() {
+                    pocket_free(session.pocket);    
+                }
+            }
+            
+            sessions.remove(session_id);    
+        }
     }
 }

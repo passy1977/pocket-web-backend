@@ -29,16 +29,11 @@
 extern "C" {
 #endif
 
-
 typedef struct
 {
     void* session;
+    void* user;
     void* aes;
-} pocket_session_t;
-
-typedef struct
-{
-
 } pocket_t;
 
 pocket_t* pocket_new(void);
@@ -51,8 +46,6 @@ pocket_stat_t pocket_change_passwd(pocket_t* self, const char* full_path_file, c
 bool pocket_copy_group(pocket_t* self, int64_t group_id_src, int64_t group_id_dst, bool move);
 bool pocket_copy_field(pocket_t* self, int64_t field_id_src, int64_t group_id_dst, bool move);
 pocket_stat_t pocket_send_data(pocket_t* self);
-
-pocket_session_t* pocket_get_session(const pocket_t* self);
 
 #ifdef __cplusplus
 }

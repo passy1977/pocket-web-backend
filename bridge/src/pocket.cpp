@@ -17,13 +17,23 @@
 *
 ***************************************************************************/
 
+#include "pocket/globals.hpp"
+using namespace pocket;
+
+#include "pocket-controllers/session.hpp"
+using controllers::session;
+
+#include "pocket-services/crypto.hpp"
+using namespace services;
+
+#include "pocket-pods/user.hpp"
+using pods::user;
 
 #include "pocket/pocket.h"
 
-#include <cstring>
-
-#include "pocket/globals.hpp"
+#include <memory>
 #include <new>
+#include <cstring>
 using namespace std;
 
 
@@ -46,9 +56,9 @@ void pocket_free(const pocket_t* pocket)
     delete pocket;
 }
 
-pocket_stat_t pocket_initialize(pocket_t* self, const char* base_path, const char* config_json,
-    const char* passwd)
+pocket_stat_t pocket_initialize(pocket_t* self, const char* base_path, const char* config_json, const char* passwd)
 {
+
     return OK;
 }
 
@@ -80,9 +90,4 @@ bool pocket_copy_field(pocket_t* self, int64_t field_id_src, int64_t group_id_ds
 pocket_stat_t pocket_send_data(pocket_t* self)
 {
     return OK;
-}
-
-pocket_session_t* pocket_get_session(const pocket_t* self)
-{
-    return nullptr;
 }

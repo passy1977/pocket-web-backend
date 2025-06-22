@@ -4,15 +4,17 @@ use crate::services::cli::Cli;
 use std::path::{Path, PathBuf};
 use std::{env, fs};
 use std::fs::File;
-use std::io::{self, Read, Write};
+use std::io::{self, Error, ErrorKind, Read, Write};
 use serde::{Deserialize, Serialize};
-
 
 #[derive(Serialize, Deserialize)]
 pub struct Data {
 
     #[serde(skip_serializing, skip_deserializing)]
     file_data_path: PathBuf,
+
+    #[serde(skip_serializing, skip_deserializing)]
+    dir_path: PathBuf,
 
     /// IP address on which the server listens
     pub ip: String,
@@ -67,6 +69,7 @@ impl Data {
 
         let mut ret = Self {
             file_data_path,
+            dir_path,
             ip: IP.to_string(),
             port: PORT,
             jwt_iss: JWT_ISS.to_string(),
@@ -120,4 +123,33 @@ impl Data {
 
         Ok(())
     }
+    
+    pub fn load_json_config(&self, email: &String) -> Result<String, Error> {
+
+        if !self.dir_path.exists() {
+            return Err(Error::new(ErrorKind::NotFound, "Dir not exist {dir_path}"))
+        }
+
+        let json_config_file = self.dir_path.join(email).join(".json");
+        if !json_config_file.exists() {
+            return Err(Error::new(ErrorKind::NotFound, "File not exist {json_config_file}"))
+        }
+        
+        
+        Ok(fs::read_to_string(json_config_file)?)
+    }
+
+    pub fn store_json_config(&self, email: &String, json_config: &String) -> Result<(), Error> {
+
+        if !self.dir_path.exists() {
+            return Err(Error::new(ErrorKind::NotFound, "Dir not exist {dir_path}"))
+        }
+
+        let  json_config_file = self.dir_path.join(email).join(".json");
+        writeln!(File::create(json_config_file)?, "{json_config}")?;
+        
+        Ok(())
+    }
+
+
 }

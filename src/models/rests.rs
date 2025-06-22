@@ -23,6 +23,7 @@ pub struct DataTransport {
     pub group_fields: Option<Vec<GroupField>>,
     pub fields: Option<Vec<Field>>,
     pub data: Option<String>,
+    pub error: Option<String>,
 }
 
 impl FromStr for DataTransport {
@@ -39,14 +40,15 @@ impl FromStr for DataTransport {
 impl DataTransport {
     pub fn default() -> Self {
         Self {
-            path: "".to_string(),
-            title: "".to_string(),
+            path: "/Login".to_string(),
+            title: "Login".to_string(),
             session_id: "".to_string(),
             jwt: None,
             groups: None,
             group_fields: None,
             fields: None,
-            data: None
+            data: None,
+            error: None
         }
     }
     

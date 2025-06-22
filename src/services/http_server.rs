@@ -1,16 +1,18 @@
-use crate::controllers::rests_controller::{hello_controller, login_controller};
+use crate::controllers::rest_controller::RestController;
 use crate::models::rests::DataTransport;
 use actix_web::{web, HttpResponse, Responder};
+
+
 pub async fn hello() -> impl Responder {
-    hello_controller()
+    RestController::share().hello()
 }
 
 pub async fn login(data_transport: web::Json<DataTransport>) -> impl Responder {
-    login_controller(data_transport)
+    RestController::share().login(data_transport)
 }
 
-pub async fn registration(_info: web::Json<DataTransport>) -> impl Responder {
-    HttpResponse::Forbidden().finish()
+pub async fn registration(data_transport: web::Json<DataTransport>) -> impl Responder {
+    RestController::share().registration(data_transport)
 }
 
 pub async fn main(_info: web::Json<DataTransport>) -> impl Responder {
@@ -32,13 +34,17 @@ pub mod server {
     use actix_files as fs;
     use actix_web::{web, App, HttpServer};
     use std::io;
+    use actix_web::middleware::Logger;
 
     pub async fn start(ip: String, port: u16) -> io::Result<()> {
+
+        env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
         println!("Starting server at http://{ip}:{port}");
         
         HttpServer::new(|| {
             App::new()
+                .wrap(Logger::default())
                 .wrap(Cors::permissive())
                 .route("/v5/pocket/hello", web::get().to(hello))
                 .route("/v5/pocket/login", web::post().to(login))

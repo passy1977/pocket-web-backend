@@ -6,8 +6,8 @@ pub(crate) mod conf {
 }
 
 pub(crate) mod jwt {
-    pub const JWT_ISS: &str = "http://localhost:8080/";
-    pub const JWT_AUD:  &str = "http://localhost:8000";
+    pub const JWT_ISS: &str = "http://localhost:8080";
+    pub const JWT_AUD: &str = "http://localhost:8080";
     
     pub const SECRET:  &str = "verysecretsecret";
 }
