@@ -1,10 +1,10 @@
 use crate::controllers::rest_controller::RestController;
 use crate::models::rests::DataTransport;
-use actix_web::{web, HttpResponse, Responder};
+use actix_web::{web, HttpRequest, HttpResponse, Responder};
 
 
-pub async fn hello() -> impl Responder {
-    RestController::share().hello()
+pub async fn hello(session_id: web::Path<String>) -> impl Responder {
+    RestController::share().hello(session_id)
 }
 
 pub async fn login(data_transport: web::Json<DataTransport>) -> impl Responder {
@@ -46,7 +46,7 @@ pub mod server {
             App::new()
                 .wrap(Logger::default())
                 .wrap(Cors::permissive())
-                .route("/v5/pocket/hello", web::get().to(hello))
+                .route("/v5/pocket/hello/{session_id}", web::get().to(hello))
                 .route("/v5/pocket/login", web::post().to(login))
                 .route("/v5/pocket/registration", web::post().to(registration))
                 .route("/v5/pocket/main", web::post().to(main))

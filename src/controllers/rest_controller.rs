@@ -1,11 +1,12 @@
-use std::sync::Arc;
+use std::ptr::null;
 use crate::constants::DATA;
 use crate::models::rests::{Claims, DataTransport};
+use crate::services::data::Data;
 use crate::services::session::{Session, Sessions};
 use actix_web::web::Json;
-use actix_web::HttpResponse;
+use actix_web::{web, HttpResponse};
 use jsonwebtoken::{encode, EncodingKey, Header};
-use crate::services::data::Data;
+use std::sync::Arc;
 
 pub struct RestController {
     data: Option<Data>
@@ -33,11 +34,23 @@ impl RestController {
     }
 
 
-    pub fn hello(&self) -> HttpResponse {
-        let session = Session::new();
-        let session_id = session.session_id.clone();
+    pub fn hello(&self, session_id: web::Path<String>) -> HttpResponse {
 
-        Sessions::share().add(session);
+        let mut session_id_handler = "".to_string();
+        if !session_id.is_empty() {
+            session_id_handler = session_id.clone();
+        }
+        
+        let session_id = match Sessions::share().get(session_id_handler.as_str()) {
+            None => {
+                let session = Session::new();
+                let session_id = session.session_id.clone();
+
+                Sessions::share().add(session);
+                session_id
+            }
+            Some(session) => session.session_id.clone()
+        };
         
         HttpResponse::Ok().json(crate::models::rests::DataTransport{
             session_id,

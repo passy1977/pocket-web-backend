@@ -40,7 +40,7 @@ impl FromStr for DataTransport {
 impl DataTransport {
     pub fn default() -> Self {
         Self {
-            path: "/Login".to_string(),
+            path: "/login".to_string(),
             title: "Login".to_string(),
             session_id: "".to_string(),
             jwt: None,
