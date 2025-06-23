@@ -14,7 +14,7 @@ pub struct Data {
     file_data_path: PathBuf,
 
     #[serde(skip_serializing, skip_deserializing)]
-    dir_path: PathBuf,
+    pub dir_path: PathBuf,
 
     /// IP address on which the server listens
     pub ip: String,

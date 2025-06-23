@@ -7,6 +7,7 @@ use actix_web::web::Json;
 use actix_web::{web, HttpResponse};
 use jsonwebtoken::{encode, EncodingKey, Header};
 use std::sync::Arc;
+use crate::bindings::{pocket_initialize, pocket_stat_t_OK};
 
 pub struct RestController {
     data: Option<Data>
@@ -40,7 +41,7 @@ impl RestController {
         if !session_id.is_empty() {
             session_id_handler = session_id.clone();
         }
-        
+
         let session_id = match Sessions::share().get(session_id_handler.as_str()) {
             None => {
                 let session = Session::new();
@@ -105,15 +106,6 @@ impl RestController {
                 ..data_transport.into_inner()
             })
         }
-        
-        // pocket_initialize(session.pocket, 
-        //     base_path: *const ::std::os::raw::c_char,
-        //     config_json: *const ::std::os::raw::c_char,
-        //     passwd: *const ::std::os::raw::c_char,
-        // ) -> pocket_stat_t;
-
-
-
 
         let claims = Claims {
             sub: "".to_string(),
@@ -138,7 +130,7 @@ impl RestController {
 
     pub fn registration(&self, data_transport: Json<DataTransport>) -> HttpResponse {
 
-        let (json_config, passwd, password_confirmation) = match &data_transport.data {
+        let (json_config, email , passwd, password_confirmation) = match &data_transport.data {
             None => return HttpResponse::Forbidden().json(DataTransport{
                 error: Some("Data not found".to_string()),
                 ..DataTransport::default()
@@ -146,14 +138,14 @@ impl RestController {
             Some(data) => {
                 let split: Vec<&str> = data.split("|").collect();
 
-                if split.len() != 3 {
+                if split.len() != 4 {
                     return HttpResponse::Forbidden().json(DataTransport{
                         error: Some("json_config, passwd and password_confirmation are mandatory".to_string()),
                         ..DataTransport::default()
                     });
                 }
 
-                (split[0].to_string(), split[1].to_string(), split[2].to_string())
+                (split[0].to_string(), split[1].to_string(), split[2].to_string(), split[3].to_string())
             }
         };
         
@@ -178,9 +170,37 @@ impl RestController {
             }
         };
 
+        let session = match Sessions::share().get(data_transport.session_id.as_str()) {
+            None => return HttpResponse::NotAcceptable().json(DataTransport{
+                error: Some("session not found".to_string()),
+                ..DataTransport::default()
+            }),
+            Some(session) => session
+        };
+
+        unsafe {
+            if pocket_initialize(session.pocket,
+                              data.dir_path.clone().as_path().to_str().unwrap().as_ptr() as *const i8,
+                              json_config.as_ptr() as *const i8,
+                              passwd.as_ptr() as *const i8
+            ) != pocket_stat_t_OK {
+                return HttpResponse::NotAcceptable().json(DataTransport{
+                    error: Some("Server Data wrong format".to_string()),
+                    ..DataTransport::default()
+                })
+            }
+        }
+
+        if data.store_json_config(&email, &json_config).is_err() {
+            return HttpResponse::NotAcceptable().json(DataTransport{
+                error: Some("Impossible store json_config".to_string()),
+                ..DataTransport::default()
+            })
+        }
+
         HttpResponse::Ok().json(DataTransport {
-            path: "/home".to_string(),
-            title: "Home".to_string(),
+            session_id: session.session_id,
+            data: Some("{email}|{passwd}".to_string()),
             ..data_transport.into_inner()
         })
     }
