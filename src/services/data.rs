@@ -124,29 +124,29 @@ impl Data {
         Ok(())
     }
     
-    pub fn load_json_config(&self, email: &String) -> Result<String, Error> {
+    pub fn load_config_json(&self, email: &String) -> Result<String, Error> {
 
         if !self.dir_path.exists() {
             return Err(Error::new(ErrorKind::NotFound, "Dir not exist {dir_path}"))
         }
 
-        let json_config_file = self.dir_path.join(email).join(".json");
-        if !json_config_file.exists() {
-            return Err(Error::new(ErrorKind::NotFound, "File not exist {json_config_file}"))
+        let config_json_file = self.dir_path.join(email).join(".json");
+        if !config_json_file.exists() {
+            return Err(Error::new(ErrorKind::NotFound, "File not exist {config_json_file}"))
         }
         
         
-        Ok(fs::read_to_string(json_config_file)?)
+        Ok(fs::read_to_string(config_json_file)?)
     }
 
-    pub fn store_json_config(&self, email: &String, json_config: &String) -> Result<(), Error> {
+    pub fn store_config_json(&self, email: &String, config_json: &String) -> Result<(), Error> {
 
         if !self.dir_path.exists() {
             return Err(Error::new(ErrorKind::NotFound, "Dir not exist {dir_path}"))
         }
 
-        let  json_config_file = self.dir_path.join(email).join(".json");
-        writeln!(File::create(json_config_file)?, "{json_config}")?;
+        let config_json_file = self.dir_path.join(email).join(".json");
+        writeln!(File::create(config_json_file)?, "{config_json}")?;
         
         Ok(())
     }

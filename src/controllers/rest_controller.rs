@@ -1,3 +1,4 @@
+use std::ffi::c_char;
 use std::ptr::null;
 use crate::constants::DATA;
 use crate::models::rests::{Claims, DataTransport};
@@ -7,7 +8,7 @@ use actix_web::web::Json;
 use actix_web::{web, HttpResponse};
 use jsonwebtoken::{encode, EncodingKey, Header};
 use std::sync::Arc;
-use crate::bindings::{pocket_initialize, pocket_stat_t_OK};
+use crate::bindings::{pocket_initialize};
 
 pub struct RestController {
     data: Option<Data>
@@ -96,13 +97,14 @@ impl RestController {
             Some(data) => data
         };
         
-        if let Ok(json_config) = data.load_json_config(&email)
+        if let Ok(config_json) = data.load_config_json(&email)
         {
 
         } else {
             return HttpResponse::Ok().json(DataTransport {
                 path: "/registration".to_string(),
                 title: "Register new user".to_string(),
+                data: Some(email),
                 ..data_transport.into_inner()
             })
         }
@@ -130,7 +132,7 @@ impl RestController {
 
     pub fn registration(&self, data_transport: Json<DataTransport>) -> HttpResponse {
 
-        let (json_config, email , passwd, password_confirmation) = match &data_transport.data {
+        let (config_json, email , passwd, password_confirmation) = match &data_transport.data {
             None => return HttpResponse::Forbidden().json(DataTransport{
                 error: Some("Data not found".to_string()),
                 ..DataTransport::default()
@@ -140,7 +142,7 @@ impl RestController {
 
                 if split.len() != 4 {
                     return HttpResponse::Forbidden().json(DataTransport{
-                        error: Some("json_config, passwd and password_confirmation are mandatory".to_string()),
+                        error: Some("config_json, passwd and password_confirmation are mandatory".to_string()),
                         ..DataTransport::default()
                     });
                 }
@@ -156,19 +158,28 @@ impl RestController {
             })
         }
 
-        if json_config.is_empty() {
+        if config_json.is_empty() {
             return HttpResponse::NotAcceptable().json(DataTransport{
-                error: Some("json_config is empty".to_string()),
+                error: Some("config_json is empty".to_string()),
                 ..DataTransport::default()
             })
         }
 
-        let data = unsafe {
+        let (data, fron_stored_data_config_json) = unsafe {
             match (&raw const DATA).read() {
                 None => return HttpResponse::InternalServerError().body("DATA not ready"),
-                Some(data) => data
+                Some(data) => {
+
+                    let fron_stored_data_config_json =  match data.load_config_json(&email) {
+                        Err(e) => return HttpResponse::InternalServerError().body(e.to_string()),
+                        Ok(fron_stored_data_config_json) => fron_stored_data_config_json
+                    };
+
+                    (data, fron_stored_data_config_json)
+                }
             }
         };
+
 
         let session = match Sessions::share().get(data_transport.session_id.as_str()) {
             None => return HttpResponse::NotAcceptable().json(DataTransport{
@@ -179,11 +190,13 @@ impl RestController {
         };
 
         unsafe {
-            if pocket_initialize(session.pocket,
-                              data.dir_path.clone().as_path().to_str().unwrap().as_ptr() as *const i8,
-                              json_config.as_ptr() as *const i8,
-                              passwd.as_ptr() as *const i8
-            ) != pocket_stat_t_OK {
+
+            if !pocket_initialize(session.pocket,
+                                  data.dir_path.clone().as_path().to_str().unwrap().as_ptr() as *const i8,
+                                  config_json.as_ptr() as *const i8,
+                                  fron_stored_data_config_json.as_ptr() as *const i8,
+                                  passwd.as_ptr() as *const i8,
+            ) {
                 return HttpResponse::NotAcceptable().json(DataTransport{
                     error: Some("Server Data wrong format".to_string()),
                     ..DataTransport::default()
@@ -191,9 +204,9 @@ impl RestController {
             }
         }
 
-        if data.store_json_config(&email, &json_config).is_err() {
+        if data.store_config_json(&email, &config_json).is_err() {
             return HttpResponse::NotAcceptable().json(DataTransport{
-                error: Some("Impossible store json_config".to_string()),
+                error: Some("Impossible store config_json".to_string()),
                 ..DataTransport::default()
             })
         }

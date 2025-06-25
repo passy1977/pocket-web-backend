@@ -20,6 +20,11 @@
 #ifndef POCKET_BRIDGE_CONSTANTS_H
 #define POCKET_BRIDGE_CONSTANTS_H
 
+#ifndef DEVICE_AES_CBC_IV
+#define DEVICE_AES_CBC_IV "1234567890123456"
+#endif
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
