@@ -1,5 +1,6 @@
 use std::{error, fmt};
 
+
 pub(crate) type Result<T, E = &'static str> = std::result::Result<T, E>;
 
 #[derive(Debug, PartialEq, Eq)]
@@ -31,3 +32,8 @@ impl error::Error for Error {
         }
     }
 }
+
+// pub fn md5(str: &String) -> String {
+//     
+//     
+// }

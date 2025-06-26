@@ -130,7 +130,9 @@ impl Data {
             return Err(Error::new(ErrorKind::NotFound, "Dir not exist {dir_path}"))
         }
 
-        let config_json_file = self.dir_path.join(email).join(".json");
+        let email = md5::compute(email.as_bytes());
+
+        let config_json_file = self.dir_path.join(email.0.to_ascii_lowercase()).join(".json");
         if !config_json_file.exists() {
             return Err(Error::new(ErrorKind::NotFound, "File not exist {config_json_file}"))
         }

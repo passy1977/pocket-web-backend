@@ -142,12 +142,12 @@ bool pocket_initialize(const pocket_t* self, const char* base_path, const char* 
                     delete session;
                     session = nullptr;
                 }
-                error(APP_TAG, "Impossbile alloc aes");
+                error(APP_TAG, "Impossible alloc aes");
                 return false;
             }
 
-            [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithCString:aes->encrypt([configJson UTF8String]).c_str() encoding:NSUTF8StringEncoding] forKey: KEY_DEVICE];
-            [[NSUserDefaults standardUserDefaults] synchronize];
+            // [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithCString:aes->encrypt([configJson UTF8String]).c_str() encoding:NSUTF8StringEncoding] forKey: KEY_DEVICE];
+            // [[NSUserDefaults standardUserDefaults] synchronize];
             return true;
         }
         catch (const runtime_error& e)

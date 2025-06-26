@@ -165,17 +165,17 @@ impl RestController {
             })
         }
 
-        let (data, fron_stored_data_config_json) = unsafe {
+        let (data, from_stored_data_config_json) = unsafe {
             match (&raw const DATA).read() {
                 None => return HttpResponse::InternalServerError().body("DATA not ready"),
                 Some(data) => {
 
-                    let fron_stored_data_config_json =  match data.load_config_json(&email) {
+                    let from_stored_data_config_json =  match data.load_config_json(&email) {
                         Err(e) => return HttpResponse::InternalServerError().body(e.to_string()),
                         Ok(fron_stored_data_config_json) => fron_stored_data_config_json
                     };
 
-                    (data, fron_stored_data_config_json)
+                    (data, from_stored_data_config_json)
                 }
             }
         };
@@ -194,7 +194,7 @@ impl RestController {
             if !pocket_initialize(session.pocket,
                                   data.dir_path.clone().as_path().to_str().unwrap().as_ptr() as *const i8,
                                   config_json.as_ptr() as *const i8,
-                                  fron_stored_data_config_json.as_ptr() as *const i8,
+                                  from_stored_data_config_json.as_ptr() as *const i8,
                                   passwd.as_ptr() as *const i8,
             ) {
                 return HttpResponse::NotAcceptable().json(DataTransport{

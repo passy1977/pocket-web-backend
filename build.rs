@@ -3,19 +3,24 @@ use std::path::PathBuf;
 use cmake::Config;
 
 fn main() {
-    // let dst = cmake::build("bridge");
     let dst = Config::new("bridge")
         .define("POCKET_MAX_BUFFER_RESPONSE_SIZE", "10485760")
         .define("POCKET_ENABLE_LOG", "1")
         .define("POCKET_ENABLE_AES", "1")
         .build();
     println!("cargo:rustc-link-search=native={}", dst.display());
-    println!("cargo:rustc-link-search={}/build", std::env::var("OUT_DIR").unwrap());
+    println!("{}", env::var("OUT_DIR").unwrap());
+    println!("cargo:rustc-link-search={}/build", env::var("OUT_DIR").unwrap());
+    println!("cargo:rustc-link-search=native={}/build/pocket-lib/", dst.display());
     println!("cargo:rustc-link-lib=static=pocketbridge");
-    println!("cargo:rustc-link-lib=static=stdc++");
+    println!("cargo:rustc-link-lib=static=pocket");
+    println!("cargo:rustc-link-lib=stdc++");
+    println!("cargo:rustc-link-lib=curl");
+    println!("cargo:rustc-link-lib=ssl");
+    println!("cargo:rustc-link-lib=crypto");
+    println!("cargo:rustc-link-lib=sqlite3");
 
     // Tell cargo to invalidate the built crate whenever the wrapper changes
-   
     println!("cargo:rerun-if-changed=bridge/inc/pocket/constants.h");
     println!("cargo:rerun-if-changed=bridge/inc/pocket/pocket.h");
     println!("cargo:rerun-if-changed=bridge/inc/pocket/field.h");
@@ -36,7 +41,6 @@ fn main() {
         .header("bridge/inc/pocket/group.h")
         .header("bridge/inc/pocket/group_controller.h")
         .header("bridge/inc/pocket/user.h")
-
         .clang_arg("-Ibridge/inc")
         
         // Tell cargo to invalidate the built crate whenever any of the
