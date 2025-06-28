@@ -1,4 +1,3 @@
-use crate::constants::DATA;
 use crate::services::data::Data;
 use crate::services::http_server::server;
 
@@ -33,11 +32,6 @@ async fn main() -> std::io::Result<()> {
     
     let port = data.port;
     let ip = data.ip.clone();
-        
-
-    unsafe { DATA = Some(data); }
-
-    
     
     server::start(ip, port).await
 }

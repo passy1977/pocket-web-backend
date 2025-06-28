@@ -33,7 +33,13 @@ impl error::Error for Error {
     }
 }
 
-// pub fn md5(str: &String) -> String {
-//     
-//     
-// }
+pub fn byte_to_hex(bytes: &[u8]) -> String {
+    let mut hex_string = String::with_capacity(bytes.len() * 2);
+
+    for byte in bytes.iter() {
+        // Converti ogni byte in una stringa esadecimale e aggiungilo alla stringa finale.
+        hex_string.push_str(&format!("{:02X}", byte));
+    }
+    
+    hex_string
+}

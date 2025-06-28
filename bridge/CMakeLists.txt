@@ -13,6 +13,7 @@ message(STATUS "CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}")
 add_definitions(-DPOCKET_ENABLE_LOG)
 add_definitions(-DPOCKET_ENABLE_AES)
 add_definitions(-DPOCKET_MAX_BUFFER_RESPONSE_SIZE=10485760)
+add_definitions(-DPOCKET_DISABLE_LOCK)
 
 include_directories(pocket-lib/inc)
 include_directories(pocket-lib/pocket-controllers/inc)

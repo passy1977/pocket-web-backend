@@ -1,4 +1,3 @@
-use crate::services::data::Data;
 
 pub(crate) mod conf {
     pub const IP: &str = "127.0.0.1";
@@ -16,8 +15,6 @@ pub(crate)  mod data {
     pub const DATA_FOLDER : &str = ".pocket-web-backend";
     pub const DATA_FILE : &str = "data.json";
 }
-
-pub(crate) static mut DATA : Option<Data> = None;
 
 
 // pub(crate) enum Stats {

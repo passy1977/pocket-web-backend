@@ -60,7 +60,7 @@ void pocket_free(const pocket_t* pocket)
     delete pocket;
 }
 
-bool pocket_initialize(const pocket_t* self, const char* base_path, const char* config_json, const char* fron_stored_data_config_json, const char* passwd)
+bool pocket_initialize(const pocket_t* self, const char* base_path, const char* config_json, const char* from_stored_data_config_json, const char* passwd)
 {
     if(self->session && self->aes)
     {
@@ -69,7 +69,7 @@ bool pocket_initialize(const pocket_t* self, const char* base_path, const char* 
     auto session = static_cast<class session*>(self->session);
     auto aes = static_cast<class aes*>(self->aes);
 
-    if (fron_stored_data_config_json)
+    if (from_stored_data_config_json && strcmp(from_stored_data_config_json, "{}") != 0)
     {
         try
         {
@@ -80,7 +80,7 @@ bool pocket_initialize(const pocket_t* self, const char* base_path, const char* 
                 return false;
             }
 
-            session = new(nothrow) class session(aes->decrypt(fron_stored_data_config_json), base_path);
+            session = new(nothrow) class session(aes->decrypt(from_stored_data_config_json), base_path);
             if(session == nullptr)
             {
                 if(aes)

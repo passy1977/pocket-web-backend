@@ -1,6 +1,6 @@
-use std::ffi::c_char;
-use std::ptr::null;
-use crate::constants::DATA;
+use std::ffi::CString;
+use std::str::FromStr;
+use crate::bindings::pocket_initialize;
 use crate::models::rests::{Claims, DataTransport};
 use crate::services::data::Data;
 use crate::services::session::{Session, Sessions};
@@ -8,22 +8,16 @@ use actix_web::web::Json;
 use actix_web::{web, HttpResponse};
 use jsonwebtoken::{encode, EncodingKey, Header};
 use std::sync::Arc;
-use crate::bindings::{pocket_initialize};
 
 pub struct RestController {
-    data: Option<Data>
+    data: Data
 }
 
 impl RestController {
     
     fn new() -> Self {
         Self { 
-            data: unsafe {
-                match (&raw const DATA).read() {
-                    None => None,
-                    Some(data) => Some(data)
-                }
-            }
+            data: Data::init().unwrap()
         }
     }
 
@@ -89,15 +83,8 @@ impl RestController {
             Some(session) => session
         };
 
-        let data = match &self.data {
-            None => return HttpResponse::Forbidden().json(DataTransport{
-                error: Some("Data not found".to_string()),
-                ..DataTransport::default()
-            }),
-            Some(data) => data
-        };
         
-        if let Ok(config_json) = data.load_config_json(&email)
+        if let Ok(config_json) = &self.data.load_config_json(&email)
         {
 
         } else {
@@ -112,11 +99,11 @@ impl RestController {
         let claims = Claims {
             sub: "".to_string(),
             exp: 0,
-            iss: data.jwt_iss.clone(),
-            aud: data.jwt_aud.clone(),
+            iss: self.data.jwt_iss.clone(),
+            aud: self.data.jwt_aud.clone(),
         };
 
-        let jwt = match encode(&Header::default(), &claims, &EncodingKey::from_secret(data.jwt_secret.as_bytes())) {
+        let jwt = match encode(&Header::default(), &claims, &EncodingKey::from_secret(&self.data.jwt_secret.as_bytes())) {
             Ok(token) => Some(token),
             Err(err) => return HttpResponse::InternalServerError().body(err.to_string())
         };
@@ -165,53 +152,64 @@ impl RestController {
             })
         }
 
-        let (data, from_stored_data_config_json) = unsafe {
-            match (&raw const DATA).read() {
-                None => return HttpResponse::InternalServerError().body("DATA not ready"),
-                Some(data) => {
 
-                    let from_stored_data_config_json =  match data.load_config_json(&email) {
-                        Err(e) => return HttpResponse::InternalServerError().body(e.to_string()),
-                        Ok(fron_stored_data_config_json) => fron_stored_data_config_json
-                    };
-
-                    (data, from_stored_data_config_json)
-                }
-            }
-        };
+        let from_stored_data_config_json = self.data.load_config_json(&email).unwrap_or_else(|_| "{}".to_string());
 
 
         let session = match Sessions::share().get(data_transport.session_id.as_str()) {
             None => return HttpResponse::NotAcceptable().json(DataTransport{
+                path: "/hello".to_string(),
+                title: "Hello".to_string(),
                 error: Some("session not found".to_string()),
                 ..DataTransport::default()
             }),
             Some(session) => session
         };
-
+         
+        if session.pocket.is_null() {
+            return HttpResponse::NotAcceptable().json(DataTransport{
+                path: "/hello".to_string(),
+                title: "Hello".to_string(),
+                error: Some("data_dit_path not found".to_string()),
+                ..DataTransport::default()
+            })
+        }
+         
+        let data_dir_path = match self.data.dir_path.clone().as_path().to_str() {
+            None => return HttpResponse::NotAcceptable().json(DataTransport{
+                session_id: session.session_id,
+                error: Some("data_dit_path not found".to_string()),
+                ..DataTransport::default()
+            }),
+            Some(data_dir_path) => data_dir_path.to_string()
+        };
+        
         unsafe {
-
             if !pocket_initialize(session.pocket,
-                                  data.dir_path.clone().as_path().to_str().unwrap().as_ptr() as *const i8,
-                                  config_json.as_ptr() as *const i8,
-                                  from_stored_data_config_json.as_ptr() as *const i8,
-                                  passwd.as_ptr() as *const i8,
+                                  CString::from_str(&data_dir_path).unwrap().as_ptr(),
+                                  CString::from_str(&config_json).unwrap().as_ptr(),
+                                  CString::from_str(&from_stored_data_config_json).unwrap().as_ptr(),
+                                  CString::from_str(&passwd).unwrap().as_ptr()
             ) {
                 return HttpResponse::NotAcceptable().json(DataTransport{
+                    session_id: session.session_id,
                     error: Some("Server Data wrong format".to_string()),
                     ..DataTransport::default()
                 })
             }
         }
-
-        if data.store_config_json(&email, &config_json).is_err() {
+        
+        if self.data.store_config_json(&email, &config_json).is_err() {
             return HttpResponse::NotAcceptable().json(DataTransport{
+                session_id: session.session_id,
                 error: Some("Impossible store config_json".to_string()),
                 ..DataTransport::default()
             })
         }
 
         HttpResponse::Ok().json(DataTransport {
+            path: "/login".to_string(),
+            title: "Login".to_string(),
             session_id: session.session_id,
             data: Some("{email}|{passwd}".to_string()),
             ..data_transport.into_inner()

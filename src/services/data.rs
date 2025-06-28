@@ -1,13 +1,14 @@
 use crate::constants::{data::*, conf::*, jwt::{JWT_AUD, JWT_ISS, SECRET}};
 use crate::utils::Result;
 use crate::services::cli::Cli;
+use crate::utils::byte_to_hex;
 use std::path::{Path, PathBuf};
 use std::{env, fs};
 use std::fs::File;
 use std::io::{self, Error, ErrorKind, Read, Write};
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Data {
 
     #[serde(skip_serializing, skip_deserializing)]
@@ -35,7 +36,6 @@ pub struct Data {
 
 
 impl Data {
-
 
     pub fn init() -> Result<Self> {
 
@@ -130,9 +130,12 @@ impl Data {
             return Err(Error::new(ErrorKind::NotFound, "Dir not exist {dir_path}"))
         }
 
-        let email = md5::compute(email.as_bytes());
+        let email = byte_to_hex(&md5::compute(email.as_bytes()).0);
 
-        let config_json_file = self.dir_path.join(email.0.to_ascii_lowercase()).join(".json");
+        let mut config_json_file = self.dir_path.clone();
+        config_json_file.push(email);
+        config_json_file.set_extension("json");
+        
         if !config_json_file.exists() {
             return Err(Error::new(ErrorKind::NotFound, "File not exist {config_json_file}"))
         }
@@ -146,8 +149,14 @@ impl Data {
         if !self.dir_path.exists() {
             return Err(Error::new(ErrorKind::NotFound, "Dir not exist {dir_path}"))
         }
-
-        let config_json_file = self.dir_path.join(email).join(".json");
+        
+        
+        let email = byte_to_hex(&md5::compute(email.as_bytes()).0);
+        
+        let mut config_json_file = self.dir_path.clone();
+        config_json_file.push(email);
+        config_json_file.set_extension("json");
+        
         writeln!(File::create(config_json_file)?, "{config_json}")?;
         
         Ok(())

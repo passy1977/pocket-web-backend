@@ -1,6 +1,6 @@
 use crate::controllers::rest_controller::RestController;
 use crate::models::rests::DataTransport;
-use actix_web::{web, HttpRequest, HttpResponse, Responder};
+use actix_web::{web, HttpResponse, Responder};
 
 
 pub async fn hello(session_id: web::Path<String>) -> impl Responder {
