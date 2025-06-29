@@ -26,7 +26,6 @@ fn main() {
     println!("cargo:rerun-if-changed=bridge/inc/pocket/field.h");
     println!("cargo:rerun-if-changed=bridge/inc/pocket/field_controller.h");
     
-    
 
     // The bindgen::Builder is the main entry point
     // to bindgen, and lets you build up options for
@@ -41,8 +40,10 @@ fn main() {
         .header("bridge/inc/pocket/group.h")
         .header("bridge/inc/pocket/group_controller.h")
         .header("bridge/inc/pocket/user.h")
+        .header("bridge/pocket-lib/pocket-services/inc/pocket-services/crypto.hpp")        
         .clang_arg("-Ibridge/inc")
-        
+        .clang_arg("-Ibridge/pocket-lib/inc")
+        .clang_arg("-Wc++20-extensions")
         // Tell cargo to invalidate the built crate whenever any of the
         // included header files changed.
         .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))

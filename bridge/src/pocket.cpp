@@ -60,7 +60,7 @@ void pocket_free(const pocket_t* pocket)
     delete pocket;
 }
 
-bool pocket_initialize(const pocket_t* self, const char* base_path, const char* config_json, const char* from_stored_data_config_json, const char* passwd)
+bool pocket_initialize(const pocket_t* self, const char* base_path, const char* config_json, const char* from_stored_data_config_json, const char* passwd, bool* store)
 {
     if(self->session && self->aes)
     {
@@ -68,6 +68,10 @@ bool pocket_initialize(const pocket_t* self, const char* base_path, const char* 
     }
     auto session = static_cast<class session*>(self->session);
     auto aes = static_cast<class aes*>(self->aes);
+    if (store)
+    {
+        *store = false;
+    }
 
     if (from_stored_data_config_json && strcmp(from_stored_data_config_json, "{}") != 0)
     {
@@ -76,7 +80,7 @@ bool pocket_initialize(const pocket_t* self, const char* base_path, const char* 
             aes = new(nothrow) class aes(DEVICE_AES_CBC_IV, passwd);
             if(aes == nullptr)
             {
-                error(APP_TAG, "Impossbile alloc aes");
+                error(APP_TAG, "Impossible alloc aes");
                 return false;
             }
 
@@ -88,7 +92,7 @@ bool pocket_initialize(const pocket_t* self, const char* base_path, const char* 
                     delete aes;
                     aes = nullptr;
                 }
-                error(APP_TAG, "Impossbile alloc session");
+                error(APP_TAG, "Impossible alloc session");
                 return false;
             }
 
@@ -129,7 +133,7 @@ bool pocket_initialize(const pocket_t* self, const char* base_path, const char* 
             session = new(nothrow) class session(config_json, base_path);
             if(session == nullptr)
             {
-                error(APP_TAG, "Impossbile alloc session");
+                error(APP_TAG, "Impossible alloc session");
                 return false;
             }
             session->init();
@@ -146,8 +150,10 @@ bool pocket_initialize(const pocket_t* self, const char* base_path, const char* 
                 return false;
             }
 
-            // [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithCString:aes->encrypt([configJson UTF8String]).c_str() encoding:NSUTF8StringEncoding] forKey: KEY_DEVICE];
-            // [[NSUserDefaults standardUserDefaults] synchronize];
+            if (store)
+            {
+                *store = true;
+            }
             return true;
         }
         catch (const runtime_error& e)

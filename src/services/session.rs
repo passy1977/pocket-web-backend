@@ -39,10 +39,7 @@ impl Session {
             Err(_) => 0
         };
     }
-
-    pub fn free(&mut self) {
-        unsafe { pocket_free(self.pocket); }
-    }
+    
 }
 
 pub struct Sessions {

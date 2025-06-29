@@ -8,6 +8,7 @@ use std::fs::File;
 use std::io::{self, Error, ErrorKind, Read, Write};
 use serde::{Deserialize, Serialize};
 
+#[repr(C)]
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Data {
 
@@ -130,7 +131,7 @@ impl Data {
             return Err(Error::new(ErrorKind::NotFound, "Dir not exist {dir_path}"))
         }
 
-        let email = byte_to_hex(&md5::compute(email.as_bytes()).0);
+        //let email = byte_to_hex(&md5::compute(email.as_bytes()).0);
 
         let mut config_json_file = self.dir_path.clone();
         config_json_file.push(email);
@@ -151,7 +152,7 @@ impl Data {
         }
         
         
-        let email = byte_to_hex(&md5::compute(email.as_bytes()).0);
+        //let email = byte_to_hex(&md5::compute(email.as_bytes()).0);
         
         let mut config_json_file = self.dir_path.clone();
         config_json_file.push(email);

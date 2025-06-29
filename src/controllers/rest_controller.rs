@@ -1,5 +1,3 @@
-use std::ffi::CString;
-use std::str::FromStr;
 use crate::bindings::pocket_initialize;
 use crate::models::rests::{Claims, DataTransport};
 use crate::services::data::Data;
@@ -7,11 +5,15 @@ use crate::services::session::{Session, Sessions};
 use actix_web::web::Json;
 use actix_web::{web, HttpResponse};
 use jsonwebtoken::{encode, EncodingKey, Header};
+use std::ffi::CString;
+use std::str::FromStr;
 use std::sync::Arc;
 
 pub struct RestController {
     data: Data
 }
+
+
 
 impl RestController {
     
@@ -75,6 +77,8 @@ impl RestController {
             }
         };
 
+        let from_stored_data_config_json = self.data.load_config_json(&email).unwrap_or_else(|_| "{}".to_string());
+        
         let session = match Sessions::share().get(&*data_transport.session_id) {
             None => return HttpResponse::Forbidden().json(DataTransport{
                 error: Some("Session not found".to_string()),
@@ -83,10 +87,39 @@ impl RestController {
             Some(session) => session
         };
 
+        let data_dir_path = match self.data.dir_path.clone().as_path().to_str() {
+            None => return HttpResponse::NotAcceptable().json(DataTransport{
+                session_id: session.session_id,
+                error: Some("data_dit_path not found".to_string()),
+                ..DataTransport::default()
+            }),
+            Some(data_dir_path) => data_dir_path.to_string()
+        };
         
         if let Ok(config_json) = &self.data.load_config_json(&email)
         {
-
+            unsafe {
+                
+                let mut store = Box::new(false);
+                
+                if !pocket_initialize(session.pocket,
+                                      CString::from_str(&data_dir_path).unwrap().as_ptr(),
+                                      CString::from_str(&config_json).unwrap().as_ptr(),
+                                      CString::from_str(&from_stored_data_config_json).unwrap().as_ptr(),
+                                      CString::from_str(&passwd).unwrap().as_ptr(),
+                                      store.as_mut()
+                ) {
+                    return HttpResponse::NotAcceptable().json(DataTransport{
+                        session_id: session.session_id,
+                        error: Some("Server Data wrong format".to_string()),
+                        ..DataTransport::default()
+                    })
+                }
+                
+                if *store {
+                    self.data.store_config_json(&email, config_json).expect("Impossible store data");
+                }
+            }
         } else {
             return HttpResponse::Ok().json(DataTransport {
                 path: "/registration".to_string(),
@@ -185,11 +218,14 @@ impl RestController {
         };
         
         unsafe {
+            let mut store = Box::new(false);
+            
             if !pocket_initialize(session.pocket,
                                   CString::from_str(&data_dir_path).unwrap().as_ptr(),
                                   CString::from_str(&config_json).unwrap().as_ptr(),
                                   CString::from_str(&from_stored_data_config_json).unwrap().as_ptr(),
-                                  CString::from_str(&passwd).unwrap().as_ptr()
+                                  CString::from_str(&passwd).unwrap().as_ptr(),
+                                  store.as_mut()
             ) {
                 return HttpResponse::NotAcceptable().json(DataTransport{
                     session_id: session.session_id,
@@ -207,11 +243,16 @@ impl RestController {
             })
         }
 
+        let mut data = String::new();
+        data.push_str(email.as_str());
+        data.push_str("|");
+        data.push_str(passwd.as_str());
+        
         HttpResponse::Ok().json(DataTransport {
             path: "/login".to_string(),
             title: "Login".to_string(),
             session_id: session.session_id,
-            data: Some("{email}|{passwd}".to_string()),
+            data: Some(data),
             ..data_transport.into_inner()
         })
     }

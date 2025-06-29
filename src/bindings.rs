@@ -1332,6 +1332,7 @@ unsafe extern "C" {
         config_json: *const ::std::os::raw::c_char,
         fron_stored_data_config_json: *const ::std::os::raw::c_char,
         passwd: *const ::std::os::raw::c_char,
+        store: *mut bool,
     ) -> bool;
 }
 unsafe extern "C" {
