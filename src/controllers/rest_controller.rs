@@ -1,4 +1,4 @@
-use crate::bindings::pocket_initialize;
+use crate::bindings::{pocket_aes_encrypt, pocket_initialize, pocket_initialize_aes};
 use crate::models::rests::{Claims, DataTransport};
 use crate::services::data::Data;
 use crate::services::session::{Session, Sessions};
@@ -8,6 +8,8 @@ use jsonwebtoken::{encode, EncodingKey, Header};
 use std::ffi::CString;
 use std::str::FromStr;
 use std::sync::Arc;
+use crate::constants::data::EMPTY_CONFIG_JSON;
+use crate::utils::aes_encrypt;
 
 pub struct RestController {
     data: Data
@@ -77,7 +79,7 @@ impl RestController {
             }
         };
 
-        let from_stored_data_config_json = self.data.load_config_json(&email).unwrap_or_else(|_| "{}".to_string());
+
         
         let session = match Sessions::share().get(&*data_transport.session_id) {
             None => return HttpResponse::Forbidden().json(DataTransport{
@@ -96,15 +98,14 @@ impl RestController {
             Some(data_dir_path) => data_dir_path.to_string()
         };
         
-        if let Ok(config_json) = &self.data.load_config_json(&email)
+        if let Ok(from_stored_data_config_json) = &self.data.load_config_json(&email)
         {
             unsafe {
                 
                 let mut store = Box::new(false);
-                
                 if !pocket_initialize(session.pocket,
                                       CString::from_str(&data_dir_path).unwrap().as_ptr(),
-                                      CString::from_str(&config_json).unwrap().as_ptr(),
+                                      CString::from_str(EMPTY_CONFIG_JSON).unwrap().as_ptr(),
                                       CString::from_str(&from_stored_data_config_json).unwrap().as_ptr(),
                                       CString::from_str(&passwd).unwrap().as_ptr(),
                                       store.as_mut()
@@ -114,10 +115,6 @@ impl RestController {
                         error: Some("Server Data wrong format".to_string()),
                         ..DataTransport::default()
                     })
-                }
-                
-                if *store {
-                    self.data.store_config_json(&email, config_json).expect("Impossible store data");
                 }
             }
         } else {
@@ -185,10 +182,6 @@ impl RestController {
             })
         }
 
-
-        let from_stored_data_config_json = self.data.load_config_json(&email).unwrap_or_else(|_| "{}".to_string());
-
-
         let session = match Sessions::share().get(data_transport.session_id.as_str()) {
             None => return HttpResponse::NotAcceptable().json(DataTransport{
                 path: "/hello".to_string(),
@@ -198,7 +191,7 @@ impl RestController {
             }),
             Some(session) => session
         };
-         
+
         if session.pocket.is_null() {
             return HttpResponse::NotAcceptable().json(DataTransport{
                 path: "/hello".to_string(),
@@ -207,7 +200,7 @@ impl RestController {
                 ..DataTransport::default()
             })
         }
-         
+
         let data_dir_path = match self.data.dir_path.clone().as_path().to_str() {
             None => return HttpResponse::NotAcceptable().json(DataTransport{
                 session_id: session.session_id,
@@ -216,14 +209,26 @@ impl RestController {
             }),
             Some(data_dir_path) => data_dir_path.to_string()
         };
+
+        unsafe {
+            if pocket_initialize_aes(session.pocket, CString::new(passwd.clone()).unwrap().as_ptr()) {
+                return HttpResponse::NotAcceptable().json(DataTransport{
+                    session_id: session.session_id,
+                    error: Some("Impossible init aes".to_string()),
+                    ..DataTransport::default()
+                })
+            }    
+        }
+        
+        let config_json = aes_encrypt(session.pocket, &config_json);
+        
+        let mut store = Box::new(false);
         
         unsafe {
-            let mut store = Box::new(false);
-            
             if !pocket_initialize(session.pocket,
                                   CString::from_str(&data_dir_path).unwrap().as_ptr(),
                                   CString::from_str(&config_json).unwrap().as_ptr(),
-                                  CString::from_str(&from_stored_data_config_json).unwrap().as_ptr(),
+                                  CString::from_str(EMPTY_CONFIG_JSON).unwrap().as_ptr(),
                                   CString::from_str(&passwd).unwrap().as_ptr(),
                                   store.as_mut()
             ) {

@@ -40,10 +40,9 @@ fn main() {
         .header("bridge/inc/pocket/group.h")
         .header("bridge/inc/pocket/group_controller.h")
         .header("bridge/inc/pocket/user.h")
-        .header("bridge/pocket-lib/pocket-services/inc/pocket-services/crypto.hpp")        
         .clang_arg("-Ibridge/inc")
         .clang_arg("-Ibridge/pocket-lib/inc")
-        .clang_arg("-Wc++20-extensions")
+        .clang_arg("-std=c17")
         // Tell cargo to invalidate the built crate whenever any of the
         // included header files changed.
         .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))

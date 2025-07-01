@@ -14,6 +14,8 @@ pub(crate) mod jwt {
 pub(crate)  mod data {
     pub const DATA_FOLDER : &str = ".pocket-web-backend";
     pub const DATA_FILE : &str = "data.json";
+
+    pub const EMPTY_CONFIG_JSON : &str = "{}";
 }
 
 

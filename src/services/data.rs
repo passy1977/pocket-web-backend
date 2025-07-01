@@ -1,12 +1,12 @@
 use crate::constants::{data::*, conf::*, jwt::{JWT_AUD, JWT_ISS, SECRET}};
-use crate::utils::Result;
+use crate::utils::{sha512_encrypt, Result};
 use crate::services::cli::Cli;
-use crate::utils::byte_to_hex;
 use std::path::{Path, PathBuf};
 use std::{env, fs};
 use std::fs::File;
 use std::io::{self, Error, ErrorKind, Read, Write};
 use serde::{Deserialize, Serialize};
+use crate::bindings::{pocket_t};
 
 #[repr(C)]
 #[derive(Serialize, Deserialize, Clone)]
@@ -131,7 +131,7 @@ impl Data {
             return Err(Error::new(ErrorKind::NotFound, "Dir not exist {dir_path}"))
         }
 
-        //let email = byte_to_hex(&md5::compute(email.as_bytes()).0);
+        let email = sha512_encrypt(email);
 
         let mut config_json_file = self.dir_path.clone();
         config_json_file.push(email);
@@ -150,10 +150,9 @@ impl Data {
         if !self.dir_path.exists() {
             return Err(Error::new(ErrorKind::NotFound, "Dir not exist {dir_path}"))
         }
-        
-        
-        //let email = byte_to_hex(&md5::compute(email.as_bytes()).0);
-        
+
+        let email = sha512_encrypt(email);
+
         let mut config_json_file = self.dir_path.clone();
         config_json_file.push(email);
         config_json_file.set_extension("json");
