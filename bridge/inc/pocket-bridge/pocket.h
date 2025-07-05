@@ -20,7 +20,7 @@
 #ifndef POCKET_BRIDGE_H
 #define POCKET_BRIDGE_H
 
-#include "pocket/constants.h"
+#include "pocket-bridge/constants.h"
 
 #include <stdbool.h>
 #include <stdlib.h>

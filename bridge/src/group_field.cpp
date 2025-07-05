@@ -17,7 +17,7 @@
 *
 ***************************************************************************/
 
-#include "pocket/group_field.h"
+#include "pocket-bridge/group_field.h"
 
 #include <new>
 #include <cstring>

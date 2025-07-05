@@ -21,10 +21,10 @@
 #ifndef POCKET_BRIDGE_GROUP_CONTROLLER_H
 #define POCKET_BRIDGE_GROUP_CONTROLLER_H
 
-#include "pocket/constants.h"
-#include "pocket/group.h"
-#include "pocket/group_field.h"
-#include "pocket/field.h"
+#include "pocket-bridge/constants.h"
+#include "pocket-bridge/group.h"
+#include "pocket-bridge/group_field.h"
+#include "pocket-bridge/field.h"
 
 
 #include <stdlib.h>

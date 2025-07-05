@@ -17,7 +17,7 @@
 *
 ***************************************************************************/
 
-#include "pocket/user.h"
+#include "pocket-bridge/user.h"
 
 #include <new>
 #include <cstring>

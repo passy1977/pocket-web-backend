@@ -17,7 +17,7 @@
  *
  ***************************************************************************/
 
-#include "pocket/group.h"
+#include "pocket-bridge/group.h"
 
 #include <cstdlib>
 #include <cstring>

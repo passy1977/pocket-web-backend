@@ -24,6 +24,13 @@
 #define DEVICE_AES_CBC_IV "1234567890123456"
 #endif
 
+#ifndef SYNCHRONIZER_TIMEOUT
+#define SYNCHRONIZER_TIMEOUT (5L)
+#endif
+
+#ifndef SYNCHRONIZER_CONNECT_TIMEOUT
+#define SYNCHRONIZER_CONNECT_TIMEOUT (10L)
+#endif
 
 #ifdef __cplusplus
 extern "C" {

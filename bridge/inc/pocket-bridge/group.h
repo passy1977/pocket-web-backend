@@ -20,7 +20,7 @@
 #ifndef POCKET_BRIDGE_GROUP_H
 #define POCKET_BRIDGE_GROUP_H
 
-#include "pocket/group.h"
+#include "pocket-bridge/group.h"
 
 #include <stdint.h>
 #include <stdbool.h>

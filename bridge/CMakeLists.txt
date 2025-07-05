@@ -32,10 +32,6 @@ file(GLOB_RECURSE POCKET_SOURCES CONFIGURE_DEPENDS "src/*.cpp" "src/*.c")
 
 add_library(${PROJECT_NAME} STATIC
         ${POCKET_INCLUDES} ${POCKET_SOURCES}
-        inc/pocket/group_field.h
-        src/group_field.cpp
-        inc/pocket/user.h
-        src/user.cpp
 )
 
 target_link_directories(${PROJECT_NAME} PRIVATE ${LIB_DIR})

@@ -17,7 +17,7 @@
  *
  ***************************************************************************/
 
-#include "pocket/group_controller.h"
+#include "pocket-bridge/group_controller.h"
 
 
 

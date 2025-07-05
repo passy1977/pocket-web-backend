@@ -20,8 +20,8 @@
 #ifndef POCKET_BRIDGE_FIELD_CONTROLLER_H
 #define POCKET_BRIDGE_FIELD_CONTROLLER_H
 
-#include "pocket/constants.h"
-#include "pocket/field.h"
+#include "pocket-bridge/constants.h"
+#include "pocket-bridge/field.h"
 
 #include <stdint.h>
 #include <stdbool.h>

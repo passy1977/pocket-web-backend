@@ -29,7 +29,7 @@ using namespace services;
 #include "pocket-pods/user.hpp"
 using pods::user;
 
-#include "pocket/pocket.h"
+#include "pocket-bridge/pocket.h"
 
 #include <memory>
 #include <new>
@@ -89,7 +89,7 @@ bool pocket_initialize(pocket_t* self, const char* base_path, const char* config
     }
 
     auto session = static_cast<class session*>(self->session);
-    class aes* aes = nullptr;
+    aes* aes = nullptr;
     if (store)
     {
         *store = false;
@@ -200,9 +200,34 @@ bool pocket_initialize(pocket_t* self, const char* base_path, const char* config
     return true;
 }
 
-pocket_stat_t pocket_login(pocket_t* self, const char* email, const char* passwd)
+pocket_stat_t pocket_login(pocket_t* self, const char* email, const char* passwd) try
 {
+        if(email == nullptr || passwd == nullptr)
+    {
+        return ERROR;
+    }
+
+    auto session = static_cast<class session*>(self->session);
+
+
+    session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
+    session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
+    auto&& userOpt = session->login(email, passwd, POCKET_ENABLE_AES);
+    if(userOpt.has_value())
+    {
+        session->send_data(userOpt);
+        return OK;
+    }
+    else
+    {
+        return static_cast<pocket_stat_t>(session->get_status());
+    }
     return OK;
+}
+catch(const runtime_error& e)
+{
+    error(APP_TAG, e.what());
+    return static_cast<pocket_stat_t>(static_cast<session*>(self->session)->get_status());
 }
 
 pocket_stat_t pocket_logout(pocket_t* self, bool soft_logout)
