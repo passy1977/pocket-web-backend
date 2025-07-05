@@ -480,9 +480,8 @@ unsafe extern "C" {
         self_: *mut pocket_t,
         base_path: *const ::std::os::raw::c_char,
         config_json: *const ::std::os::raw::c_char,
-        fron_stored_data_config_json: *const ::std::os::raw::c_char,
+        encrypted: bool,
         passwd: *const ::std::os::raw::c_char,
-        store: *mut bool,
     ) -> bool;
 }
 unsafe extern "C" {

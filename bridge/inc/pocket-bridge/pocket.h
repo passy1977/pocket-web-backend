@@ -41,7 +41,7 @@ pocket_t* pocket_new(void);
 void pocket_free(const pocket_t* pocket);
 
 bool pocket_initialize_aes(pocket_t* self, const char* passwd);
-bool pocket_initialize(pocket_t* self, const char* base_path, const char* config_json, const char* fron_stored_data_config_json, const char* passwd, bool* store);
+bool pocket_initialize(pocket_t* self, const char* base_path, const char* config_json, bool encrypted, const char* passwd);
 pocket_stat_t pocket_login(pocket_t* self, const char* email, const char* passwd);
 pocket_stat_t pocket_logout(pocket_t* self, bool soft_logout);
 pocket_stat_t pocket_change_passwd(pocket_t* self, const char* full_path_file, const char* new_passwd);
