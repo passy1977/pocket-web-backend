@@ -522,7 +522,7 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn pocket_aes_decrypt(
         self_: *mut pocket_t,
-        plain: *const ::std::os::raw::c_char,
+        encrypted: *const ::std::os::raw::c_char,
     ) -> *const ::std::os::raw::c_char;
 }
 unsafe extern "C" {

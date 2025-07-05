@@ -1,4 +1,4 @@
-use crate::bindings::{pocket_aes_encrypt, pocket_initialize, pocket_initialize_aes};
+use crate::bindings::{free, pocket_initialize, pocket_initialize_aes, pocket_login, pocket_stat_t, pocket_stat_t_OK};
 use crate::models::rests::{Claims, DataTransport};
 use crate::services::data::Data;
 use crate::services::session::{Session, Sessions};
@@ -9,6 +9,7 @@ use std::ffi::CString;
 use std::str::FromStr;
 use std::sync::Arc;
 use crate::constants::data::EMPTY_CONFIG_JSON;
+use crate::constants::Stats;
 use crate::utils::aes_encrypt;
 
 pub struct RestController {
@@ -102,6 +103,14 @@ impl RestController {
         {
             unsafe {
                 
+                // if !pocket_initialize_aes(session.pocket, CString::new(passwd.clone()).unwrap().as_ptr()) {
+                //     return HttpResponse::NotAcceptable().json(DataTransport{
+                //         session_id: session.session_id,
+                //         error: Some("Impossible init aes".to_string()),
+                //         ..DataTransport::default()
+                //     })
+                // }    
+
                 let mut store = Box::new(false);
                 if !pocket_initialize(session.pocket,
                                       CString::from_str(&data_dir_path).unwrap().as_ptr(),
@@ -112,10 +121,24 @@ impl RestController {
                 ) {
                     return HttpResponse::NotAcceptable().json(DataTransport{
                         session_id: session.session_id,
-                        error: Some("Server Data wrong format".to_string()),
+                        error: Some("Server data wrong format".to_string()),
                         ..DataTransport::default()
                     })
                 }
+
+                let rc = pocket_login(session.pocket,
+                                      CString::from_str(&email).unwrap().as_ptr(),
+                                      CString::from_str(&passwd).unwrap().as_ptr());
+
+                if rc != Stats::Ok {
+                    return HttpResponse::NotAcceptable().json(DataTransport{
+                        session_id: session.session_id,
+                        error: Some("Wrong email or passwd".to_string()),
+                        data: Some(Stats::from(rc).to_string()),
+                        ..DataTransport::default()
+                    })
+                }
+                
             }
         } else {
             return HttpResponse::Ok().json(DataTransport {
@@ -211,7 +234,7 @@ impl RestController {
         };
 
         unsafe {
-            if pocket_initialize_aes(session.pocket, CString::new(passwd.clone()).unwrap().as_ptr()) {
+            if !pocket_initialize_aes(session.pocket, CString::new(passwd.clone()).unwrap().as_ptr()) {
                 return HttpResponse::NotAcceptable().json(DataTransport{
                     session_id: session.session_id,
                     error: Some("Impossible init aes".to_string()),
@@ -221,7 +244,15 @@ impl RestController {
         }
         
         let config_json = aes_encrypt(session.pocket, &config_json);
-        
+        if config_json == "" {
+            return HttpResponse::NotAcceptable().json(DataTransport{
+                session_id: session.session_id,
+                error: Some("Impossible encrypt config_json".to_string()),
+                ..DataTransport::default()
+            })
+        }
+
+
         let mut store = Box::new(false);
         
         unsafe {
@@ -234,18 +265,20 @@ impl RestController {
             ) {
                 return HttpResponse::NotAcceptable().json(DataTransport{
                     session_id: session.session_id,
-                    error: Some("Server Data wrong format".to_string()),
+                    error: Some("Server data wrong format".to_string()),
                     ..DataTransport::default()
                 })
             }
         }
-        
-        if self.data.store_config_json(&email, &config_json).is_err() {
-            return HttpResponse::NotAcceptable().json(DataTransport{
-                session_id: session.session_id,
-                error: Some("Impossible store config_json".to_string()),
-                ..DataTransport::default()
-            })
+
+        if *store {
+            if self.data.store_config_json(&email, &config_json).is_err() {
+                return HttpResponse::NotAcceptable().json(DataTransport{
+                    session_id: session.session_id,
+                    error: Some("Impossible store config_json".to_string()),
+                    ..DataTransport::default()
+                })
+            }
         }
 
         let mut data = String::new();

@@ -6,7 +6,6 @@ use std::{env, fs};
 use std::fs::File;
 use std::io::{self, Error, ErrorKind, Read, Write};
 use serde::{Deserialize, Serialize};
-use crate::bindings::{pocket_t};
 
 #[repr(C)]
 #[derive(Serialize, Deserialize, Clone)]

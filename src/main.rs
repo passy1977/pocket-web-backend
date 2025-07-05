@@ -23,6 +23,7 @@ mod traits;
 mod controllers;
 //https://medium.com/@AlexanderObregon/building-restful-apis-with-rust-and-warp-70a6159fd804
 
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let data = match Data::init() {
@@ -32,6 +33,6 @@ async fn main() -> std::io::Result<()> {
     
     let port = data.port;
     let ip = data.ip.clone();
-    
+
     server::start(ip, port).await
 }

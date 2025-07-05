@@ -83,13 +83,13 @@ bool pocket_initialize_aes(pocket_t* self, const char* passwd)
 
 bool pocket_initialize(pocket_t* self, const char* base_path, const char* config_json, const char* from_stored_data_config_json, const char* passwd, bool* store)
 {
-    if (self == nullptr || base_path == nullptr || config_json == nullptr || from_stored_data_config_json == nullptr || passwd == nullptr, store == nullptr)
+    if (self == nullptr || base_path == nullptr || config_json == nullptr || from_stored_data_config_json == nullptr || passwd == nullptr || store == nullptr)
     {
         return false;
     }
 
     auto session = static_cast<class session*>(self->session);
-    auto aes = static_cast<class aes*>(self->aes);
+    class aes* aes = nullptr;
     if (store)
     {
         *store = false;
@@ -104,6 +104,7 @@ bool pocket_initialize(pocket_t* self, const char* base_path, const char* config
             {
                 return false;
             }
+            aes = static_cast<class aes*>(self->aes);
 
             session = new(nothrow) class session(aes->decrypt(from_stored_data_config_json), base_path);
             if(session == nullptr)
@@ -140,8 +141,9 @@ bool pocket_initialize(pocket_t* self, const char* base_path, const char* config
     }
     else
     {
+        aes = static_cast<class aes*>(self->aes);
+        
         //no encrypt configJson and not stored
-
         if (config_json == nullptr)
         {
             error(APP_TAG, "configJson == nullptr");
@@ -151,7 +153,7 @@ bool pocket_initialize(pocket_t* self, const char* base_path, const char* config
 
         try
         {
-            session = new(nothrow) class session(config_json, base_path);
+            session = new(nothrow) class session(aes->decrypt(config_json), base_path);
             if(session == nullptr)
             {
                 error(APP_TAG, "Impossible alloc session");
@@ -228,15 +230,15 @@ pocket_stat_t pocket_send_data(pocket_t* self)
     return OK;
 }
 
-const char* pocket_aes_decrypt(pocket_t* self, const char plain[])
+const char* pocket_aes_decrypt(pocket_t* self, const char encrypted[])
 {
-    if (self == nullptr || plain == nullptr || self->aes == nullptr)
+    if (self == nullptr || encrypted == nullptr || self->aes == nullptr)
     {
         return nullptr;
     }
     auto aes = static_cast<class aes*>(self->aes);
 
-    auto dec = aes->decrypt(plain);
+    auto dec = aes->decrypt(encrypted);
 
     auto ret = static_cast<char*>(malloc(dec.size() + 1));
     if (ret == nullptr)
@@ -262,6 +264,7 @@ const char* pocket_aes_encrypt(pocket_t* self, const char plain[])
     {
         return nullptr;
     }
+    memset(ret, '\0', enc.length() + 1);
     memcpy(ret, enc.c_str(), enc.length());
 
     return ret;
@@ -275,6 +278,7 @@ const char* pocket_sha512_encrypt(const char str[])
     {
         return nullptr;
     }
+    memset(ret, '\0', enc.length() + 1);
     memcpy(ret, enc.c_str(), enc.length());
     return ret;
 }

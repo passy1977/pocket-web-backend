@@ -50,7 +50,7 @@ bool pocket_copy_field(pocket_t* self, int64_t field_id_src, int64_t group_id_ds
 pocket_stat_t pocket_send_data(pocket_t* self);
 
 
-const char* pocket_aes_decrypt(pocket_t* self, const char plain[]);
+const char* pocket_aes_decrypt(pocket_t* self, const char encrypted[]);
 const char* pocket_aes_encrypt(pocket_t* self, const char plain[]);
 const char* pocket_sha512_encrypt(const char str[]);
 
