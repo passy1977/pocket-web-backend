@@ -139,4 +139,4 @@ impl Group {
     }
 }
 
-
+pub type Groups = Vec<Group>;

@@ -125,3 +125,4 @@ impl Field {
     }
 }
 
+pub type Fields = Vec<Field>;

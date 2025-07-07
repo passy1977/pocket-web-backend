@@ -3,26 +3,24 @@ use std::{ffi::CString, str::FromStr};
 use actix_web::{web::Json, HttpResponse};
 use jsonwebtoken::{encode, EncodingKey, Header};
 
-use crate::{bindings::{pocket_initialize, pocket_login}, constants::Stats, models::rests::{Claims, DataTransport}, rest::rest_controller::RestController, services::session::{Session, Sessions}};
-
+use crate::services::http_response_helper::HttpResponseHelper;
+use crate::{bindings::{pocket_initialize, pocket_login}, constants::Stats, models::rests::{Claims, DataTransport}, rest::rest_controller::RestController, services::session::Sessions};
 
 impl RestController {
     
 pub fn login(&self, data_transport: Json<DataTransport>) -> HttpResponse {
 
         let (email, passwd) = match &data_transport.data {
-            None => return HttpResponse::Forbidden().json(DataTransport{
-                error: Some("No data send".to_string()),
-                ..DataTransport::default()
-            }),
+            None => return HttpResponseHelper::forbidden()
+                .error("No data send")
+                .build(),
             Some(data) => {
                 let split: Vec<&str> = data.split("|").collect();
 
                 if split.len() != 2 {
-                    return HttpResponse::Forbidden().json(DataTransport{
-                        error: Some("email and passwd are mandatory".to_string()),
-                        ..DataTransport::default()
-                    });
+                    return HttpResponseHelper::forbidden()
+                        .error("email and passwd are mandatory")
+                        .build()
                 }
 
                 (split[0].to_string(), split[1].to_string())
@@ -30,19 +28,17 @@ pub fn login(&self, data_transport: Json<DataTransport>) -> HttpResponse {
         };
 
         let session = match Sessions::share().get(&*data_transport.session_id) {
-            None => return HttpResponse::Forbidden().json(DataTransport{
-                error: Some("Session not found".to_string()),
-                ..DataTransport::default()
-            }),
+            None => return HttpResponseHelper::forbidden()
+                .error("Session not found")
+                .build(),
             Some(session) => session
         };
 
         let data_dir_path = match self.data.dir_path.clone().as_path().to_str() {
-            None => return HttpResponse::NotAcceptable().json(DataTransport{
-                session_id: session.session_id,
-                error: Some("data_dit_path not found".to_string()),
-                ..DataTransport::default()
-            }),
+            None => return HttpResponseHelper::not_acceptable()
+                .session_id(session.session_id)
+                .error("data_dit_path not found")
+                .build(),
             Some(data_dir_path) => data_dir_path.to_string()
         };
         
@@ -55,11 +51,10 @@ pub fn login(&self, data_transport: Json<DataTransport>) -> HttpResponse {
                                       true,
                                       CString::from_str(&passwd).unwrap().as_ptr()
                 ) {
-                    return HttpResponse::NotAcceptable().json(DataTransport{
-                        session_id: session.session_id,
-                        error: Some("Server data wrong format".to_string()),
-                        ..DataTransport::default()
-                    })
+                        return HttpResponseHelper::not_acceptable()
+                            .session_id(session.session_id)
+                            .error("Server data wrong format")
+                            .build()
                 }
 
                 let rc = pocket_login(session.pocket,
@@ -67,21 +62,19 @@ pub fn login(&self, data_transport: Json<DataTransport>) -> HttpResponse {
                                       CString::from_str(&passwd).unwrap().as_ptr());
 
                 if rc != Stats::Ok {
-                    return HttpResponse::NotAcceptable().json(DataTransport{
-                        session_id: session.session_id,
-                        error: Some("Wrong email or passwd".to_string()),
-                        data: Some(Stats::from(rc).to_string()),
-                        ..DataTransport::default()
-                    })
+                    return HttpResponseHelper::not_acceptable()
+                        .session_id(session.session_id)
+                        .error("Wrong email or passwd")
+                        .data(Stats::from(rc).to_string())
+                        .build()
                 }
             }
         } else {
-            return HttpResponse::Ok().json(DataTransport {
-                path: "/registration".to_string(),
-                title: "Register new user".to_string(),
-                data: Some(email),
-                ..data_transport.into_inner()
-            })
+            return HttpResponseHelper::ok()
+                .path("/registration")
+                .title("Register new user")
+                .data(email)
+                .build();
         }
 
         let claims = Claims {
@@ -93,16 +86,18 @@ pub fn login(&self, data_transport: Json<DataTransport>) -> HttpResponse {
 
         let jwt = match encode(&Header::default(), &claims, &EncodingKey::from_secret(&self.data.jwt_secret.as_bytes())) {
             Ok(token) => Some(token),
-            Err(err) => return HttpResponse::InternalServerError().body(err.to_string())
+            Err(err) => return HttpResponseHelper::internal_server_error()
+                .error(err.to_string())
+                .build()
         };
 
-        HttpResponse::Ok().json(DataTransport {
-            path: "/home".to_string(),
-            title: "Home".to_string(),
-            jwt,
-            ..data_transport.into_inner()
-        })
 
+     HttpResponseHelper::ok()
+        .path("/home")
+         .title("Home")
+         .jwt(jwt.unwrap())
+         .session_id(session.session_id)
+        .build()
     }
 
 }

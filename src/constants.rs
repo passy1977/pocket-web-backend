@@ -1,10 +1,8 @@
 use std::fmt;
 use std::fmt::{Display, Formatter};
-use std::ops::Deref;
-use serde::{Deserialize, Serialize};
 use crate::bindings;
 use crate::bindings::pocket_stat_t;
-use crate::constants::Stats::{Busy, CacheNotFound, DbFieldError, DbGenericError, DbGroupError, DbGroupFieldError, DeviceIdNotMatch, Error, JsonParsingError, LocalDeviceIdNotMatch, MapIdError, NoNetwork, PasswdError, Ready, SecretEmpty, SecretNotMatch, TimestampLastNotParsable, TimestampLastUpdateNotMatch, UserNotFound, WrongSizeToken};
+use crate::constants::Stats::{Busy, CacheNotFound, DbFieldError, DbGenericError, DbGroupError, DbGroupFieldError, DeviceIdNotMatch, DeviceNotFound, Error, JsonParsingError, LocalDeviceIdNotMatch, MapIdError, NoNetwork, PasswdError, Ready, SecretEmpty, SecretNotMatch, TimestampLastNotParsable, TimestampLastUpdateNotMatch, UserNotFound, WrongSizeToken};
 
 pub(crate) mod conf {
     pub const IP: &str = "127.0.0.1";
@@ -21,8 +19,6 @@ pub(crate) mod jwt {
 pub(crate)  mod data {
     pub const DATA_FOLDER : &str = ".pocket-web-backend";
     pub const DATA_FILE : &str = "data.json";
-
-    pub const EMPTY_CONFIG_JSON : &str = "{}";
 }
 
 #[derive(Clone, Copy)]
@@ -59,6 +55,7 @@ impl Stats {
             bindings::pocket_stat_t_USER_NOT_FOUND => UserNotFound,
             bindings::pocket_stat_t_WRONG_SIZE_TOKEN => WrongSizeToken,
             bindings::pocket_stat_t_DEVICE_ID_NOT_MATCH => DeviceIdNotMatch,
+            bindings::pocket_stat_t_DEVICE_NOT_FOUND => DeviceNotFound,
             bindings::pocket_stat_t_SECRET_NOT_MATCH => SecretNotMatch,
             bindings::pocket_stat_t_PASSWD_ERROR => PasswdError,
             bindings::pocket_stat_t_TIMESTAMP_LAST_UPDATE_NOT_MATCH => TimestampLastUpdateNotMatch,

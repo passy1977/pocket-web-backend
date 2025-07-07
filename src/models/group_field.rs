@@ -98,3 +98,4 @@ impl GroupField {
     }
 }
 
+pub type GroupFields = Vec<GroupField>;

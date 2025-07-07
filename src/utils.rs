@@ -1,6 +1,5 @@
 use std::{error, fmt};
 use std::ffi::{CStr, CString};
-use actix_web::body::MessageBody;
 
 use crate::bindings::{free, pocket_aes_encrypt, pocket_sha512_encrypt, pocket_t};
 

@@ -1,9 +1,9 @@
-use std::str::FromStr;
+use crate::models::field::Fields;
+use crate::models::group::Groups;
+use crate::models::group_field::GroupFields;
 use serde::{Deserialize, Serialize};
 use serde_json::from_str;
-use crate::models::field::Field;
-use crate::models::group::Group;
-use crate::models::group_field::GroupField;
+use std::str::FromStr;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
@@ -19,9 +19,9 @@ pub struct DataTransport {
     pub title: String,
     pub session_id: String,
     pub jwt: Option<String>,
-    pub groups: Option<Vec<Group>>,
-    pub group_fields: Option<Vec<GroupField>>,
-    pub fields: Option<Vec<Field>>,
+    pub groups: Option<Groups>,
+    pub group_fields: Option<GroupFields>,
+    pub fields: Option<Fields>,
     pub data: Option<String>,
     pub error: Option<String>,
 }
