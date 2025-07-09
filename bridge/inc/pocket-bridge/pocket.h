@@ -38,7 +38,7 @@ typedef struct
 } pocket_t;
 
 pocket_t* pocket_new(void);
-void pocket_free(const pocket_t* pocket);
+void pocket_free(pocket_t* pocket);
 
 bool pocket_initialize_aes(pocket_t* self, const char* passwd);
 bool pocket_initialize(pocket_t* self, const char* base_path, const char* config_json, bool encrypted, const char* passwd);

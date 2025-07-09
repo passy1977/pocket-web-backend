@@ -25,7 +25,7 @@
 #include "pocket-bridge/group.h"
 #include "pocket-bridge/group_field.h"
 #include "pocket-bridge/field.h"
-
+#include "pocket-bridge/pocket.h"
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -37,7 +37,12 @@ extern "C" {
 
 
 typedef struct {
+    pocket_t* pocket;
     bool reachability;
+    void* view_group;
+    void* view_group_field;
+    void* view_field;
+    void* show_list;
 } pocket_group_controller_t;
 
 typedef struct {
@@ -45,7 +50,7 @@ typedef struct {
     size_t count;
 } pocket_show_list_t;
 
-pocket_group_controller_t* pocket_group_controller_init() ;
+pocket_group_controller_t* pocket_group_controller_init(pocket_t* pocket);
 
 void pocket_group_controller_initialize(pocket_group_controller_t* controller);
 pocket_group_t** pocket_get_list_group(pocket_group_controller_t *controller, uint32_t groupId, const char *search, int *count);

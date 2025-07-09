@@ -54,10 +54,18 @@ pocket_t* pocket_new(void)
     return pocket;
 }
 
-void pocket_free(const pocket_t* pocket)
+void pocket_free(pocket_t* pocket)
 {
     if (pocket == nullptr) return;
+
+    if (pocket->user != nullptr)
+    {
+        delete pocket->user;
+        pocket->user = nullptr;
+    }
+
     delete pocket;
+    pocket = nullptr;
 }
 
 bool pocket_initialize_aes(pocket_t* self, const char* passwd)
@@ -150,9 +158,22 @@ pocket_stat_t pocket_login(pocket_t* self, const char* email, const char* passwd
 
     session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
     session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
-    if(auto&& userOpt = session->login(email, passwd, POCKET_ENABLE_AES); userOpt.has_value())
+    if(auto&& user_opt = session->login(email, passwd, POCKET_ENABLE_AES); user_opt.has_value())
     {
-        session->send_data(userOpt);
+        session->send_data(user_opt);
+        if (self->user)
+        {
+            delete self->user;
+        }
+        // self->user = new(nothrow) user;
+        // if(self->user == nullptr)
+        // {
+        //     error(APP_TAG, "Impossible alloc user");
+        //     return ERROR;
+        // }
+
+        self->user = &*user_opt.value();
+
         return OK;
     }
     else
