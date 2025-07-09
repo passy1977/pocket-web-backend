@@ -73,6 +73,7 @@ pub fn login(&self, data_transport: Json<DataTransport>) -> HttpResponse {
             return HttpResponseHelper::ok()
                 .path("/registration")
                 .title("Register new user")
+                .session_id(session.session_id)
                 .data(email)
                 .build();
         }

@@ -1,6 +1,6 @@
 use actix_web::{web, HttpResponse};
 
-use crate::{ models::rests::DataTransport, rest::rest_controller::RestController, services::session::{Session, Sessions}};
+use crate::{ models::rests::DataTransport, rest::rest_controller::RestController, services::{http_response_helper::HttpResponseHelper, session::{Session, Sessions}}};
 
 
 impl RestController {
@@ -24,10 +24,7 @@ impl RestController {
             Some(session) => session.session_id.clone()
         };
         
-        HttpResponse::Ok().json(crate::models::rests::DataTransport{
-            session_id,
-            ..DataTransport::default()   
-        })
+        HttpResponseHelper::ok().session_id(session_id).build()
     }
 
 }
