@@ -612,48 +612,55 @@ unsafe extern "C" {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct field_controller_t {
+pub struct pocket_field_controller_t {
     pub reachability: bool,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of field_controller_t"][::std::mem::size_of::<field_controller_t>() - 1usize];
-    ["Alignment of field_controller_t"][::std::mem::align_of::<field_controller_t>() - 1usize];
-    ["Offset of field: field_controller_t::reachability"]
-        [::std::mem::offset_of!(field_controller_t, reachability) - 0usize];
+    ["Size of pocket_field_controller_t"]
+        [::std::mem::size_of::<pocket_field_controller_t>() - 1usize];
+    ["Alignment of pocket_field_controller_t"]
+        [::std::mem::align_of::<pocket_field_controller_t>() - 1usize];
+    ["Offset of field: pocket_field_controller_t::reachability"]
+        [::std::mem::offset_of!(pocket_field_controller_t, reachability) - 0usize];
 };
 unsafe extern "C" {
-    pub fn pocket_field_controller_init() -> *mut field_controller_t;
+    pub fn pocket_field_controller_new(pocket: *mut pocket_t) -> *mut pocket_field_controller_t;
 }
 unsafe extern "C" {
-    pub fn pocket_field_controller_initialize(self_: *mut field_controller_t);
+    pub fn pocket_field_controller_free(field_controller: *mut pocket_field_controller_t);
+}
+unsafe extern "C" {
+    pub fn pocket_field_controller_init(self_: *mut pocket_field_controller_t);
 }
 unsafe extern "C" {
     pub fn pocket_field_controller_get_list_field(
-        self_: *mut field_controller_t,
+        self_: *mut pocket_field_controller_t,
         group_id: i64,
         search: *const ::std::os::raw::c_char,
     ) -> *mut *mut pocket_field_t;
 }
 unsafe extern "C" {
     pub fn pocket_field_controller_persist_field(
-        self_: *mut field_controller_t,
+        self_: *mut pocket_field_controller_t,
         f: *const pocket_field_t,
     ) -> pocket_stat_t;
 }
 unsafe extern "C" {
     pub fn pocket_field_controller_del_field(
-        self_: *mut field_controller_t,
+        self_: *mut pocket_field_controller_t,
         f: *mut pocket_field_t,
     ) -> pocket_stat_t;
 }
 unsafe extern "C" {
-    pub fn pocket_field_controller_size_filed(self_: *mut field_controller_t, group_id: i64)
-    -> i32;
+    pub fn pocket_field_controller_size_filed(
+        self_: *mut pocket_field_controller_t,
+        group_id: i64,
+    ) -> i32;
 }
 unsafe extern "C" {
     pub fn pocket_field_controller_get_filed(
-        self_: *mut field_controller_t,
+        self_: *mut pocket_field_controller_t,
         group_id: i64,
     ) -> *mut pocket_field_t;
 }
@@ -835,15 +842,18 @@ const _: () = {
         [::std::mem::offset_of!(pocket_show_list_t, count) - 8usize];
 };
 unsafe extern "C" {
-    pub fn pocket_group_controller_init(pocket: *mut pocket_t) -> *mut pocket_group_controller_t;
+    pub fn pocket_group_controller_new(pocket: *mut pocket_t) -> *mut pocket_group_controller_t;
 }
 unsafe extern "C" {
-    pub fn pocket_group_controller_initialize(controller: *mut pocket_group_controller_t);
+    pub fn pocket_group_controller_free(group_controller: *mut pocket_group_controller_t);
+}
+unsafe extern "C" {
+    pub fn pocket_group_controller_init(controller: *mut pocket_group_controller_t);
 }
 unsafe extern "C" {
     pub fn pocket_get_list_group(
         controller: *const pocket_group_controller_t,
-        groupId: u32,
+        group_id: u32,
         search: *const ::std::os::raw::c_char,
         count: *mut ::std::os::raw::c_int,
     ) -> *mut *mut pocket_group_t;
@@ -866,20 +876,20 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn pocket_get_group(
         controller: *mut pocket_group_controller_t,
-        groupId: u32,
+        group_id: u32,
     ) -> *mut pocket_group_t;
 }
 unsafe extern "C" {
     pub fn pocket_get_last_id_group_field() -> u32;
 }
 unsafe extern "C" {
-    pub fn pocket_data_export(fullPathFileExport: *const ::std::os::raw::c_char) -> bool;
+    pub fn pocket_data_export(full_path_file_export: *const ::std::os::raw::c_char) -> bool;
 }
 unsafe extern "C" {
-    pub fn pocket_data_import(fullPathFileImport: *const ::std::os::raw::c_char) -> bool;
+    pub fn pocket_data_import(full_path_file_import: *const ::std::os::raw::c_char) -> bool;
 }
 unsafe extern "C" {
-    pub fn pocket_data_import_legacy(fullPathFileImport: *const ::std::os::raw::c_char) -> bool;
+    pub fn pocket_data_import_legacy(full_path_file_import: *const ::std::os::raw::c_char) -> bool;
 }
 unsafe extern "C" {
     pub fn pocket_clean_show_list(controller: *mut pocket_group_controller_t);
@@ -897,13 +907,13 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn pocket_add_to_show_list(
         controller: *mut pocket_group_controller_t,
-        groupField: *const pocket_group_field_t,
+        group_field: *const pocket_group_field_t,
     ) -> bool;
 }
 unsafe extern "C" {
     pub fn pocket_del_from_show_list(
         controller: *mut pocket_group_controller_t,
-        idGroupField: u32,
+        id_group_field: u32,
     ) -> bool;
 }
 unsafe extern "C" {

@@ -19,40 +19,51 @@
 
 #include "pocket-bridge/field_controller.h"
 
-field_controller_t* pocket_field_controller_init(void) {
+pocket_field_controller_t* pocket_field_controller_new(pocket_t* pocket) {
     return nullptr;
 }
 
-void pocket_field_controller_initialize(field_controller_t* self)
+void pocket_field_controller_free(pocket_field_controller_t* field_controller)
+{
+        if (field_controller == nullptr)
+    {
+        return;
+    }
+
+    delete field_controller;
+    field_controller = NULL;
+}
+
+void pocket_field_controller_init(pocket_field_controller_t* self)
 {
 
 }
 
-pocket_field_t** pocket_field_controller_get_list_field(field_controller_t* self, pocket_stat_t group_id, const char* search)
+pocket_field_t** pocket_field_controller_get_list_field(pocket_field_controller_t* self, pocket_stat_t group_id, const char* search)
 {
 
     return nullptr;
 }
 
-pocket_stat_t pocket_field_controller_persist_field(field_controller_t* self, const pocket_field_t* f)
+pocket_stat_t pocket_field_controller_persist_field(pocket_field_controller_t* self, const pocket_field_t* f)
 {
 
     return OK;
 }
 
-pocket_stat_t pocket_field_controller_del_field(field_controller_t* self, pocket_field_t* f)
+pocket_stat_t pocket_field_controller_del_field(pocket_field_controller_t* self, pocket_field_t* f)
 {
 
     return OK;
 }
 
-int32_t pocket_field_controller_size_filed(field_controller_t* self, pocket_stat_t group_id)
+int32_t pocket_field_controller_size_filed(pocket_field_controller_t* self, pocket_stat_t group_id)
 {
 
     return 0;
 }
 
-pocket_field_t* pocket_field_controller_get_filed(field_controller_t* self, pocket_stat_t group_id)
+pocket_field_t* pocket_field_controller_get_filed(pocket_field_controller_t* self, pocket_stat_t group_id)
 {
 
     return nullptr;

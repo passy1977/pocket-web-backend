@@ -1,12 +1,12 @@
-use actix_web::{web, HttpResponse};
-
-use crate::{ models::rests::DataTransport, rest::rest_controller::RestController, services::{http_response_helper::HttpResponseHelper, session::{Session, Sessions}}};
-
+use actix_web::{web::Path, HttpResponse};
+use crate::rest::rest_controller::RestController;
+use crate::services::http_response_helper::HttpResponseHelper;
+use crate::services::session::{Session, Sessions};
 
 impl RestController {
     
 
-    pub fn hello(&self, session_id: web::Path<String>) -> HttpResponse {
+    pub fn hello(&self, session_id: Path<String>) -> HttpResponse {
 
         let mut session_id_handler = "".to_string();
         if !session_id.is_empty() {

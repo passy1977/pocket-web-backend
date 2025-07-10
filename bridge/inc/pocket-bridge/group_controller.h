@@ -50,23 +50,24 @@ typedef struct {
     size_t count;
 } pocket_show_list_t;
 
-pocket_group_controller_t* pocket_group_controller_init(pocket_t* pocket);
+pocket_group_controller_t* pocket_group_controller_new(pocket_t* pocket);
+void pocket_group_controller_free(pocket_group_controller_t* group_controller);
 
-void pocket_group_controller_initialize(pocket_group_controller_t* controller);
-pocket_group_t** pocket_get_list_group(const pocket_group_controller_t *controller, uint32_t groupId, const char *search, int *count);
+void pocket_group_controller_init(pocket_group_controller_t* controller);
+pocket_group_t** pocket_get_list_group(const pocket_group_controller_t *controller, uint32_t group_id, const char *search, int *count);
 int32_t pocket_count_child(const pocket_group_t* group);
 pocket_stat_t pocket_del_group(pocket_group_controller_t *controller, const pocket_group_t* group);
 pocket_stat_t pocket_persist_group(pocket_group_controller_t *controller, const pocket_group_t* group);
-pocket_group_t* pocket_get_group(pocket_group_controller_t *controller, uint32_t groupId);
+pocket_group_t* pocket_get_group(pocket_group_controller_t *controller, uint32_t group_id);
 uint32_t pocket_get_last_id_group_field(void);
-bool pocket_data_export(const char *fullPathFileExport);
-bool pocket_data_import(const char *fullPathFileImport);
-bool pocket_data_import_legacy(const char *fullPathFileImport);
+bool pocket_data_export(const char *full_path_file_export);
+bool pocket_data_import(const char *full_path_file_import);
+bool pocket_data_import_legacy(const char *full_path_file_import);
 void pocket_clean_show_list(pocket_group_controller_t* controller);
 void pocket_fill_show_list(pocket_group_controller_t* controller, const pocket_group_t *group, bool insert);
 pocket_show_list_t* pocket_get_show_list(void);
-bool pocket_add_to_show_list(pocket_group_controller_t *controller, const pocket_group_field_t *groupField);
-bool pocket_del_from_show_list(pocket_group_controller_t *controller, uint32_t idGroupField);
+bool pocket_add_to_show_list(pocket_group_controller_t *controller, const pocket_group_field_t *group_field);
+bool pocket_del_from_show_list(pocket_group_controller_t *controller, uint32_t id_group_field);
 uint8_t pocket_size_show_list(const pocket_group_controller_t* controller);
 
 #ifdef __cplusplus

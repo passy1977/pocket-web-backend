@@ -15,8 +15,8 @@ pub async fn registration(data_transport: web::Json<DataTransport>) -> impl Resp
     RestController::share().registration(data_transport)
 }
 
-pub async fn main(_info: web::Json<DataTransport>) -> impl Responder {
-    HttpResponse::Forbidden().finish()
+pub async fn main(data_transport: web::Json<DataTransport>) -> impl Responder {
+    RestController::share().main(data_transport)
 }
 
 pub async fn field_detail(_info: web::Json<DataTransport>) -> impl Responder {
