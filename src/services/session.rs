@@ -9,8 +9,6 @@ use ulid::Ulid;
 pub struct Session {
     /// Unique identifier (ulid) for users who are using the client
     pub session_id: String,
-
-    pub jwt: Option<String>,
     
     pub pocket: *mut pocket_t,
     
@@ -24,7 +22,6 @@ impl Session {
     pub fn new() -> Session {
         Self {
             session_id: Ulid::new().to_string(),
-            jwt: None,
             pocket: unsafe { pocket_new() },
             timestamp_last_update: match SystemTime::now().duration_since(UNIX_EPOCH) {
                 Ok(duration) => duration.as_secs(), 

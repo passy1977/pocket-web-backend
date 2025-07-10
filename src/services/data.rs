@@ -1,4 +1,4 @@
-use crate::constants::{data::*, conf::*, jwt::{JWT_AUD, JWT_ISS, SECRET}};
+use crate::constants::{data::*, conf::*};
 use crate::utils::{sha512_encrypt, Result};
 use crate::services::cli::Cli;
 use std::path::{Path, PathBuf};
@@ -22,12 +22,6 @@ pub struct Data {
 
     /// Connection port
     pub port: u16,
-
-    pub jwt_iss: String,
-
-    pub jwt_aud: String,
-    
-    pub jwt_secret: String,
 
     #[serde(skip_serializing, skip_deserializing)]
     pub(super) update : bool
@@ -72,9 +66,6 @@ impl Data {
             dir_path,
             ip: IP.to_string(),
             port: PORT,
-            jwt_iss: JWT_ISS.to_string(),
-            jwt_aud: JWT_AUD.to_string(),
-            jwt_secret: SECRET.to_string(),
             update: false
         };
         
@@ -106,9 +97,6 @@ impl Data {
 
         self.ip = data.ip;
         self.port = data.port;
-        self.jwt_aud = data.jwt_aud;
-        self.jwt_iss = data.jwt_iss;
-        self.jwt_secret = data.jwt_secret;
         self.update = false;
 
         Ok(())

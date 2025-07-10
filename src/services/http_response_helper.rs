@@ -47,11 +47,6 @@ impl HttpResponseHelper {
         self
     }
 
-    pub fn jwt(mut self, jwt: impl Into<String>) -> Self {
-        self.1.jwt = Some(jwt.into());
-        self
-    }
-
     pub fn groups(mut self, groups: Groups) -> Self {
         self.1.groups = Some(groups);
         self
