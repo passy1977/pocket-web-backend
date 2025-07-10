@@ -1,4 +1,4 @@
-use crate::bindings::{free, pocket_field_new_with_args, pocket_field_t};
+use crate::bindings::{free, pocket_field_new_with_params, pocket_field_t};
 use std::ffi::{c_void, CStr, CString};
 use serde::{Deserialize, Serialize};
 
@@ -94,7 +94,7 @@ impl Field {
                 None => std::ptr::null_mut()
             };
             
-            let ret = pocket_field_new_with_args(
+            let ret = pocket_field_new_with_params(
                 self.id,
                 self.server_id,
                 self.user_id,

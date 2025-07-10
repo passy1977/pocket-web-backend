@@ -45,6 +45,7 @@ constexpr char APP_TAG[] = "GroupController";
 
 }
  
+extern pocket_group_t* convert(const group::ptr& group) noexcept;
 
 pocket_group_controller_t* pocket_group_controller_init(pocket_t* pocket)
 {
@@ -74,7 +75,7 @@ void pocket_group_controller_initialize(pocket_group_controller_t* controller)
 }
 
 
-pocket_group_t** pocket_get_list_group(pocket_group_controller_t *controller, uint32_t group_id, const char *search, int *count) try
+pocket_group_t** pocket_get_list_group(const pocket_group_controller_t *controller, uint32_t group_id, const char *search, int *count) try
 {
     if (!controller || !count) return nullptr;
 
@@ -84,7 +85,7 @@ pocket_group_t** pocket_get_list_group(pocket_group_controller_t *controller, ui
     auto&& list = view_group->get_list(group_id, search);
     *count = list.size();
 
-    auto ret = new(nothrow) pocket_group_t[*count];
+    auto ret = new(nothrow) pocket_group_t*[*count];
     if (ret == nullptr)
     {
         return nullptr;
@@ -93,10 +94,10 @@ pocket_group_t** pocket_get_list_group(pocket_group_controller_t *controller, ui
     int32_t i = 0;
     for(auto &&it : list)
     {
-        ret[i] = *it;
+        ret[i]  = convert(it);
         i++;
     }
-    return nullptr;
+    return ret;
 }
 catch(const runtime_error& e)
 {

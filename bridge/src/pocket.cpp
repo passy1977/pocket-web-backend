@@ -58,7 +58,7 @@ void pocket_free(pocket_t* pocket)
 {
     if (pocket == nullptr) return;
 
-    if (pocket->user != nullptr)
+    if (pocket->user)
     {
         delete pocket->user;
         pocket->user = nullptr;

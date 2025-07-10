@@ -46,9 +46,9 @@ typedef struct {
     uint64_t timestamp_creation;
 } pocket_group_t;
 
-pocket_group_t* pocket_group_init(void);
+pocket_group_t* pocket_group_new(void);
 
-pocket_group_t* pocket_group_init_with_id(int64_t id,
+pocket_group_t* pocket_group_new_with_params(int64_t id,
                                           int64_t server_id,
                                           int64_t user_id,
                                           int64_t group_id,

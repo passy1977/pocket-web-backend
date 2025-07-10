@@ -24,7 +24,7 @@
 
 using namespace std;
 
-pocket_group_field_t* pocket_group_field_init() {
+pocket_group_field_t* pocket_group_field_new() {
     auto group_field = new(std::nothrow) pocket_group_field_t {
         .new_insertion = false,
         .id = 0,
@@ -43,7 +43,7 @@ pocket_group_field_t* pocket_group_field_init() {
     return group_field;
 }
 
-pocket_group_field_t* pocket_group_field_init_with_id(int64_t id,
+pocket_group_field_t* pocket_group_field_new_with_params(int64_t id,
                                                       int64_t server_id,
                                                       int64_t user_id,
                                                       int64_t group_id,

@@ -19,13 +19,16 @@
 
 #include "pocket-bridge/group.h"
 
-#include <cstdlib>
+#include "pocket-pods/group.hpp"
+using pocket::pods::group;
+
 #include <cstring>
 #include <new>
+#include <optional>
 
 using namespace std;
 
-pocket_group_t* pocket_group_init()
+pocket_group_t* pocket_group_new()
 {
     auto group = new(nothrow) pocket_group_t {
         .id = 0,
@@ -49,7 +52,7 @@ pocket_group_t* pocket_group_init()
     return group;
 }
 
-pocket_group_t* pocket_group_init_with_id(int64_t id,
+pocket_group_t* pocket_group_new_with_params(int64_t id,
                                           int64_t server_id,
                                           int64_t user_id,
                                           int64_t group_id,
@@ -115,4 +118,9 @@ void pocket_group_free(pocket_group_t *group)
 
         delete group;
     }
+}
+
+pocket_group_t* convert(const group::ptr& group) noexcept
+{
+    return nullptr;
 }

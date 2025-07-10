@@ -1,4 +1,4 @@
-use crate::bindings::{free, pocket_group_field_init_with_id, pocket_group_field_t};
+use crate::bindings::{free, pocket_group_field_new_with_params, pocket_group_field_t};
 use std::ffi::{c_void, CStr, CString};
 use serde::{Deserialize, Serialize};
 
@@ -73,7 +73,7 @@ impl GroupField {
                 None => std::ptr::null_mut()
             };
 
-            let ret = pocket_group_field_init_with_id(
+            let ret = pocket_group_field_new_with_params(
                 self.id,
                 self.server_id,
                 self.user_id,

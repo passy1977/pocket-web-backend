@@ -49,7 +49,7 @@ pocket_field_t* pocket_field_new()
  return field;
 }
 
-pocket_field_t* pocket_field_new_with_args(int64_t id, int64_t server_id, int64_t user_id, int64_t group_id,
+pocket_field_t* pocket_field_new_with_params(int64_t id, int64_t server_id, int64_t user_id, int64_t group_id,
  int64_t server_group_id, int64_t group_field_id, int64_t server_group_field_id, const char* title, const char* value,
  bool is_hidden,  bool synchronized, bool deleted, uint64_t timestamp_creation)
 {
