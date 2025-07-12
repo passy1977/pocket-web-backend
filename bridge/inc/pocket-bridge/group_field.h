@@ -49,6 +49,6 @@ pocket_group_field_t* pocket_group_field_new_with_params(int64_t id,
                                                       bool deleted,
                                                       uint64_t timestamp_creation);
 
-void pocket_group_field_free(pocket_group_field_t *group_field);
+void pocket_group_field_free(pocket_group_field_t* group_field);
 
 #endif //GROUP_FIELD_H

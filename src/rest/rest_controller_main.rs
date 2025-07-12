@@ -1,6 +1,9 @@
+use std::error::Error;
+use std::ffi::CString;
+use std::ops::Deref;
 use actix_web::HttpResponse;
 use actix_web::web::Json;
-use crate::bindings::{pocket_field_controller_init, pocket_field_controller_new, pocket_group_controller_init, pocket_group_controller_new};
+use crate::bindings::{pocket_group_controller_get_list_group, pocket_field_controller_init, pocket_field_controller_new, pocket_group_controller_init, pocket_group_controller_new};
 use crate::models::rests::DataTransport;
 use crate::rest::rest_controller::RestController;
 use crate::services::http_response_helper::HttpResponseHelper;
@@ -22,7 +25,12 @@ pub fn main(&self, data_transport: Json<DataTransport>) -> HttpResponse {
                     .build()
             }
 
-            (split[0].to_string(), split[1].to_string())
+            (match split[0].to_string().parse::<u32>() {
+                Ok(group_id) => group_id,
+                Err(e) => return HttpResponseHelper::internal_server_error()
+                    .error(e.to_string())
+                    .build()
+            }, split[1].to_string())
         }
     };
 
@@ -45,10 +53,6 @@ pub fn main(&self, data_transport: Json<DataTransport>) -> HttpResponse {
 
             pocket_group_controller_init(session.group_controller);
 
-            Sessions::share().remove(&session.session_id);
-
-            Sessions::share().add(session.clone());
-
             session.group_controller
         } else {
             session.group_controller
@@ -69,9 +73,6 @@ pub fn main(&self, data_transport: Json<DataTransport>) -> HttpResponse {
 
             pocket_field_controller_init(session.field_controller);
 
-            Sessions::share().remove(&session.session_id);
-
-            Sessions::share().add(session.clone());
 
             session.field_controller
         } else {
@@ -81,6 +82,39 @@ pub fn main(&self, data_transport: Json<DataTransport>) -> HttpResponse {
         field_controller
     };
     
+
+    Sessions::share().remove(&session.session_id, false);
+
+    Sessions::share().add(session.clone());
+
+
+    unsafe {
+
+        let mut count = Box::new(1i32);
+        let groups_ptr = pocket_group_controller_get_list_group(
+            group_controller,
+            group_id,
+            CString::new(search).expect("search::new failed").as_ptr(),
+            count.as_mut()
+        );
+        if groups_ptr.is_null() {
+            return HttpResponseHelper::internal_server_error()
+                .error("Groups it's null")
+                .build()
+        }
+
+        let mut groups = Vec::with_capacity(*count as usize);
+        for i in 0i32..*count {
+            let group_ptr = *groups_ptr.offset(i as isize);
+            if !group_ptr.is_null() {
+                let group = std::ptr::read(group_ptr);
+                groups.push(group);
+            }
+        }
+
+    }
+
+
     HttpResponseHelper::ok().session_id("ssss").build()
 }
 

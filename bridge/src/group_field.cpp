@@ -78,7 +78,7 @@ pocket_group_field_t* pocket_group_field_new_with_params(int64_t id,
     return group_field;
 }
 
-void pocket_group_field_free(pocket_group_field_t *group_field)
+void pocket_group_field_free(pocket_group_field_t* group_field)
 {
     if (group_field)
     {

@@ -19,24 +19,42 @@
 
 #include "pocket-bridge/field_controller.h"
 
+#include "pocket-controllers/session.hpp"
+using pocket::controllers::session;
+
+#include <new>
+using namespace std;
+
 pocket_field_controller_t* pocket_field_controller_new(pocket_t* pocket) {
-    return nullptr;
+    if (pocket == nullptr)
+    {
+        return nullptr;
+    }
+    return new(nothrow) pocket_field_controller_t {
+        .pocket = pocket,
+        .reachability = true,
+        .view_field = nullptr
+    };
 }
 
 void pocket_field_controller_free(pocket_field_controller_t* field_controller)
 {
-        if (field_controller == nullptr)
+    if (field_controller == nullptr)
     {
         return;
     }
 
     delete field_controller;
-    field_controller = NULL;
+    field_controller = nullptr;
 }
 
 void pocket_field_controller_init(pocket_field_controller_t* self)
 {
-
+    if (self && self->pocket && self->pocket->session)
+    {
+        auto session = static_cast<class session*>(self->pocket->session);
+        self->view_field = session->get_view_field().get();
+    }
 }
 
 pocket_field_t** pocket_field_controller_get_list_field(pocket_field_controller_t* self, pocket_stat_t group_id, const char* search)

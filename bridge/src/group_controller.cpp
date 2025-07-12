@@ -58,39 +58,37 @@ pocket_group_controller_t* pocket_group_controller_new(pocket_t* pocket)
         .reachability = true,
         .view_group = nullptr,
         .view_group_field = nullptr,
-        .view_field = nullptr,
         .show_list = nullptr
     };
 }
 
-void pocket_group_controller_free(pocket_group_controller_t* group_controller)
+void pocket_group_controller_free(pocket_group_controller_t* self)
 {
-    if (group_controller == nullptr)
+    if (self == nullptr)
     {
         return;
     }
 
-    delete group_controller;
-    group_controller = NULL;
+    delete self;
+    self = NULL;
 }
 
-void pocket_group_controller_init(pocket_group_controller_t* controller) 
+void pocket_group_controller_init(pocket_group_controller_t* self) 
 {
-    if (controller && controller->pocket && controller->pocket->session)
+    if (self && self->pocket && self->pocket->session)
     {
-        auto session = static_cast<class session*>(controller->pocket->session);
-        controller->view_group = session->get_view_group().get();
-        controller->view_group_field = session->get_view_group_field().get();
-        controller->view_field = session->get_view_field().get();
+        auto session = static_cast<class session*>(self->pocket->session);
+        self->view_group = session->get_view_group().get();
+        self->view_group_field = session->get_view_group_field().get();
     }
 }
 
 
-pocket_group_t** pocket_get_list_group(const pocket_group_controller_t *controller, uint32_t group_id, const char *search, int *count) try
+pocket_group_t** pocket_group_controller_get_list_group(const pocket_group_controller_t* self, uint32_t group_id, const char *search, int *count) try
 {
-    if (!controller || !count) return nullptr;
+    if (!self || !count) return nullptr;
 
-    auto view_group = static_cast<view<group> *>(controller->view_group);
+    auto view_group = static_cast<view<group> *>(self->view_group);
 
 
     auto&& list = view_group->get_list(group_id, search);
@@ -116,46 +114,46 @@ catch(const runtime_error& e)
     return nullptr;    
 }
 
-int32_t pocket_count_child(const pocket_group_t* group)
+int32_t pocket_group_controller_count_child(const pocket_group_controller_t* self, const pocket_group_t* group)
 {
-    if (!group) return -1;
+    if (self == nullptr || group == nullptr) return -1;
 
     return 0; // Placeholder
 }
 
-pocket_stat_t pocket_del_group(pocket_group_controller_t *controller, const pocket_group_t* group)
+pocket_stat_t pocket_group_controller_del_group(pocket_group_controller_t* self, const pocket_group_t* group)
 {
 
     return OK; // Placeholder
 }
 
-pocket_stat_t pocket_persist_group(pocket_group_controller_t *controller, const pocket_group_t* group)
+pocket_stat_t pocket_group_controller_persist_group(pocket_group_controller_t* self, const pocket_group_t* group)
 {
 
     return OK; // Placeholder
 }
 
-pocket_group_t* pocket_get_group(pocket_group_controller_t *controller, uint32_t group_id)
+pocket_group_t* pocket_group_controller_get_group(pocket_group_controller_t* self, uint32_t group_id)
 {
-    if (!controller) return nullptr;
+    if (!self) return nullptr;
 
     return nullptr; // Placeholder
 }
 
-uint32_t pocket_get_last_id_group_field(void)
+uint32_t pocket_group_controller_get_last_id_group_field(void)
 {
 
     return 0; // Placeholder
 }
 
-bool pocket_data_export(const char *full_path_file_export)
+bool pocket_group_controller_data_export(const char* full_path_file_export)
 {
     if (!full_path_file_export) return false;
 
     return true; // Placeholder
 }
 
-bool pocket_data_import(const char *full_path_file_import)
+bool pocket_group_controller_data_import(const char* full_path_file_import)
 {
     if (!full_path_file_import) return false;
 
@@ -163,45 +161,45 @@ bool pocket_data_import(const char *full_path_file_import)
     return true; // Placeholder
 }
 
-bool pocket_data_import_legacy(const char *full_path_file_import)
+bool pocket_group_controller_data_import_legacy(const char* full_path_file_import)
 {
     if (!full_path_file_import) return false;
 
     return true; // Placeholder
 }
 
-void pocket_clean_show_list(pocket_group_controller_t* controller)
+void pocket_group_controller_clean_show_list(pocket_group_controller_t* controller)
 {
 
 }
 
-void pocket_fill_show_list(pocket_group_controller_t* controller, const pocket_group_t *group, bool insert)
+void pocket_group_controller_fill_show_list(pocket_group_controller_t* controller, const pocket_group_t *group, bool insert)
 {
 
 }
 
-pocket_show_list_t* pocket_get_show_list(void)
+pocket_show_list_t* pocket_group_controller_get_show_list(void)
 {
     return nullptr;
 }
 
-bool pocket_add_to_show_list(pocket_group_controller_t *controller, const pocket_group_field_t *group_field)
+bool pocket_add_to_show_list(pocket_group_controller_t* self, const pocket_group_field_t* group_field)
 {
-    if (!controller || !group_field) return false;
+    if (!self || !group_field) return false;
 
     return true; // Placeholder
 }
 
-bool pocket_del_from_show_list(pocket_group_controller_t *controller, uint32_t id_group_field)
+bool pocket_group_controller_del_from_show_list(pocket_group_controller_t* self, uint32_t id_group_field)
 {
-    if (!controller) return false;
+    if (!self) return false;
 
     return true; // Placeholder
 }
 
-uint8_t pocket_size_show_list(const pocket_group_controller_t* controller)
+uint8_t pocket_group_controller_size_show_list(const pocket_group_controller_t* self)
 {
-    if (!controller) return 0;
+    if (!self) return 0;
 
     return 0; // Placeholder
 }
