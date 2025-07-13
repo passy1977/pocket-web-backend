@@ -32,7 +32,6 @@ using views::view;
 
 #include "pocket-pods/group.hpp"
 #include "pocket-pods/group-field.hpp"
-#include "pocket-pods/field.hpp"
 using namespace pods;
 
 #include <new>
@@ -41,7 +40,7 @@ using namespace std;
 namespace
 {
 
-constexpr char APP_TAG[] = "GroupController";
+constexpr char APP_TAG[] = "group_controller";
 
 }
  
@@ -84,7 +83,7 @@ void pocket_group_controller_init(pocket_group_controller_t* self)
 }
 
 
-pocket_group_t** pocket_group_controller_get_list_group(const pocket_group_controller_t* self, uint32_t group_id, const char *search, int *count) try
+pocket_group_t** pocket_group_controller_get_list_group(const pocket_group_controller_t* self, int64_t group_id, const char *search, int *count) try
 {
     if (!self || !count) return nullptr;
 
@@ -100,7 +99,7 @@ pocket_group_t** pocket_group_controller_get_list_group(const pocket_group_contr
         return nullptr;
     }
 
-    int32_t i = 0;
+    size_t i = 0;
     for(auto &&it : list)
     {
         ret[i]  = convert(it);
@@ -133,14 +132,14 @@ pocket_stat_t pocket_group_controller_persist_group(pocket_group_controller_t* s
     return OK; // Placeholder
 }
 
-pocket_group_t* pocket_group_controller_get_group(pocket_group_controller_t* self, uint32_t group_id)
+pocket_group_t* pocket_group_controller_get_group(pocket_group_controller_t* self, int64_t group_id)
 {
     if (!self) return nullptr;
 
     return nullptr; // Placeholder
 }
 
-uint32_t pocket_group_controller_get_last_id_group_field(void)
+int64_t pocket_group_controller_get_last_id_group_field(void)
 {
 
     return 0; // Placeholder
@@ -190,7 +189,7 @@ bool pocket_add_to_show_list(pocket_group_controller_t* self, const pocket_group
     return true; // Placeholder
 }
 
-bool pocket_group_controller_del_from_show_list(pocket_group_controller_t* self, uint32_t id_group_field)
+bool pocket_group_controller_del_from_show_list(pocket_group_controller_t* self, int64_t id_group_field)
 {
     if (!self) return false;
 

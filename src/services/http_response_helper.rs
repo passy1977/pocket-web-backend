@@ -2,6 +2,7 @@ use crate::models::field::Fields;
 use crate::models::group::Groups;
 use crate::models::group_field::GroupFields;
 use crate::models::rests::DataTransport;
+use crate::utils::Result;
 use actix_web::HttpResponse;
 
 enum Status {
@@ -47,8 +48,11 @@ impl HttpResponseHelper {
         self
     }
 
-    pub fn groups(mut self, groups: Groups) -> Self {
-        self.1.groups = Some(groups);
+    pub fn groups(mut self, groups: Result<Groups>) -> Self {
+        self.1.groups = match groups {
+            Ok(groups) => Some(groups),
+            Err(_) => None,
+        };
         self
     }
 
@@ -57,8 +61,11 @@ impl HttpResponseHelper {
         self
     }
 
-    pub fn fields(mut self, fields: Fields) -> Self {
-        self.1.fields = Some(fields);
+    pub fn fields(mut self, fields: Result<Fields>) -> Self {
+        self.1.fields = match fields {
+            Ok(fields) => Some(fields),
+            Err(_) => None,
+        };
         self
     }
 

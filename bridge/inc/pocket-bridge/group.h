@@ -35,12 +35,9 @@ typedef struct {
     int64_t user_id;
     int64_t group_id;
     int64_t server_group_id;
-    int64_t group_field_id;
-    int64_t server_group_field_id;
     char* title; // Usare char* o un altro tipo stringa C appropriato
     char* icon;
     char* note;
-    bool is_hidden;
     bool synchronized;
     bool deleted;
     uint64_t timestamp_creation;

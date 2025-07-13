@@ -1,3 +1,4 @@
+
 cmake_minimum_required(VERSION 3.25)
 project(pocketbridge VERSION "0.1.0" LANGUAGES C CXX)
 
@@ -45,5 +46,7 @@ target_sources(${PROJECT_NAME} PUBLIC
 )
 
 target_link_libraries(${PROJECT_NAME} pocket)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-Wl,-Map=${PROJECT_NAME}.map")
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_BINARY_DIR}/.)

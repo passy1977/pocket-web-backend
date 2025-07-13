@@ -17,8 +17,10 @@
 *
 ***************************************************************************/
 
-#include "pocket-pods/field.hpp"
 #include "pocket-bridge/field.h"
+
+#include "pocket-pods/field.hpp"
+using pocket::pods::field;
 
 #include <cstdlib>
 #include <cstring>
@@ -49,9 +51,20 @@ pocket_field_t* pocket_field_new()
  return field;
 }
 
-pocket_field_t* pocket_field_new_with_params(int64_t id, int64_t server_id, int64_t user_id, int64_t group_id,
- int64_t server_group_id, int64_t group_field_id, int64_t server_group_field_id, const char* title, const char* value,
- bool is_hidden,  bool synchronized, bool deleted, uint64_t timestamp_creation)
+pocket_field_t* pocket_field_new_with_params(
+ int64_t id,
+ int64_t server_id,
+ int64_t user_id,
+ int64_t group_id,
+ int64_t server_group_id,
+ int64_t group_field_id,
+ int64_t server_group_field_id,
+ const char* title,
+ const char* value,
+ bool is_hidden,
+ bool synchronized,
+ bool deleted,
+ uint64_t timestamp_creation)
 {
  auto field = pocket_field_new();
  if (field == nullptr) return nullptr;
@@ -112,67 +125,21 @@ void pocket_field_free(pocket_field_t* field)
 }
 
 
-pocket::pods::field::ptr convert(const pocket_field_t* field)
+pocket_field_t* convert(const field::ptr& field)
 {
-
- auto&& ret = make_unique<pocket::pods::field>();
-
- ret->id = field->id;
- ret->server_id = field->server_id;
- ret->user_id = field->user_id;
- ret->group_id = field->group_id;
- ret->server_group_id = field->server_group_id;
- ret->group_field_id = field->group_field_id;
- ret->server_group_field_id = field->server_group_field_id;
- if (field->title)
- {
-  ret->title = field->title;
- }
- if (field->value)
- {
-  ret->value = field->value;
- }
- ret->is_hidden = field->is_hidden;
- ret->synchronized = field->synchronized;
- ret->deleted = field->deleted;
- ret->timestamp_creation = field->timestamp_creation;
-
- return ret;
-}
-
-pocket_field_t convert(const pocket::pods::field::ptr &field)
-{
- pocket_field_t ret;
- memset(&ret, 0, sizeof(ret));
-
- ret.id = field->id;
- ret.server_id = field->server_id;
- ret.user_id = field->user_id;
- ret.group_id = field->group_id;
- ret.server_group_id = field->server_group_id;
- ret.group_field_id = field->group_field_id;
- ret.server_group_field_id = field->server_group_field_id;
-
- ret.title = new(nothrow) char[field->title.size() + 1];
- if (ret.title == nullptr)
- {
-  memset(&ret, '\0', sizeof(ret));
-  return ret;
- }
- strcpy(ret.title, field->title.c_str());
-
- ret.value = new(nothrow) char[field->value.size() + 1];
- if (ret.value == nullptr)
- {
-  memset(&ret, '\0', sizeof(ret));
-  return ret;
- }
- strcpy(ret.value, field->value.c_str());
-
- ret.is_hidden = field->is_hidden;
- ret.synchronized = field->synchronized;
- ret.deleted = field->deleted;
- ret.timestamp_creation = field->timestamp_creation;
-
- return ret;
+  return pocket_field_new_with_params(
+   field->id,
+   field->server_id,
+   field->user_id,
+   field->group_id,
+   field->server_group_id,
+   field->group_field_id,
+   field->server_group_field_id,
+   field->title.c_str(),
+   field->value.c_str(),
+   field->synchronized,
+   field->is_hidden,
+   field->deleted,
+   field->timestamp_creation
+  );
 }

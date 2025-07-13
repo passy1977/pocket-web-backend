@@ -52,12 +52,12 @@ pocket_group_controller_t* pocket_group_controller_new(pocket_t* pocket);
 void pocket_group_controller_free(pocket_group_controller_t* self);
 
 void pocket_group_controller_init(pocket_group_controller_t* self);
-pocket_group_t** pocket_group_controller_get_list_group(const pocket_group_controller_t* self, uint32_t group_id, const char *search, int *count);
+pocket_group_t** pocket_group_controller_get_list_group(const pocket_group_controller_t* self, int64_t group_id, const char *search, int *count);
 int32_t pocket_group_controller_count_child(const pocket_group_controller_t* self, const pocket_group_t* group);
 pocket_stat_t pocket_group_controller_del_group(pocket_group_controller_t* self, const pocket_group_t* group);
 pocket_stat_t pocket_group_controller_persist_group(pocket_group_controller_t* self, const pocket_group_t* group);
-pocket_group_t* pocket_group_controller_get_group(pocket_group_controller_t* self, uint32_t group_id);
-uint32_t pocket_group_controller_get_last_id_group_field(pocket_group_controller_t* self);
+pocket_group_t* pocket_group_controller_get_group(pocket_group_controller_t* self, int64_t group_id);
+int64_t pocket_group_controller_get_last_id_group_field(pocket_group_controller_t* self);
 bool pocket_group_controller_data_export(const char* full_path_file_export);
 bool pocket_group_controller_data_import(const char* full_path_file_import);
 bool pocket_group_controller_data_import_legacy(const char* full_path_file_import);
@@ -65,7 +65,7 @@ void pocket_group_controller_clean_show_list(pocket_group_controller_t* controll
 void pocket_group_controller_fill_show_list(pocket_group_controller_t* controller, const pocket_group_t *group, bool insert);
 pocket_show_list_t* pocket_group_controller_get_show_list(void);
 bool pocket_group_controller_add_to_show_list(pocket_group_controller_t* self, const pocket_group_field_t* group_field);
-bool pocket_group_controller_del_from_show_list(pocket_group_controller_t* self, uint32_t id_group_field);
+bool pocket_group_controller_del_from_show_list(pocket_group_controller_t* self, int64_t id_group_field);
 uint8_t pocket_group_controller_size_show_list(const pocket_group_controller_t* self);
 
 #ifdef __cplusplus

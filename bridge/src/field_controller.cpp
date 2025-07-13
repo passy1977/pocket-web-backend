@@ -19,11 +19,30 @@
 
 #include "pocket-bridge/field_controller.h"
 
+#include "pocket/globals.hpp"
+using namespace pocket;
+
 #include "pocket-controllers/session.hpp"
 using pocket::controllers::session;
 
+
+#include "pocket-views/view.hpp"
+using views::view;
+
+#include "pocket-pods/field.hpp"
+using namespace pods;
+
 #include <new>
 using namespace std;
+
+namespace
+{
+
+constexpr char APP_TAG[] = "field_controller";
+
+}
+
+extern pocket_field_t* convert(const field::ptr& field);
 
 pocket_field_controller_t* pocket_field_controller_new(pocket_t* pocket) {
     if (pocket == nullptr)
@@ -57,31 +76,56 @@ void pocket_field_controller_init(pocket_field_controller_t* self)
     }
 }
 
-pocket_field_t** pocket_field_controller_get_list_field(pocket_field_controller_t* self, pocket_stat_t group_id, const char* search)
+pocket_field_t** pocket_field_controller_get_list_field(const pocket_field_controller_t* self, int64_t group_id, const char* search, int *count) try
 {
+    if (!self || !count) return nullptr;
 
+    auto view_field = static_cast<view<field> *>(self->view_field);
+
+
+    auto&& list = view_field->get_list(group_id, search);
+    *count = list.size();
+
+    auto ret = new(nothrow) pocket_field_t*[*count];
+    if (ret == nullptr)
+    {
+        return nullptr;
+    }
+
+    size_t i = 0;
+    for(auto &&it : list)
+    {
+        ret[i] = convert(it);
+        i++;
+    }
+    return ret;
+}
+catch(const runtime_error& e)
+{
+    error(APP_TAG, e.what());
     return nullptr;
 }
 
-pocket_stat_t pocket_field_controller_persist_field(pocket_field_controller_t* self, const pocket_field_t* f)
+
+pocket_stat_t pocket_field_controller_persist_field(const pocket_field_controller_t* self, const pocket_field_t* f)
 {
 
     return OK;
 }
 
-pocket_stat_t pocket_field_controller_del_field(pocket_field_controller_t* self, pocket_field_t* f)
+pocket_stat_t pocket_field_controller_del_field(const pocket_field_controller_t* self, pocket_field_t* f)
 {
 
     return OK;
 }
 
-int32_t pocket_field_controller_size_filed(pocket_field_controller_t* self, pocket_stat_t group_id)
+int32_t pocket_field_controller_size_filed(const pocket_field_controller_t* self, pocket_stat_t group_id)
 {
 
     return 0;
 }
 
-pocket_field_t* pocket_field_controller_get_filed(pocket_field_controller_t* self, pocket_stat_t group_id)
+pocket_field_t* pocket_field_controller_get_filed(const pocket_field_controller_t* self, pocket_stat_t group_id)
 {
 
     return nullptr;

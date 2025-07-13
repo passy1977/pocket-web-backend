@@ -641,32 +641,33 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn pocket_field_controller_get_list_field(
-        self_: *mut pocket_field_controller_t,
+        self_: *const pocket_field_controller_t,
         group_id: i64,
         search: *const ::std::os::raw::c_char,
+        count: *mut ::std::os::raw::c_int,
     ) -> *mut *mut pocket_field_t;
 }
 unsafe extern "C" {
     pub fn pocket_field_controller_persist_field(
-        self_: *mut pocket_field_controller_t,
+        self_: *const pocket_field_controller_t,
         f: *const pocket_field_t,
     ) -> pocket_stat_t;
 }
 unsafe extern "C" {
     pub fn pocket_field_controller_del_field(
-        self_: *mut pocket_field_controller_t,
+        self_: *const pocket_field_controller_t,
         f: *mut pocket_field_t,
     ) -> pocket_stat_t;
 }
 unsafe extern "C" {
     pub fn pocket_field_controller_size_filed(
-        self_: *mut pocket_field_controller_t,
+        self_: *const pocket_field_controller_t,
         group_id: i64,
     ) -> i32;
 }
 unsafe extern "C" {
     pub fn pocket_field_controller_get_filed(
-        self_: *mut pocket_field_controller_t,
+        self_: *const pocket_field_controller_t,
         group_id: i64,
     ) -> *mut pocket_field_t;
 }
@@ -678,19 +679,16 @@ pub struct pocket_group_t {
     pub user_id: i64,
     pub group_id: i64,
     pub server_group_id: i64,
-    pub group_field_id: i64,
-    pub server_group_field_id: i64,
     pub title: *mut ::std::os::raw::c_char,
     pub icon: *mut ::std::os::raw::c_char,
     pub note: *mut ::std::os::raw::c_char,
-    pub is_hidden: bool,
     pub synchronized: bool,
     pub deleted: bool,
     pub timestamp_creation: u64,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of pocket_group_t"][::std::mem::size_of::<pocket_group_t>() - 96usize];
+    ["Size of pocket_group_t"][::std::mem::size_of::<pocket_group_t>() - 80usize];
     ["Alignment of pocket_group_t"][::std::mem::align_of::<pocket_group_t>() - 8usize];
     ["Offset of field: pocket_group_t::id"][::std::mem::offset_of!(pocket_group_t, id) - 0usize];
     ["Offset of field: pocket_group_t::server_id"]
@@ -701,24 +699,18 @@ const _: () = {
         [::std::mem::offset_of!(pocket_group_t, group_id) - 24usize];
     ["Offset of field: pocket_group_t::server_group_id"]
         [::std::mem::offset_of!(pocket_group_t, server_group_id) - 32usize];
-    ["Offset of field: pocket_group_t::group_field_id"]
-        [::std::mem::offset_of!(pocket_group_t, group_field_id) - 40usize];
-    ["Offset of field: pocket_group_t::server_group_field_id"]
-        [::std::mem::offset_of!(pocket_group_t, server_group_field_id) - 48usize];
     ["Offset of field: pocket_group_t::title"]
-        [::std::mem::offset_of!(pocket_group_t, title) - 56usize];
+        [::std::mem::offset_of!(pocket_group_t, title) - 40usize];
     ["Offset of field: pocket_group_t::icon"]
-        [::std::mem::offset_of!(pocket_group_t, icon) - 64usize];
+        [::std::mem::offset_of!(pocket_group_t, icon) - 48usize];
     ["Offset of field: pocket_group_t::note"]
-        [::std::mem::offset_of!(pocket_group_t, note) - 72usize];
-    ["Offset of field: pocket_group_t::is_hidden"]
-        [::std::mem::offset_of!(pocket_group_t, is_hidden) - 80usize];
+        [::std::mem::offset_of!(pocket_group_t, note) - 56usize];
     ["Offset of field: pocket_group_t::synchronized"]
-        [::std::mem::offset_of!(pocket_group_t, synchronized) - 81usize];
+        [::std::mem::offset_of!(pocket_group_t, synchronized) - 64usize];
     ["Offset of field: pocket_group_t::deleted"]
-        [::std::mem::offset_of!(pocket_group_t, deleted) - 82usize];
+        [::std::mem::offset_of!(pocket_group_t, deleted) - 65usize];
     ["Offset of field: pocket_group_t::timestamp_creation"]
-        [::std::mem::offset_of!(pocket_group_t, timestamp_creation) - 88usize];
+        [::std::mem::offset_of!(pocket_group_t, timestamp_creation) - 72usize];
 };
 unsafe extern "C" {
     pub fn pocket_group_new() -> *mut pocket_group_t;
@@ -856,7 +848,7 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn pocket_group_controller_get_list_group(
         self_: *const pocket_group_controller_t,
-        group_id: u32,
+        group_id: i64,
         search: *const ::std::os::raw::c_char,
         count: *mut ::std::os::raw::c_int,
     ) -> *mut *mut pocket_group_t;
@@ -882,13 +874,13 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn pocket_group_controller_get_group(
         self_: *mut pocket_group_controller_t,
-        group_id: u32,
+        group_id: i64,
     ) -> *mut pocket_group_t;
 }
 unsafe extern "C" {
     pub fn pocket_group_controller_get_last_id_group_field(
         self_: *mut pocket_group_controller_t,
-    ) -> u32;
+    ) -> i64;
 }
 unsafe extern "C" {
     pub fn pocket_group_controller_data_export(
@@ -927,7 +919,7 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn pocket_group_controller_del_from_show_list(
         self_: *mut pocket_group_controller_t,
-        id_group_field: u32,
+        id_group_field: i64,
     ) -> bool;
 }
 unsafe extern "C" {

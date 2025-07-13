@@ -24,7 +24,6 @@ using pocket::pods::group;
 
 #include <cstring>
 #include <new>
-#include <optional>
 
 using namespace std;
 
@@ -36,12 +35,9 @@ pocket_group_t* pocket_group_new()
         .user_id = 0,
         .group_id = 0,
         .server_group_id = 0,
-        .group_field_id = 0,
-        .server_group_field_id = 0,
         .title = nullptr,
         .icon = nullptr,
         .note = nullptr,
-        .is_hidden = false,
         .synchronized = false,
         .deleted = false,
         .timestamp_creation = 0
@@ -57,8 +53,6 @@ pocket_group_t* pocket_group_new_with_params(int64_t id,
                                           int64_t user_id,
                                           int64_t group_id,
                                           int64_t server_group_id,
-                                          int64_t group_field_id,
-                                          int64_t server_group_field_id,
                                           const char *title,
                                           const char *icon,
                                           const char *note,
@@ -74,8 +68,6 @@ pocket_group_t* pocket_group_new_with_params(int64_t id,
     group->user_id = user_id;
     group->group_id = group_id;
     group->server_group_id = server_group_id;
-    group->group_field_id = group_field_id;
-    group->server_group_field_id = server_group_field_id;
 
     group->title = strdup(title);
     group->icon = strdup(icon);
@@ -120,7 +112,19 @@ void pocket_group_free(pocket_group_t *group)
     }
 }
 
-pocket_group_t* convert(const group::ptr& group) noexcept
-{
-    return nullptr;
+pocket_group_t* convert(const group::ptr& group)
+{                              
+    return ::pocket_group_new_with_params(
+        group->id,
+        group->server_id,
+        group->user_id,
+        group->group_id,
+        group->server_group_id,
+        group->title.c_str(),
+        group->icon.c_str(),
+        group->note.c_str(),
+        group->synchronized,
+        group->deleted,
+        group->timestamp_creation
+    );
 }

@@ -42,11 +42,11 @@ pocket_field_controller_t* pocket_field_controller_new(pocket_t* pocket);
 void pocket_field_controller_free(pocket_field_controller_t* self);
 
 void pocket_field_controller_init(pocket_field_controller_t* self);
-pocket_field_t** pocket_field_controller_get_list_field(pocket_field_controller_t* self, int64_t group_id, const char* search);
-pocket_stat_t pocket_field_controller_persist_field(pocket_field_controller_t* self, const pocket_field_t* f);
-pocket_stat_t pocket_field_controller_del_field(pocket_field_controller_t* self, pocket_field_t* f);
-int32_t pocket_field_controller_size_filed(pocket_field_controller_t* self, int64_t group_id);
-pocket_field_t* pocket_field_controller_get_filed(pocket_field_controller_t* self, int64_t group_id);
+pocket_field_t** pocket_field_controller_get_list_field(const pocket_field_controller_t* self, int64_t group_id, const char *search, int *count);
+pocket_stat_t pocket_field_controller_persist_field(const pocket_field_controller_t* self, const pocket_field_t* f);
+pocket_stat_t pocket_field_controller_del_field(const pocket_field_controller_t* self, pocket_field_t* f);
+int32_t pocket_field_controller_size_filed(const pocket_field_controller_t* self, int64_t group_id);
+pocket_field_t* pocket_field_controller_get_filed(const pocket_field_controller_t* self, int64_t group_id);
 
 
 #ifdef __cplusplus
