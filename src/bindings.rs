@@ -671,6 +671,12 @@ unsafe extern "C" {
         group_id: i64,
     ) -> *mut pocket_field_t;
 }
+unsafe extern "C" {
+    pub fn pocket_field_controller_count_child(
+        self_: *const pocket_field_controller_t,
+        field: *const pocket_group_t,
+    ) -> i32;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct pocket_group_t {
@@ -685,10 +691,11 @@ pub struct pocket_group_t {
     pub synchronized: bool,
     pub deleted: bool,
     pub timestamp_creation: u64,
+    pub has_child: bool,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of pocket_group_t"][::std::mem::size_of::<pocket_group_t>() - 80usize];
+    ["Size of pocket_group_t"][::std::mem::size_of::<pocket_group_t>() - 88usize];
     ["Alignment of pocket_group_t"][::std::mem::align_of::<pocket_group_t>() - 8usize];
     ["Offset of field: pocket_group_t::id"][::std::mem::offset_of!(pocket_group_t, id) - 0usize];
     ["Offset of field: pocket_group_t::server_id"]
@@ -711,6 +718,8 @@ const _: () = {
         [::std::mem::offset_of!(pocket_group_t, deleted) - 65usize];
     ["Offset of field: pocket_group_t::timestamp_creation"]
         [::std::mem::offset_of!(pocket_group_t, timestamp_creation) - 72usize];
+    ["Offset of field: pocket_group_t::has_child"]
+        [::std::mem::offset_of!(pocket_group_t, has_child) - 80usize];
 };
 unsafe extern "C" {
     pub fn pocket_group_new() -> *mut pocket_group_t;
@@ -728,6 +737,7 @@ unsafe extern "C" {
         synchronized: bool,
         deleted: bool,
         timestamp_creation: u64,
+        has_child: bool,
     ) -> *mut pocket_group_t;
 }
 unsafe extern "C" {
@@ -848,6 +858,7 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn pocket_group_controller_get_list_group(
         self_: *const pocket_group_controller_t,
+        field_controller: *const pocket_field_controller_t,
         group_id: i64,
         search: *const ::std::os::raw::c_char,
         count: *mut ::std::os::raw::c_int,

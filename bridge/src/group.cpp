@@ -40,7 +40,8 @@ pocket_group_t* pocket_group_new()
         .note = nullptr,
         .synchronized = false,
         .deleted = false,
-        .timestamp_creation = 0
+        .timestamp_creation = 0,
+        .has_child = false
     };
     if (!group) return nullptr;
 
@@ -58,7 +59,8 @@ pocket_group_t* pocket_group_new_with_params(int64_t id,
                                           const char *note,
                                           bool synchronized,
                                           bool deleted,
-                                          uint64_t timestamp_creation)
+                                          uint64_t timestamp_creation,
+                                          bool has_child)
 {
     auto group = new(nothrow) pocket_group_t;
     if (!group) return nullptr;
@@ -82,7 +84,7 @@ pocket_group_t* pocket_group_new_with_params(int64_t id,
     group->synchronized = synchronized;
     group->deleted = deleted;
     group->timestamp_creation = timestamp_creation;
-
+    group->has_child = has_child;
     return group;
 }
 
@@ -125,6 +127,7 @@ pocket_group_t* convert(const group::ptr& group)
         group->note.c_str(),
         group->synchronized,
         group->deleted,
-        group->timestamp_creation
+        group->timestamp_creation,
+        false
     );
 }

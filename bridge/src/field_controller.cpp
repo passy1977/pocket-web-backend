@@ -19,6 +19,7 @@
 
 #include "pocket-bridge/field_controller.h"
 
+#include "pocket-bridge/group.h"
 #include "pocket/globals.hpp"
 using namespace pocket;
 
@@ -129,4 +130,17 @@ pocket_field_t* pocket_field_controller_get_filed(const pocket_field_controller_
 {
 
     return nullptr;
+}
+
+int32_t pocket_field_controller_count_child(const pocket_field_controller_t* self, const pocket_group_t* group) try
+{
+    if (self == nullptr || group == nullptr) return -1;
+    auto view_field = static_cast<view<struct field> *>(self->view_field);
+
+    return static_cast<uint32_t>(view_field->get_list(group->id).size());
+}
+catch(const runtime_error& e)
+{
+    error(APP_TAG, e.what());
+    return 0;
 }

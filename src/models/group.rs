@@ -46,6 +46,7 @@ impl pocket_group_t {
             synchronized: deref_group.synchronized,
             deleted: deref_group.deleted,
             timestamp_creation: deref_group.timestamp_creation,
+            has_child: deref_group.has_child,
         })
     }
 }
@@ -64,6 +65,7 @@ pub struct Group {
     pub synchronized: bool,
     pub deleted: bool,
     pub timestamp_creation: u64,
+    pub has_child: bool
 }
 
 
@@ -82,6 +84,7 @@ impl Group {
             synchronized: false,
             deleted: false,
             timestamp_creation: 0,
+            has_child: false,
         }
     }
 
@@ -113,7 +116,8 @@ impl Group {
                 note,
                 self.synchronized,
                 self.deleted,
-                self.timestamp_creation
+                self.timestamp_creation,
+                false
             );
 
             if self.title.as_ref().is_some() {

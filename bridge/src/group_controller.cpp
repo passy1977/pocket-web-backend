@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "pocket-bridge/group_controller.h"
+#include "pocket-bridge/field_controller.h"
 
 #include "pocket/globals.hpp"
 using namespace pocket;
@@ -69,7 +70,7 @@ void pocket_group_controller_free(pocket_group_controller_t* self)
     }
 
     delete self;
-    self = NULL;
+    self = nullptr;
 }
 
 void pocket_group_controller_init(pocket_group_controller_t* self) 
@@ -83,7 +84,7 @@ void pocket_group_controller_init(pocket_group_controller_t* self)
 }
 
 
-pocket_group_t** pocket_group_controller_get_list_group(const pocket_group_controller_t* self, int64_t group_id, const char *search, int *count) try
+pocket_group_t** pocket_group_controller_get_list_group(const pocket_group_controller_t* self, const pocket_field_controller_t* field_controller, int64_t group_id, const char *search, int *count) try
 {
     if (!self || !count) return nullptr;
 
@@ -91,7 +92,7 @@ pocket_group_t** pocket_group_controller_get_list_group(const pocket_group_contr
 
 
     auto&& list = view_group->get_list(group_id, search);
-    *count = list.size();
+    *count = static_cast<int>(list.size());
 
     auto ret = new(nothrow) pocket_group_t*[*count];
     if (ret == nullptr)
@@ -102,7 +103,11 @@ pocket_group_t** pocket_group_controller_get_list_group(const pocket_group_contr
     size_t i = 0;
     for(auto &&it : list)
     {
-        ret[i]  = convert(it);
+        auto pocket_group = convert(it);
+
+        pocket_group->has_child = pocket_group_controller_count_child(self, pocket_group) + pocket_field_controller_count_child(field_controller, pocket_group) > 0;
+
+        ret[i]  = pocket_group;
         i++;
     }
     return ret;
@@ -113,11 +118,17 @@ catch(const runtime_error& e)
     return nullptr;    
 }
 
-int32_t pocket_group_controller_count_child(const pocket_group_controller_t* self, const pocket_group_t* group)
+int32_t pocket_group_controller_count_child(const pocket_group_controller_t* self, const pocket_group_t* group) try
 {
     if (self == nullptr || group == nullptr) return -1;
+    auto view_group = static_cast<view<struct group> *>(self->view_group);
 
-    return 0; // Placeholder
+    return static_cast<uint32_t>(view_group->get_list(group->id).size());
+}
+catch(const runtime_error& e)
+{
+    error(APP_TAG, e.what());
+    return 0;
 }
 
 pocket_stat_t pocket_group_controller_del_group(pocket_group_controller_t* self, const pocket_group_t* group)

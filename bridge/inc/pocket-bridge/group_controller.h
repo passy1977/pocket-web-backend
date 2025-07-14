@@ -48,11 +48,14 @@ typedef struct {
     size_t count;
 } pocket_show_list_t;
 
+struct pocket_field_controller_t;
+typedef struct pocket_field_controller_t pocket_field_controller_t;
+
 pocket_group_controller_t* pocket_group_controller_new(pocket_t* pocket);
 void pocket_group_controller_free(pocket_group_controller_t* self);
 
 void pocket_group_controller_init(pocket_group_controller_t* self);
-pocket_group_t** pocket_group_controller_get_list_group(const pocket_group_controller_t* self, int64_t group_id, const char *search, int *count);
+pocket_group_t** pocket_group_controller_get_list_group(const pocket_group_controller_t* self, const pocket_field_controller_t* field_controller, int64_t group_id, const char *search, int *count);
 int32_t pocket_group_controller_count_child(const pocket_group_controller_t* self, const pocket_group_t* group);
 pocket_stat_t pocket_group_controller_del_group(pocket_group_controller_t* self, const pocket_group_t* group);
 pocket_stat_t pocket_group_controller_persist_group(pocket_group_controller_t* self, const pocket_group_t* group);

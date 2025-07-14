@@ -29,7 +29,7 @@
 extern "C" {
 #endif
 
-typedef struct {
+typedef struct pocket_group_t {
     int64_t id;
     int64_t server_id;
     int64_t user_id;
@@ -41,6 +41,7 @@ typedef struct {
     bool synchronized;
     bool deleted;
     uint64_t timestamp_creation;
+    bool has_child;
 } pocket_group_t;
 
 pocket_group_t* pocket_group_new(void);
@@ -55,7 +56,8 @@ pocket_group_t* pocket_group_new_with_params(int64_t id,
                                           const char *note,
                                           bool synchronized,
                                           bool deleted,
-                                          uint64_t timestamp_creation);
+                                          uint64_t timestamp_creation,
+                                          bool has_child);
 
 void pocket_group_free(pocket_group_t *group);
 

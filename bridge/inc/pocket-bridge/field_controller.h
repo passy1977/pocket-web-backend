@@ -31,12 +31,16 @@
 extern "C" {
 #endif
 
-typedef struct
+typedef struct pocket_field_controller_t
 {
     pocket_t* pocket;
     bool reachability;
     void* view_field;
 } pocket_field_controller_t;
+
+struct pocket_group_t;
+typedef struct pocket_group_t pocket_group_t;
+
 
 pocket_field_controller_t* pocket_field_controller_new(pocket_t* pocket);
 void pocket_field_controller_free(pocket_field_controller_t* self);
@@ -47,7 +51,7 @@ pocket_stat_t pocket_field_controller_persist_field(const pocket_field_controlle
 pocket_stat_t pocket_field_controller_del_field(const pocket_field_controller_t* self, pocket_field_t* f);
 int32_t pocket_field_controller_size_filed(const pocket_field_controller_t* self, int64_t group_id);
 pocket_field_t* pocket_field_controller_get_filed(const pocket_field_controller_t* self, int64_t group_id);
-
+int32_t pocket_field_controller_count_child(const pocket_field_controller_t* self, const pocket_group_t* field);
 
 #ifdef __cplusplus
 }

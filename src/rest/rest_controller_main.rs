@@ -21,7 +21,9 @@ fn to_group(group: pocket_group_t) -> Group {
         note: unsafe { Some(CStr::from_ptr(group.note).to_string_lossy().into()) },
         synchronized: group.synchronized, 
         deleted: group.deleted, 
-        timestamp_creation: group.timestamp_creation }
+        timestamp_creation: group.timestamp_creation,
+        has_child: group.has_child
+    }
 }
 
 fn to_field(field: pocket_field_t) -> Field {
@@ -40,7 +42,7 @@ fn to_field(field: pocket_field_t) -> Field {
         timestamp_creation: field.timestamp_creation }
 }
 
-fn get_list_group(group_controller: *const pocket_group_controller_t, group_id: i64, search: &String,) -> Result<Groups> {
+fn get_list_group(group_controller: *const pocket_group_controller_t, field_controller: *const pocket_field_controller_t, group_id: i64, search: &String,) -> Result<Groups> {
     let mut ret = Groups::new();
 
     unsafe {
@@ -48,6 +50,7 @@ fn get_list_group(group_controller: *const pocket_group_controller_t, group_id: 
         let mut count = Box::new(0i32);
         let groups_ptr = pocket_group_controller_get_list_group(
             group_controller,
+            field_controller,
             group_id,
             CString::new(search.clone()).expect("search::new failed").as_ptr(),
             count.as_mut()
@@ -64,7 +67,6 @@ fn get_list_group(group_controller: *const pocket_group_controller_t, group_id: 
                 pocket_group_free(group_ptr);
             }
         }
-
     }
 
     Ok(ret)
@@ -94,7 +96,6 @@ fn get_list_field(field_controller: *const pocket_field_controller_t, group_id: 
                 pocket_field_free(field_ptr);
             }
         }
-
     }
 
     Ok(ret)
@@ -182,7 +183,7 @@ pub fn home(&self, data_transport: Json<DataTransport>) -> HttpResponse {
 
     HttpResponseHelper::ok()
         .session_id(session.session_id)
-        .groups(get_list_group(group_controller, group_id, &search))
+        .groups(get_list_group(group_controller, field_controller, group_id, &search))
         .fields(get_list_field(field_controller, group_id, &search))
         .build()
 }
