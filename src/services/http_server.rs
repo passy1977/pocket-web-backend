@@ -32,9 +32,14 @@ pub async fn debug(data_transport: web::Json<DataTransport>) -> impl Responder {
     RestController::share().debug(data_transport)
 }
 
+pub async fn data(data_transport: web::Json<DataTransport>) -> impl Responder {
+    RestController::share().data(data_transport)
+}
+
+
 
 pub mod server {
-    use crate::services::http_server::{debug, field_detail, group_detail, hello, login, home, registration};
+    use crate::services::http_server::{debug, field_detail, group_detail, hello, login, home, registration, data};
     use actix_cors::Cors;
     use actix_files as fs;
     use actix_web::{web, App, HttpServer};
@@ -55,6 +60,7 @@ pub mod server {
                 .route("/v5/pocket/login", web::post().to(login))
                 .route("/v5/pocket/registration", web::post().to(registration))
                 .route("/v5/pocket/home", web::post().to(home))
+                .route("/v5/pocket/data", web::post().to(data))
                 .route("/v5/pocket/field_detail", web::post().to(field_detail))
                 .route("/v5/pocket/group_detail", web::post().to(group_detail))
                 .route("/v5/pocket/debug", web::post().to(debug))

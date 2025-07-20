@@ -4,7 +4,7 @@ use std::ffi::{c_void, CStr, CString};
 
 impl pocket_group_t {
 
-    pub fn to_group(&self) -> Option<Group> {
+    pub fn to_group(&self) -> Group {
         let title;
         let icon;
         let note;
@@ -34,7 +34,7 @@ impl pocket_group_t {
             };
         }
 
-        Some(Group {
+        Group {
             id: deref_group.id,
             server_id: deref_group.server_id,
             user_id: deref_group.user_id,
@@ -47,7 +47,7 @@ impl pocket_group_t {
             deleted: deref_group.deleted,
             timestamp_creation: deref_group.timestamp_creation,
             has_child: deref_group.has_child,
-        })
+        }
     }
 }
 
@@ -139,5 +139,7 @@ impl Group {
         ret
     }
 }
+
+
 
 pub type Groups = Vec<Group>;

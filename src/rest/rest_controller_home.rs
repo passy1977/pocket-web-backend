@@ -1,46 +1,14 @@
-use std::ffi::{CStr, CString};
-use actix_web::HttpResponse;
-use actix_web::web::Json;
 use crate::bindings::{pocket_field_controller_get_list_field, pocket_field_controller_init, pocket_field_controller_new, pocket_field_controller_t, pocket_field_free, pocket_field_t, pocket_group_controller_get_list_group, pocket_group_controller_init, pocket_group_controller_new, pocket_group_controller_t, pocket_group_free, pocket_group_t};
-use crate::models::field::{Field, Fields};
-use crate::models::group::{Group, Groups};
+use crate::models::field::Fields;
+use crate::models::group::Groups;
 use crate::models::rests::DataTransport;
 use crate::rest::rest_controller::RestController;
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;
 use crate::utils::Result;
-
-fn to_group(group: pocket_group_t) -> Group {
-    Group { id: group.id, 
-        server_id: group.server_id, 
-        user_id: group.server_id, 
-        group_id: group.group_id, 
-        server_group_id: group.server_group_id, 
-        title: unsafe { Some(CStr::from_ptr(group.title).to_string_lossy().into()) },
-        icon: unsafe { Some(CStr::from_ptr(group.icon).to_string_lossy().into()) },
-        note: unsafe { Some(CStr::from_ptr(group.note).to_string_lossy().into()) },
-        synchronized: group.synchronized, 
-        deleted: group.deleted, 
-        timestamp_creation: group.timestamp_creation,
-        has_child: group.has_child
-    }
-}
-
-fn to_field(field: pocket_field_t) -> Field {
-    Field { id: field.id,
-        server_id: field.server_id,
-        user_id: field.server_id,
-        group_id: field.group_id,
-        server_group_id: field.server_group_id,
-        group_field_id: field.group_field_id,
-        server_group_field_id: field.server_group_field_id,
-        title: unsafe { Some(CStr::from_ptr(field.title).to_string_lossy().into()) },
-        value: unsafe { Some(CStr::from_ptr(field.value).to_string_lossy().into()) },
-        synchronized: field.synchronized,
-        is_hidden: field.is_hidden,
-        deleted: field.deleted,
-        timestamp_creation: field.timestamp_creation }
-}
+use actix_web::web::Json;
+use actix_web::HttpResponse;
+use std::ffi::CString;
 
 fn get_list_group(group_controller: *const pocket_group_controller_t, field_controller: *const pocket_field_controller_t, group_id: i64, search: &String,) -> Result<Groups> {
     let mut ret = Groups::new();
@@ -62,8 +30,8 @@ fn get_list_group(group_controller: *const pocket_group_controller_t, field_cont
         for i in 0i32..*count {
             let group_ptr = *groups_ptr.offset(i as isize);
             if !group_ptr.is_null() {
-                let group: pocket_group_t = std::ptr::read(group_ptr);
-                ret.push(to_group(group));
+                let pocket_group: pocket_group_t = std::ptr::read(group_ptr);
+                ret.push(pocket_group.to_group());
                 pocket_group_free(group_ptr);
             }
         }
@@ -91,8 +59,8 @@ fn get_list_field(field_controller: *const pocket_field_controller_t, group_id: 
         for i in 0i32..*count {
             let field_ptr = *fields_ptr.offset(i as isize);
             if !field_ptr.is_null() {
-                let field: pocket_field_t = std::ptr::read(field_ptr);
-                ret.push(to_field(field));
+                let pocket_field: pocket_field_t = std::ptr::read(field_ptr);
+                ret.push(pocket_field.to_field());
                 pocket_field_free(field_ptr);
             }
         }

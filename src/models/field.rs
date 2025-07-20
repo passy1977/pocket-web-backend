@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 impl pocket_field_t {
 
-    pub fn to_field(&self) -> Option<Field> {
+    pub fn to_field(&self) -> Field {
         let title;
         let value;
         let deref_field : pocket_field_t;
@@ -26,7 +26,7 @@ impl pocket_field_t {
             };
         }
 
-        Some(Field {
+        Field {
             id: deref_field.id,
             server_id: deref_field.server_id,
             user_id: deref_field.user_id,
@@ -40,7 +40,7 @@ impl pocket_field_t {
             synchronized: deref_field.synchronized,
             deleted: deref_field.deleted,
             timestamp_creation: deref_field.timestamp_creation,
-        })
+        }
     }
 }
 
