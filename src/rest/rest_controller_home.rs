@@ -1,3 +1,4 @@
+use std::error::Error;
 use crate::bindings::{pocket_field_controller_get_list_field, pocket_field_controller_init, pocket_field_controller_new, pocket_field_controller_t, pocket_field_free, pocket_field_t, pocket_group_controller_get_list_group, pocket_group_controller_init, pocket_group_controller_new, pocket_group_controller_t, pocket_group_free, pocket_group_t};
 use crate::models::field::Fields;
 use crate::models::group::Groups;
@@ -10,7 +11,7 @@ use actix_web::web::Json;
 use actix_web::HttpResponse;
 use std::ffi::CString;
 
-fn get_list_group(group_controller: *const pocket_group_controller_t, field_controller: *const pocket_field_controller_t, group_id: i64, search: &String,) -> Result<Groups> {
+pub fn get_list_group(group_controller: *const pocket_group_controller_t, field_controller: *const pocket_field_controller_t, group_id: i64, search: &String,) -> Result<Groups> {
     let mut ret = Groups::new();
 
     unsafe {
@@ -40,7 +41,7 @@ fn get_list_group(group_controller: *const pocket_group_controller_t, field_cont
     Ok(ret)
 }
 
-fn get_list_field(field_controller: *const pocket_field_controller_t, group_id: i64, search: &String,) -> Result<Fields> {
+pub fn get_list_field(field_controller: *const pocket_field_controller_t, group_id: i64, search: &String,) -> Result<Fields> {
     let mut ret = Fields::new();
 
     unsafe {
@@ -69,30 +70,37 @@ fn get_list_field(field_controller: *const pocket_field_controller_t, group_id: 
     Ok(ret)
 }
 
-impl RestController {
-    
 
-pub fn home(&self, data_transport: Json<DataTransport>) -> HttpResponse {
-    let (group_id, search) = match &data_transport.data {
-        None => return HttpResponseHelper::forbidden()
-            .error("No data send")
-            .build(),
+pub fn split_id_group_and_search(data_transport: &Json<DataTransport>) -> Result<(i64, String)> {
+    match &data_transport.data {
+        None => Err("No data send"),
         Some(data) => {
             let split: Vec<&str> = data.split("|").collect();
 
             if split.len() != 2 {
-                return HttpResponseHelper::forbidden()
-                    .error("group_id is mandatory")
-                    .build()
+                return Err("group_id is mandatory")
             }
 
-            (match split[0].to_string().parse::<i64>() {
+            let id_group = match split[0].to_string().parse::<i64>() {
                 Ok(group_id) => group_id,
-                Err(e) => return HttpResponseHelper::internal_server_error()
-                    .error(e.to_string())
-                    .build()
-            }, split[1].to_string())
+                Err(_) => return Err("group_id parse error"),
+            };
+
+            Ok((id_group, split[1].to_string()))
         }
+    }
+
+}
+
+impl RestController {
+    
+
+pub fn home(&self, data_transport: Json<DataTransport>) -> HttpResponse {
+    let (group_id, search) = match split_id_group_and_search(&data_transport) {
+        Ok((id_group, search)) => (id_group, search),
+        Err(e) => return HttpResponseHelper::internal_server_error()
+                        .error(e)
+                        .build()
     };
 
     let mut session = match Sessions::share().get(&*data_transport.session_id) {
