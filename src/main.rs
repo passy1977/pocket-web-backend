@@ -1,6 +1,5 @@
 use crate::services::data::Data;
 use crate::services::http_server::server;
-
 mod constants;
 
 #[allow(

@@ -872,7 +872,8 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn pocket_group_controller_del_group(
-        self_: *mut pocket_group_controller_t,
+        self_: *const pocket_group_controller_t,
+        field_controller: *const pocket_field_controller_t,
         group: *const pocket_group_t,
     ) -> pocket_stat_t;
 }

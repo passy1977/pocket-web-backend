@@ -131,10 +131,38 @@ catch(const runtime_error& e)
     return 0;
 }
 
-pocket_stat_t pocket_group_controller_del_group(pocket_group_controller_t* self, const pocket_group_t* group)
+pocket_stat_t pocket_group_controller_del_group(const pocket_group_controller_t* self, const pocket_field_controller_t* field_controller, const pocket_group_t* group) try
 {
+    if (!self || !field_controller || !group) return ERROR;
 
-    return OK; // Placeholder
+    auto session = static_cast<class session*>(self->pocket->session);
+    auto logged_user = optional{make_unique<class user>(*static_cast<struct user*>(self->pocket->user))};
+
+    auto view_group = static_cast<view<struct group> *>(self->view_group);
+    auto view_group_field = static_cast<view<group_field> *>(self->view_group_field);
+    auto view_field = static_cast<view<field> *>(field_controller->view_field);
+
+    view_group_field->del_by_group_id(group->id);
+    view_field->del_by_group_id(group->id);
+    view_group->del(group->id);
+
+    session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
+    session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
+    if(auto&& user = session->send_data(logged_user); user)
+    {
+        self->pocket->user = &*user.value();
+        return OK;
+    }
+    else
+    {
+        return static_cast<pocket_stat_t>(session->get_status());
+    }
+
+}
+catch(const runtime_error& e)
+{
+    error(APP_TAG, e.what());
+    return ERROR;
 }
 
 pocket_stat_t pocket_group_controller_persist_group(pocket_group_controller_t* self, const pocket_group_t* group)

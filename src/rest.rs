@@ -4,3 +4,4 @@ pub(crate) mod rest_controller_login;
 pub(crate) mod rest_controller_registration;
 pub(crate) mod rest_controller_home;
 mod rest_controller_data;
+mod rust_controller_macro;

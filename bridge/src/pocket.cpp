@@ -163,7 +163,7 @@ pocket_stat_t pocket_login(pocket_t* self, const char* email, const char* passwd
         session->send_data(user_opt);
         if (self->user)
         {
-            delete reinterpret_cast<pods::user *>(self->user);
+            delete reinterpret_cast<user *>(self->user);
         }
         self->user = &*user_opt.value();
 
