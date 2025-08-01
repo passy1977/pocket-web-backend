@@ -60,7 +60,7 @@ void pocket_free(pocket_t* pocket)
 
     if (pocket->user)
     {
-        delete reinterpret_cast<pods::user *>(pocket->user);
+        delete static_cast<user *>(pocket->user);
         pocket->user = nullptr;
     }
 
@@ -163,9 +163,10 @@ pocket_stat_t pocket_login(pocket_t* self, const char* email, const char* passwd
         session->send_data(user_opt);
         if (self->user)
         {
-            delete reinterpret_cast<user *>(self->user);
+            delete[] static_cast<user *>(self->user);
         }
-        self->user = &*user_opt.value();
+        self->user = new uint8_t[sizeof(user_opt)];
+        memcpy(self->user, &user_opt, sizeof(user_opt));
 
         return OK;
     }

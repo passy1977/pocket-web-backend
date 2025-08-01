@@ -9,53 +9,36 @@ use actix_web::web::Json;
 use actix_web::HttpResponse;
 
 fn group_handler(group_controller: *mut pocket_group_controller_t, field_controller: *mut pocket_field_controller_t,  data_transport: &Json<DataTransport>, kind: &String, err : &mut Option<&str>) -> bool {
-    let (group_id, search) = match split_id_group_and_search(&data_transport) {
-        Ok((id_group, search)) => (id_group, search),
-        Err(e) => {
-            *err = Some(e);
-            (-1, "".to_string())
-        }
-    };
+    if data_transport.groups.is_none() {
+        return false;
+    }
 
     if err.is_some() {
         return false;
     }
 
-    let groups = match get_list_group(group_controller, field_controller, group_id, &search) {
-        Ok(groups) => groups,
-        Err(e) => {
-            *err = Some(e);
-            Groups::new()
-        }
-    };
-
-    if err.is_some() {
-        return false;
-    }
-
-    for group in groups {
+    for group in data_transport.groups.clone().unwrap() {
         let Group { id, server_id, deleted, .. } = group;
-        match (id, server_id, deleted)  {
+        return match (id, server_id, deleted) {
             (id, _server_id @ 0, _deleted @ false) if id > 0 => {
                 //new
                 unsafe {
-                    return pocket_group_controller_persist_group(group_controller, group.to_pocket_field_t()) == pocket_stat_t_OK
+                    pocket_group_controller_persist_group(group_controller, group.to_pocket_field_t()) == pocket_stat_t_OK
                 }
             }
             (id, server_id, _deleted @ false) if id > 0 && server_id > 0 => {
                 //modify
                 unsafe {
-                    return pocket_group_controller_persist_group(group_controller, group.to_pocket_field_t()) == pocket_stat_t_OK
+                    pocket_group_controller_persist_group(group_controller, group.to_pocket_field_t()) == pocket_stat_t_OK
                 }
             }
             (id, _, _deleted @ true) if id > 0 => {
                 //delete
                 unsafe {
-                    return pocket_group_controller_del_group(group_controller, field_controller, group.to_pocket_field_t()) == pocket_stat_t_OK
+                    pocket_group_controller_del_group(group_controller, field_controller, group.to_pocket_field_t()) == pocket_stat_t_OK
                 }
-
             }
-            (_, _, _) => return false
+            (_, _, _) => false
         }
     }
 

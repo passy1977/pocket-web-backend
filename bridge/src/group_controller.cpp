@@ -136,7 +136,7 @@ pocket_stat_t pocket_group_controller_del_group(const pocket_group_controller_t*
     if (!self || !field_controller || !group) return ERROR;
 
     auto session = static_cast<class session*>(self->pocket->session);
-    auto logged_user = optional{make_unique<class user>(*static_cast<struct user*>(self->pocket->user))};
+    auto logged_user = static_cast<user::opt_ptr *>(self->pocket->user);
 
     auto view_group = static_cast<view<struct group> *>(self->view_group);
     auto view_group_field = static_cast<view<group_field> *>(self->view_group_field);
@@ -148,7 +148,7 @@ pocket_stat_t pocket_group_controller_del_group(const pocket_group_controller_t*
 
     session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
     session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
-    if(auto&& user = session->send_data(logged_user); user)
+    if(auto&& user = session->send_data(*logged_user); user)
     {
         self->pocket->user = &*user.value();
         return OK;
