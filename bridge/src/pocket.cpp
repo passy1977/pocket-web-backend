@@ -158,15 +158,15 @@ pocket_stat_t pocket_login(pocket_t* self, const char* email, const char* passwd
 
     session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
     session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
-    if(auto&& user_opt = session->login(email, passwd, POCKET_ENABLE_AES); user_opt.has_value())
+    if(auto&& user = session->login(email, passwd, POCKET_ENABLE_AES); user.has_value())
     {
-        session->send_data(user_opt);
+        session->send_data(user);
         if (self->user)
         {
-            delete[] static_cast<user *>(self->user);
+            delete[] static_cast<uint8_t *>(self->user);
         }
-        self->user = new uint8_t[sizeof(user_opt)];
-        memcpy(self->user, &user_opt, sizeof(user_opt));
+        self->user = new uint8_t[sizeof(user)];
+        memcpy(self->user, &user, sizeof(user));
 
         return OK;
     }

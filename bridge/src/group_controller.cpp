@@ -138,9 +138,9 @@ pocket_stat_t pocket_group_controller_del_group(const pocket_group_controller_t*
     auto session = static_cast<class session*>(self->pocket->session);
     auto logged_user = static_cast<user::opt_ptr *>(self->pocket->user);
 
-    auto view_group = static_cast<view<struct group> *>(self->view_group);
-    auto view_group_field = static_cast<view<group_field> *>(self->view_group_field);
-    auto view_field = static_cast<view<field> *>(field_controller->view_field);
+    const auto view_group = static_cast<view<struct group> *>(self->view_group);
+    const auto view_group_field = static_cast<view<group_field> *>(self->view_group_field);
+    const auto view_field = static_cast<view<field> *>(field_controller->view_field);
 
     view_group_field->del_by_group_id(group->id);
     view_field->del_by_group_id(group->id);
@@ -150,7 +150,12 @@ pocket_stat_t pocket_group_controller_del_group(const pocket_group_controller_t*
     session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
     if(auto&& user = session->send_data(*logged_user); user)
     {
-        self->pocket->user = &*user.value();
+        if (self->pocket->user)
+        {
+            delete[] static_cast<uint8_t *>(self->pocket->user);
+        }
+        self->pocket->user = new uint8_t[sizeof(user)];
+        memcpy(self->pocket->user, &user, sizeof(user));
         return OK;
     }
     else

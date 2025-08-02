@@ -88,7 +88,7 @@ impl Group {
         }
     }
 
-    pub fn to_pocket_field_t(&self) -> *mut pocket_group_t {
+    pub fn to_pocket_group_t(&self) -> *mut pocket_group_t {
         let ret : *mut pocket_group_t = unsafe {
             let title = match self.title.clone() {
                 Some(title) => CString::new(title).unwrap().into_raw(),

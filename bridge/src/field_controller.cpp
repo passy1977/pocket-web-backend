@@ -114,10 +114,38 @@ pocket_stat_t pocket_field_controller_persist_field(const pocket_field_controlle
     return OK;
 }
 
-pocket_stat_t pocket_field_controller_del_field(const pocket_field_controller_t* self, pocket_field_t* f)
+pocket_stat_t pocket_field_controller_del_field(const pocket_field_controller_t* self, pocket_field_t* field) try
 {
+    if (!self || !field) return ERROR;
 
-    return OK;
+    auto session = static_cast<class session*>(self->pocket->session);
+    auto logged_user = static_cast<user::opt_ptr *>(self->pocket->user);
+
+    const auto view_field = static_cast<view<struct field> *>(self->view_field);
+
+    view_field->del(field->id);
+
+    session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
+    session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
+    if(auto&& user = session->send_data(*logged_user); user)
+    {
+        if (self->pocket->user)
+        {
+            delete[] static_cast<uint8_t *>(self->pocket->user);
+        }
+        self->pocket->user = new uint8_t[sizeof(user)];
+        memcpy(self->pocket->user, &user, sizeof(user));
+        return OK;
+    }
+    else
+    {
+        return static_cast<pocket_stat_t>(session->get_status());
+    }
+}
+catch(const runtime_error& e)
+{
+    error(APP_TAG, e.what());
+    return ERROR;
 }
 
 int32_t pocket_field_controller_size_filed(const pocket_field_controller_t* self, pocket_stat_t group_id)
