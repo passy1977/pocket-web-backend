@@ -1,6 +1,6 @@
 
 use crate::{models::rests::DataTransport, rest::rest_controller::RestController};
-use actix_web::{web, HttpResponse, Responder};
+use actix_web::{web, Responder};
 
 
 pub async fn hello(session_id: web::Path<String>) -> impl Responder {
@@ -19,12 +19,12 @@ pub async fn home(data_transport: web::Json<DataTransport>) -> impl Responder {
     RestController::share().home(data_transport)
 }
 
-pub async fn field_detail(_info: web::Json<DataTransport>) -> impl Responder {
-    HttpResponse::Forbidden().finish()
+pub async fn field_detail(data_transport: web::Json<DataTransport>) -> impl Responder {
+    RestController::share().group_detail(data_transport)
 }
 
-pub async fn group_detail(_info: web::Json<DataTransport>) -> impl Responder {
-    HttpResponse::Forbidden().finish()
+pub async fn group_detail(data_transport: web::Json<DataTransport>) -> impl Responder {
+    RestController::share().field_detail(data_transport)
 }
 
 

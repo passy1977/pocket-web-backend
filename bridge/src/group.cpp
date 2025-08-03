@@ -131,3 +131,18 @@ pocket_group_t* convert(const group::ptr& group)
         false
     );
 }
+
+group::ptr convert(const pocket_group_t* group)
+{
+    auto g = make_unique<struct group>();
+    g->server_id = group->server_id;
+    g->group_id = group->group_id;
+    g->server_group_id = group->server_group_id;
+    g->title = group->title;
+    g->icon = group->icon;
+    g->note = group->note;
+    g->synchronized = group->synchronized;
+    g->deleted = group->deleted;
+    g->timestamp_creation = group->timestamp_creation;
+    return g;
+}

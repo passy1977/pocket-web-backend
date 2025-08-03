@@ -1,15 +1,15 @@
 use crate::bindings::{pocket_field_controller_del_field, pocket_field_controller_init, pocket_field_controller_new, pocket_field_controller_persist_field, pocket_field_controller_t, pocket_group_controller_del_group, pocket_group_controller_init, pocket_group_controller_new, pocket_group_controller_persist_group, pocket_group_controller_t, pocket_stat_t_OK};
-use crate::models::group::{Group, Groups};
+use crate::models::field::Field;
+use crate::models::group::Group;
 use crate::models::rests::DataTransport;
-use crate::rest::rest_controller::{get_list_group, split_id_group_and_search, RestController};
+use crate::rest::rest_controller::RestController;
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;
 use crate::{get_field_controller, get_group_controller, get_session};
 use actix_web::web::Json;
 use actix_web::HttpResponse;
-use crate::models::field::Field;
 
-fn group_handler(group_controller: *mut pocket_group_controller_t, field_controller: *mut pocket_field_controller_t, data_transport: &Json<DataTransport>, kind: &String, err : &mut Option<&str>) -> bool {
+fn group_handler(group_controller: *mut pocket_group_controller_t, field_controller: *mut pocket_field_controller_t, data_transport: &Json<DataTransport>, _kind: &String, err : &mut Option<&str>) -> bool {
     if data_transport.groups.is_none() {
         return false;
     }
@@ -46,12 +46,12 @@ fn group_handler(group_controller: *mut pocket_group_controller_t, field_control
     true
 }
 
-fn group_field_handler(group_controller: *mut pocket_group_controller_t, field_controller: *mut pocket_field_controller_t,  data_transport: &Json<DataTransport>, kind: &String, err : &mut Option<&str>) -> bool {
+fn group_field_handler(_group_controller: *mut pocket_group_controller_t, _field_controller: *mut pocket_field_controller_t,  _data_transport: &Json<DataTransport>, _kind: &String, _err : &mut Option<&str>) -> bool {
 
     true
 }
 
-fn field_handler(field_controller: *mut pocket_field_controller_t, data_transport: &Json<DataTransport>, kind: &String, err : &mut Option<&str>) -> bool {
+fn field_handler(field_controller: *mut pocket_field_controller_t, data_transport: &Json<DataTransport>, _kind: &String, err : &mut Option<&str>) -> bool {
     if data_transport.fields.is_none() {
         return false;
     }
@@ -111,7 +111,7 @@ impl RestController {
 
         let field_controller = get_field_controller!(session);
 
-        let status_op = match kind.as_str() {
+        match kind.as_str() {
             "group" => group_handler(group_controller, field_controller, &data_transport, &action, &mut err),
             "groupField" => group_field_handler(group_controller, field_controller, &data_transport, &action, &mut err),
             "field" => field_handler(field_controller, &data_transport, &action, &mut err),
