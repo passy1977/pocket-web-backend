@@ -43,14 +43,15 @@ typedef struct pocket_group_t pocket_group_t;
 
 
 pocket_field_controller_t* pocket_field_controller_new(pocket_t* pocket);
-void pocket_field_controller_free(pocket_field_controller_t* self);
+void pocket_field_controller_free(const pocket_field_controller_t* self);
 
 void pocket_field_controller_init(pocket_field_controller_t* self);
-pocket_field_t** pocket_field_controller_get_list_field(const pocket_field_controller_t* self, int64_t group_id, const char *search, int *count);
-pocket_stat_t pocket_field_controller_persist_field(const pocket_field_controller_t* self, const pocket_field_t* f);
-pocket_stat_t pocket_field_controller_del_field(const pocket_field_controller_t* self, pocket_field_t* f);
-int32_t pocket_field_controller_size_filed(const pocket_field_controller_t* self, int64_t group_id);
-pocket_field_t* pocket_field_controller_get_filed(const pocket_field_controller_t* self, int64_t group_id);
+pocket_field_t** pocket_field_controller_get_list(const pocket_field_controller_t* self, int64_t group_id, const char *search, int *count);
+void pocket_field_controller_free_list(pocket_field_t** list, int count);
+pocket_stat_t pocket_field_controller_persist(const pocket_field_controller_t* self, const pocket_field_t* f);
+pocket_stat_t pocket_field_controller_del(const pocket_field_controller_t* self, pocket_field_t* f);
+int32_t pocket_field_controller_size(const pocket_field_controller_t* self, int64_t group_id);
+pocket_field_t* pocket_field_controller_get(const pocket_field_controller_t* self, int64_t group_id);
 int32_t pocket_field_controller_count_child(const pocket_field_controller_t* self, const pocket_group_t* field);
 
 #ifdef __cplusplus

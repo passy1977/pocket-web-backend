@@ -56,8 +56,11 @@ impl HttpResponseHelper {
         self
     }
 
-    pub fn group_fields(mut self, group_fields: GroupFields) -> Self {
-        self.1.group_fields = Some(group_fields);
+    pub fn group_fields(mut self, group_fields: Result<GroupFields>) -> Self {
+        self.1.group_fields = match group_fields {
+            Ok(group_fields) => Some(group_fields),
+            Err(_) => None,
+        };
         self
     }
 

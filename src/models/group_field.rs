@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 impl pocket_group_field_t {
 
-    pub fn to_field(&self) -> Option<GroupField> {
+    pub fn to_group_field(&self) -> GroupField {
         let title;
         let deref_group_field: pocket_group_field_t;
         unsafe {
@@ -19,7 +19,7 @@ impl pocket_group_field_t {
 
         }
 
-        Some(GroupField {
+        GroupField {
             id: deref_group_field.id,
             server_id: deref_group_field.server_id,
             user_id: deref_group_field.user_id,
@@ -30,7 +30,7 @@ impl pocket_group_field_t {
             synchronized: deref_group_field.synchronized,
             deleted: deref_group_field.deleted,
             timestamp_creation: deref_group_field.timestamp_creation,
-        })
+        }
     }
 }
 
@@ -66,7 +66,7 @@ impl GroupField {
         }
     }
 
-    pub fn to_pocket_field_t(&self) -> *mut pocket_group_field_t {
+    pub fn to_pocket_group_field_t(&self) -> *mut pocket_group_field_t {
         let ret : *mut pocket_group_field_t = unsafe {
             let title = match self.title.clone() {
                 Some(title) => CString::new(title).unwrap().into_raw(),

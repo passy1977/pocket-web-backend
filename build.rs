@@ -34,11 +34,13 @@ fn main() {
         // The input header we would like to generate
         // bindings for.
         .header("bridge/inc/pocket-bridge/constants.h")
-        .header("bridge/inc/pocket-bridge/pocket.h")
         .header("bridge/inc/pocket-bridge/field.h")
         .header("bridge/inc/pocket-bridge/field_controller.h")
         .header("bridge/inc/pocket-bridge/group.h")
         .header("bridge/inc/pocket-bridge/group_controller.h")
+        .header("bridge/inc/pocket-bridge/group_field.h")
+        .header("bridge/inc/pocket-bridge/group_field_controller.h")
+        .header("bridge/inc/pocket-bridge/pocket.h")
         .header("bridge/inc/pocket-bridge/user.h")
         .clang_arg("-Ibridge/inc")
         .clang_arg("-Ibridge/pocket-lib/inc")
@@ -50,7 +52,7 @@ fn main() {
         .generate()
         // Unwrap the Result and panic on failure.
         .expect("Unable to generate bindings");
-    
+
     // Write the bindings to the src/bindings/[os]/[arch]/bindings.rs file.
     let out_path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap())
         .join("src");

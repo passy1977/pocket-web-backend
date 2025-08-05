@@ -18,17 +18,17 @@
  ***************************************************************************/
 
 #include "pocket-bridge/group_controller.h"
+#include "pocket-bridge/group_field_controller.h"
 #include "pocket-bridge/field_controller.h"
 
 #include "pocket/globals.hpp"
 using namespace pocket;
 
 #include "pocket-controllers/session.hpp"
-using pocket::controllers::session;
+using controllers::session;
 
 
 #include "pocket-views/view-group.hpp"
-#include "pocket-views/view-group-field.hpp"
 using views::view;
 
 #include "pocket-pods/group.hpp"
@@ -36,6 +36,7 @@ using views::view;
 using namespace pods;
 
 #include <new>
+#include <ranges>
 using namespace std;
 
 namespace
@@ -58,11 +59,10 @@ pocket_group_controller_t* pocket_group_controller_new(pocket_t* pocket)
         .reachability = true,
         .view_group = nullptr,
         .view_group_field = nullptr,
-        .show_list = nullptr
     };
 }
 
-void pocket_group_controller_free(pocket_group_controller_t* self)
+void pocket_group_controller_free(const pocket_group_controller_t* self)
 {
     if (self == nullptr)
     {
@@ -70,7 +70,6 @@ void pocket_group_controller_free(pocket_group_controller_t* self)
     }
 
     delete self;
-    self = nullptr;
 }
 
 void pocket_group_controller_init(pocket_group_controller_t* self) 
@@ -84,7 +83,7 @@ void pocket_group_controller_init(pocket_group_controller_t* self)
 }
 
 
-pocket_group_t** pocket_group_controller_get_list_group(const pocket_group_controller_t* self, const pocket_field_controller_t* field_controller, int64_t group_id, const char *search, int *count) try
+pocket_group_t** pocket_group_controller_get_list(const pocket_group_controller_t* self, const pocket_field_controller_t* field_controller, int64_t group_id, const char *search, int *count) try
 {
     if (!self || !count) return nullptr;
 
@@ -94,7 +93,7 @@ pocket_group_t** pocket_group_controller_get_list_group(const pocket_group_contr
     auto&& list = view_group->get_list(group_id, search);
     *count = static_cast<int>(list.size());
 
-    auto ret = new(nothrow) pocket_group_t*[*count];
+    const auto ret = new(nothrow) pocket_group_t*[*count];
     if (ret == nullptr)
     {
         return nullptr;
@@ -103,7 +102,7 @@ pocket_group_t** pocket_group_controller_get_list_group(const pocket_group_contr
     size_t i = 0;
     for(auto &&it : list)
     {
-        auto pocket_group = convert(it);
+        const auto pocket_group = convert(it);
 
         pocket_group->has_child = pocket_group_controller_count_child(self, pocket_group) + pocket_field_controller_count_child(field_controller, pocket_group) > 0;
 
@@ -118,10 +117,24 @@ catch(const runtime_error& e)
     return nullptr;    
 }
 
+void pocket_group_controller_free_list(pocket_group_t** list, int count)
+{
+    if (list == nullptr)
+    {
+        return;
+    }
+
+    for (int i : std::views::iota(0, count)) {
+        pocket_group_free(list[i]);
+    }
+
+    delete [] list;
+}
+
 int32_t pocket_group_controller_count_child(const pocket_group_controller_t* self, const pocket_group_t* group) try
 {
     if (self == nullptr || group == nullptr) return -1;
-    auto view_group = static_cast<view<struct group> *>(self->view_group);
+    const auto view_group = static_cast<view<struct group> *>(self->view_group);
 
     return static_cast<uint32_t>(view_group->get_list(group->id).size());
 }
@@ -131,15 +144,15 @@ catch(const runtime_error& e)
     return 0;
 }
 
-pocket_stat_t pocket_group_controller_del_group(const pocket_group_controller_t* self, const pocket_field_controller_t* field_controller, const pocket_group_t* group) try
+pocket_stat_t pocket_group_controller_del(const pocket_group_controller_t* self, const pocket_group_field_controller_t* group_field_controller, const pocket_field_controller_t* field_controller, const pocket_group_t* group) try
 {
-    if (!self || !field_controller || !group) return ERROR;
+    if (!self || !group_field_controller || !field_controller || !group) return ERROR;
 
     auto session = static_cast<class session*>(self->pocket->session);
     auto logged_user = static_cast<user::opt_ptr *>(self->pocket->user);
 
     const auto view_group = static_cast<view<struct group> *>(self->view_group);
-    const auto view_group_field = static_cast<view<group_field> *>(self->view_group_field);
+    const auto view_group_field = static_cast<view<group_field> *>(group_field_controller->view_group_field);
     const auto view_field = static_cast<view<field> *>(field_controller->view_field);
 
     view_group_field->del_by_group_id(group->id);
@@ -170,7 +183,7 @@ catch(const runtime_error& e)
     return ERROR;
 }
 
-pocket_stat_t pocket_group_controller_persist_group(const pocket_group_controller_t* self, const pocket_group_t* group) try
+pocket_stat_t pocket_group_controller_persist(const pocket_group_controller_t* self, const pocket_group_t* group) try
 {
     if (!self || !group) return ERROR;
 
@@ -259,14 +272,13 @@ catch(const runtime_error& e)
     return ERROR;
 }
 
-pocket_group_t* pocket_group_controller_get_group(const pocket_group_controller_t* self, int64_t group_id) try
+pocket_group_t* pocket_group_controller_get(const pocket_group_controller_t* self, int64_t group_id) try
 {
     if (!self) return nullptr;
 
     const auto view_group = static_cast<view<struct group> *>(self->view_group);
 
-    auto&&group_opt = view_group->get(group_id);
-    if(group_opt)
+    if(auto&&group_opt = view_group->get(group_id))
     {
         return convert(*group_opt);
     }
@@ -314,30 +326,4 @@ void pocket_group_controller_clean_show_list(pocket_group_controller_t* controll
 void pocket_group_controller_fill_show_list(pocket_group_controller_t* controller, const pocket_group_t *group, bool insert)
 {
 
-}
-
-pocket_show_list_t* pocket_group_controller_get_show_list(void)
-{
-    return nullptr;
-}
-
-bool pocket_add_to_show_list(pocket_group_controller_t* self, const pocket_group_field_t* group_field)
-{
-    if (!self || !group_field) return false;
-
-    return true; // Placeholder
-}
-
-bool pocket_group_controller_del_from_show_list(pocket_group_controller_t* self, int64_t id_group_field)
-{
-    if (!self) return false;
-
-    return true; // Placeholder
-}
-
-uint8_t pocket_group_controller_size_show_list(const pocket_group_controller_t* self)
-{
-    if (!self) return 0;
-
-    return 0; // Placeholder
 }

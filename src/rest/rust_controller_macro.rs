@@ -32,6 +32,27 @@ macro_rules! get_group_controller {
 }
 
 #[macro_export]
+macro_rules! get_group_field_controller {
+    ($session:expr) => {{
+        let group_field_controller = unsafe {
+            if $session.group_field_controller.is_null() {
+                $session.group_field_controller = pocket_group_field_controller_new($session.pocket);
+                if $session.group_field_controller.is_null() {
+                    return HttpResponseHelper::internal_server_error()
+                        .error("Group controller null")
+                        .build();
+                }
+                pocket_group_field_controller_init($session.group_field_controller);
+            }
+
+            $session.group_field_controller
+        };
+
+        group_field_controller
+    }};
+}
+
+#[macro_export]
 macro_rules! get_field_controller {
     ($session:expr) => {{
         let field_controller = unsafe {

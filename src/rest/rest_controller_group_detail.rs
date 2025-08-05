@@ -1,15 +1,16 @@
 use crate::services::session::Sessions;
 use crate::models::rests::DataTransport;
-use crate::rest::rest_controller::RestController;
+use crate::rest::rest_controller::{get_list_group, get_list_group_field, RestController};
 use crate::services::http_response_helper::HttpResponseHelper;
 use actix_web::web::Json;
 use actix_web::HttpResponse;
-use crate::get_session;
+use crate::{get_group_controller, get_group_field_controller, get_session};
+use crate::bindings::{pocket_group_controller_init, pocket_group_controller_new, pocket_group_field_controller_init, pocket_group_field_controller_new};
 
 impl RestController {
 
     pub fn group_detail(&self, data_transport: Json<DataTransport>) -> HttpResponse {
-        let session = get_session!(data_transport.session_id, "Session not found");
+        let mut session = get_session!(data_transport.session_id, "Session not found");
 
         let id = match &data_transport.data {
             None => return HttpResponseHelper::internal_server_error()
@@ -24,13 +25,17 @@ impl RestController {
                 }
         };
 
+        let group_controller = get_group_controller!(session);
 
+        let group_field_controller = get_group_field_controller!(session);
 
+        let search = "".to_string();
 
         HttpResponseHelper::ok()
             .path("/group-detail")
-            .title("Login")
+            .title("Group detail")
             .session_id(session.session_id)
+            .group_fields(get_list_group_field(group_field_controller, id, &search))
             .build()
     }
 

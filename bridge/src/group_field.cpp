@@ -22,6 +22,9 @@
 #include <new>
 #include <cstring>
 
+#include "pocket-pods/group-field.hpp"
+using pocket::pods::group_field;
+
 using namespace std;
 
 pocket_group_field_t* pocket_group_field_new() {
@@ -90,4 +93,19 @@ void pocket_group_field_free(pocket_group_field_t* group_field)
 
         delete group_field;
     }
+}
+
+pocket_group_field_t* convert(const group_field::ptr& group)
+{
+    return ::pocket_group_field_new_with_params(
+        group->id,
+        group->server_id,
+        group->user_id,
+        group->group_id,
+        group->server_group_id,
+        group->title.c_str(),
+        group->is_hidden,
+        group->synchronized,
+        group->deleted,
+        group->timestamp_creation);
 }

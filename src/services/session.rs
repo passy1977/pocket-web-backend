@@ -1,4 +1,4 @@
-use crate::bindings::{pocket_field_controller_free, pocket_field_controller_t, pocket_free, pocket_group_controller_free, pocket_group_controller_t, pocket_new, pocket_t};
+use crate::bindings::{pocket_field_controller_free, pocket_field_controller_t, pocket_free, pocket_group_controller_free, pocket_group_controller_t, pocket_group_field_controller_t, pocket_new, pocket_t};
 use std::collections::HashMap;
 use std::ptr::null_mut;
 use std::sync::{Arc, Mutex};
@@ -14,6 +14,8 @@ pub struct Session {
     
     pub group_controller: *mut pocket_group_controller_t,
 
+    pub group_field_controller: *mut pocket_group_field_controller_t,
+
     pub field_controller: *mut pocket_field_controller_t,
 
     pub timestamp_last_update: u64
@@ -28,6 +30,7 @@ impl Session {
             session_id: Ulid::new().to_string(),
             pocket: unsafe { pocket_new() },
             group_controller: null_mut(),
+            group_field_controller: null_mut(),
             field_controller: null_mut(),
             timestamp_last_update: match SystemTime::now().duration_since(UNIX_EPOCH) {
                 Ok(duration) => duration.as_secs(), 

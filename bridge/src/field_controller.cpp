@@ -24,7 +24,7 @@
 using namespace pocket;
 
 #include "pocket-controllers/session.hpp"
-using pocket::controllers::session;
+using controllers::session;
 
 
 #include "pocket-views/view.hpp"
@@ -34,6 +34,7 @@ using views::view;
 using namespace pods;
 
 #include <new>
+#include <ranges>
 using namespace std;
 
 namespace
@@ -57,7 +58,7 @@ pocket_field_controller_t* pocket_field_controller_new(pocket_t* pocket) {
     };
 }
 
-void pocket_field_controller_free(pocket_field_controller_t* field_controller)
+void pocket_field_controller_free(const pocket_field_controller_t* field_controller)
 {
     if (field_controller == nullptr)
     {
@@ -77,7 +78,7 @@ void pocket_field_controller_init(pocket_field_controller_t* self)
     }
 }
 
-pocket_field_t** pocket_field_controller_get_list_field(const pocket_field_controller_t* self, int64_t group_id, const char* search, int *count) try
+pocket_field_t** pocket_field_controller_get_list(const pocket_field_controller_t* self, int64_t group_id, const char* search, int *count) try
 {
     if (!self || !count) return nullptr;
 
@@ -87,7 +88,7 @@ pocket_field_t** pocket_field_controller_get_list_field(const pocket_field_contr
     auto&& list = view_field->get_list(group_id, search);
     *count = list.size();
 
-    auto ret = new(nothrow) pocket_field_t*[*count];
+    const auto ret = new(nothrow) pocket_field_t*[*count];
     if (ret == nullptr)
     {
         return nullptr;
@@ -107,14 +108,28 @@ catch(const runtime_error& e)
     return nullptr;
 }
 
+void pocket_field_controller_free_list(pocket_field_t** list, int count)
+{
+    if (list == nullptr)
+    {
+        return;
+    }
 
-pocket_stat_t pocket_field_controller_persist_field(const pocket_field_controller_t* self, const pocket_field_t* f)
+    for (int i : std::views::iota(0, count)) {
+        pocket_field_free(list[i]);
+    }
+
+    delete [] list;
+}
+
+
+pocket_stat_t pocket_field_controller_persist(const pocket_field_controller_t* self, const pocket_field_t* f)
 {
 
     return OK;
 }
 
-pocket_stat_t pocket_field_controller_del_field(const pocket_field_controller_t* self, pocket_field_t* field) try
+pocket_stat_t pocket_field_controller_del(const pocket_field_controller_t* self, pocket_field_t* field) try
 {
     if (!self || !field) return ERROR;
 
@@ -148,13 +163,13 @@ catch(const runtime_error& e)
     return ERROR;
 }
 
-int32_t pocket_field_controller_size_filed(const pocket_field_controller_t* self, pocket_stat_t group_id)
+int32_t pocket_field_controller_size(const pocket_field_controller_t* self, pocket_stat_t group_id)
 {
 
     return 0;
 }
 
-pocket_field_t* pocket_field_controller_get_filed(const pocket_field_controller_t* self, pocket_stat_t group_id)
+pocket_field_t* pocket_field_controller_get(const pocket_field_controller_t* self, pocket_stat_t group_id)
 {
 
     return nullptr;
@@ -163,9 +178,9 @@ pocket_field_t* pocket_field_controller_get_filed(const pocket_field_controller_
 int32_t pocket_field_controller_count_child(const pocket_field_controller_t* self, const pocket_group_t* group) try
 {
     if (self == nullptr || group == nullptr) return -1;
-    auto view_field = static_cast<view<struct field> *>(self->view_field);
+    const auto view_field = static_cast<view<struct field> *>(self->view_field);
 
-    return static_cast<uint32_t>(view_field->get_list(group->id).size());
+    return view_field->get_list(group->id).size();
 }
 catch(const runtime_error& e)
 {

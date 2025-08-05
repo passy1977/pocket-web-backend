@@ -4,9 +4,10 @@ use crate::services::data::Data;
 use actix_web::web::Json;
 use actix_web::HttpResponse;
 use std::sync::Arc;
-use crate::bindings::{pocket_field_controller_get_list_field, pocket_field_controller_t, pocket_field_free, pocket_field_t, pocket_group_controller_get_list_group, pocket_group_controller_t, pocket_group_free, pocket_group_t};
+use crate::bindings::{pocket_field_controller_free_list, pocket_field_controller_get_list, pocket_field_controller_t, pocket_field_free, pocket_field_t, pocket_group_controller_free_list, pocket_group_controller_get_list, pocket_group_controller_t, pocket_group_field_controller_free, pocket_group_field_controller_free_list, pocket_group_field_controller_get_list, pocket_group_field_controller_t, pocket_group_field_t, pocket_group_free, pocket_group_t};
 use crate::models::field::Fields;
 use crate::models::group::Groups;
+use crate::models::group_field::GroupFields;
 
 pub struct RestController {
     pub(super) data: Data
@@ -33,13 +34,13 @@ pub fn split_id_group_and_search(data_transport: &Json<DataTransport>) -> crate:
 
 }
 
-pub fn get_list_group(group_controller: *const pocket_group_controller_t, field_controller: *const pocket_field_controller_t, group_id: i64, search: &String,) -> crate::utils::Result<Groups> {
+pub fn get_list_group(group_controller: *const pocket_group_controller_t, field_controller: *const pocket_field_controller_t, group_id: i64, search: &String) -> crate::utils::Result<Groups> {
     let mut ret = Groups::new();
 
     unsafe {
 
         let mut count = Box::new(0i32);
-        let groups_ptr = pocket_group_controller_get_list_group(
+        let groups_ptr = pocket_group_controller_get_list(
             group_controller,
             field_controller,
             group_id,
@@ -55,21 +56,52 @@ pub fn get_list_group(group_controller: *const pocket_group_controller_t, field_
             if !group_ptr.is_null() {
                 let pocket_group: pocket_group_t = std::ptr::read(group_ptr);
                 ret.push(pocket_group.to_group());
-                pocket_group_free(group_ptr);
             }
         }
+
+        pocket_group_controller_free_list(groups_ptr, *count);
     }
 
     Ok(ret)
 }
 
-pub fn get_list_field(field_controller: *const pocket_field_controller_t, group_id: i64, search: &String,) -> crate::utils::Result<Fields> {
+pub fn get_list_group_field(group_field_controller: *const pocket_group_field_controller_t, group_id: i64, search: &String) -> crate::utils::Result<GroupFields> {
+    let mut ret = GroupFields::new();
+
+    unsafe {
+
+        let mut count = Box::new(0i32);
+        let groups_fields_ptr = pocket_group_field_controller_get_list(
+            group_field_controller,
+            group_id,
+            CString::new(search.clone()).expect("search::new failed").as_ptr(),
+            count.as_mut()
+        );
+        if groups_fields_ptr.is_null() {
+            return Err("Groups it's null")
+        }
+
+        for i in 0i32..*count {
+            let group_field_ptr = *groups_fields_ptr.offset(i as isize);
+            if !group_field_ptr.is_null() {
+                let pocket_group_field: pocket_group_field_t = std::ptr::read(group_field_ptr);
+                ret.push(pocket_group_field.to_group_field());
+            }
+        }
+
+        pocket_group_field_controller_free_list(groups_fields_ptr, *count);
+    }
+
+    Ok(ret)
+}
+
+pub fn get_list_field(field_controller: *const pocket_field_controller_t, group_id: i64, search: &String) -> crate::utils::Result<Fields> {
     let mut ret = Fields::new();
 
     unsafe {
 
         let mut count = Box::new(0i32);
-        let fields_ptr = pocket_field_controller_get_list_field(
+        let fields_ptr = pocket_field_controller_get_list(
             field_controller,
             group_id,
             CString::new(search.clone()).expect("search::new failed").as_ptr(),
@@ -84,9 +116,10 @@ pub fn get_list_field(field_controller: *const pocket_field_controller_t, group_
             if !field_ptr.is_null() {
                 let pocket_field: pocket_field_t = std::ptr::read(field_ptr);
                 ret.push(pocket_field.to_field());
-                pocket_field_free(field_ptr);
             }
         }
+
+        pocket_field_controller_free_list(fields_ptr, *count);
     }
 
     Ok(ret)

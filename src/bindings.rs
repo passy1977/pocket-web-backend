@@ -3,9 +3,7 @@
 pub const DEVICE_AES_CBC_IV: &[u8; 17] = b"1234567890123456\0";
 pub const SYNCHRONIZER_TIMEOUT: u32 = 5;
 pub const SYNCHRONIZER_CONNECT_TIMEOUT: u32 = 10;
-pub const true_: u32 = 1;
-pub const false_: u32 = 0;
-pub const __bool_true_false_are_defined: u32 = 1;
+pub const _STDINT_H: u32 = 1;
 pub const _FEATURES_H: u32 = 1;
 pub const __GLIBC_USE_ISOC2X: u32 = 0;
 pub const __USE_ISOC11: u32 = 1;
@@ -38,29 +36,6 @@ pub const __GLIBC_USE_IEC_60559_EXT: u32 = 0;
 pub const __GLIBC_USE_IEC_60559_FUNCS_EXT: u32 = 0;
 pub const __GLIBC_USE_IEC_60559_FUNCS_EXT_C2X: u32 = 0;
 pub const __GLIBC_USE_IEC_60559_TYPES_EXT: u32 = 0;
-pub const _STDLIB_H: u32 = 1;
-pub const __HAVE_FLOAT128: u32 = 0;
-pub const __HAVE_DISTINCT_FLOAT128: u32 = 0;
-pub const __HAVE_FLOAT64X: u32 = 1;
-pub const __HAVE_FLOAT64X_LONG_DOUBLE: u32 = 1;
-pub const __HAVE_FLOAT16: u32 = 0;
-pub const __HAVE_FLOAT32: u32 = 1;
-pub const __HAVE_FLOAT64: u32 = 1;
-pub const __HAVE_FLOAT32X: u32 = 1;
-pub const __HAVE_FLOAT128X: u32 = 0;
-pub const __HAVE_DISTINCT_FLOAT16: u32 = 0;
-pub const __HAVE_DISTINCT_FLOAT32: u32 = 0;
-pub const __HAVE_DISTINCT_FLOAT64: u32 = 0;
-pub const __HAVE_DISTINCT_FLOAT32X: u32 = 0;
-pub const __HAVE_DISTINCT_FLOAT64X: u32 = 0;
-pub const __HAVE_DISTINCT_FLOAT128X: u32 = 0;
-pub const __HAVE_FLOATN_NOT_TYPEDEF: u32 = 0;
-pub const __ldiv_t_defined: u32 = 1;
-pub const __lldiv_t_defined: u32 = 1;
-pub const RAND_MAX: u32 = 2147483647;
-pub const EXIT_FAILURE: u32 = 1;
-pub const EXIT_SUCCESS: u32 = 0;
-pub const _STDINT_H: u32 = 1;
 pub const _BITS_TYPES_H: u32 = 1;
 pub const _BITS_TYPESIZES_H: u32 = 1;
 pub const __OFF_T_MATCHES_OFF64_T: u32 = 1;
@@ -110,6 +85,31 @@ pub const SIG_ATOMIC_MAX: u32 = 2147483647;
 pub const SIZE_MAX: i32 = -1;
 pub const WINT_MIN: u32 = 0;
 pub const WINT_MAX: u32 = 4294967295;
+pub const true_: u32 = 1;
+pub const false_: u32 = 0;
+pub const __bool_true_false_are_defined: u32 = 1;
+pub const _STDLIB_H: u32 = 1;
+pub const __HAVE_FLOAT128: u32 = 0;
+pub const __HAVE_DISTINCT_FLOAT128: u32 = 0;
+pub const __HAVE_FLOAT64X: u32 = 1;
+pub const __HAVE_FLOAT64X_LONG_DOUBLE: u32 = 1;
+pub const __HAVE_FLOAT16: u32 = 0;
+pub const __HAVE_FLOAT32: u32 = 1;
+pub const __HAVE_FLOAT64: u32 = 1;
+pub const __HAVE_FLOAT32X: u32 = 1;
+pub const __HAVE_FLOAT128X: u32 = 0;
+pub const __HAVE_DISTINCT_FLOAT16: u32 = 0;
+pub const __HAVE_DISTINCT_FLOAT32: u32 = 0;
+pub const __HAVE_DISTINCT_FLOAT64: u32 = 0;
+pub const __HAVE_DISTINCT_FLOAT32X: u32 = 0;
+pub const __HAVE_DISTINCT_FLOAT64X: u32 = 0;
+pub const __HAVE_DISTINCT_FLOAT128X: u32 = 0;
+pub const __HAVE_FLOATN_NOT_TYPEDEF: u32 = 0;
+pub const __ldiv_t_defined: u32 = 1;
+pub const __lldiv_t_defined: u32 = 1;
+pub const RAND_MAX: u32 = 2147483647;
+pub const EXIT_FAILURE: u32 = 1;
+pub const EXIT_SUCCESS: u32 = 0;
 pub const pocket_stat_t_READY: pocket_stat_t = 0;
 pub const pocket_stat_t_BUSY: pocket_stat_t = 1;
 pub const pocket_stat_t_USER_NOT_FOUND: pocket_stat_t = 600;
@@ -133,6 +133,170 @@ pub const pocket_stat_t_MAP_ID_ERROR: pocket_stat_t = 707;
 pub const pocket_stat_t_LOCAL_DEVICE_ID_NOT_MATCH: pocket_stat_t = 802;
 pub const pocket_stat_t_OK: pocket_stat_t = 200;
 pub type pocket_stat_t = ::std::os::raw::c_uint;
+pub type __u_char = ::std::os::raw::c_uchar;
+pub type __u_short = ::std::os::raw::c_ushort;
+pub type __u_int = ::std::os::raw::c_uint;
+pub type __u_long = ::std::os::raw::c_ulong;
+pub type __int8_t = ::std::os::raw::c_schar;
+pub type __uint8_t = ::std::os::raw::c_uchar;
+pub type __int16_t = ::std::os::raw::c_short;
+pub type __uint16_t = ::std::os::raw::c_ushort;
+pub type __int32_t = ::std::os::raw::c_int;
+pub type __uint32_t = ::std::os::raw::c_uint;
+pub type __int64_t = ::std::os::raw::c_long;
+pub type __uint64_t = ::std::os::raw::c_ulong;
+pub type __int_least8_t = __int8_t;
+pub type __uint_least8_t = __uint8_t;
+pub type __int_least16_t = __int16_t;
+pub type __uint_least16_t = __uint16_t;
+pub type __int_least32_t = __int32_t;
+pub type __uint_least32_t = __uint32_t;
+pub type __int_least64_t = __int64_t;
+pub type __uint_least64_t = __uint64_t;
+pub type __quad_t = ::std::os::raw::c_long;
+pub type __u_quad_t = ::std::os::raw::c_ulong;
+pub type __intmax_t = ::std::os::raw::c_long;
+pub type __uintmax_t = ::std::os::raw::c_ulong;
+pub type __dev_t = ::std::os::raw::c_ulong;
+pub type __uid_t = ::std::os::raw::c_uint;
+pub type __gid_t = ::std::os::raw::c_uint;
+pub type __ino_t = ::std::os::raw::c_ulong;
+pub type __ino64_t = ::std::os::raw::c_ulong;
+pub type __mode_t = ::std::os::raw::c_uint;
+pub type __nlink_t = ::std::os::raw::c_ulong;
+pub type __off_t = ::std::os::raw::c_long;
+pub type __off64_t = ::std::os::raw::c_long;
+pub type __pid_t = ::std::os::raw::c_int;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct __fsid_t {
+    pub __val: [::std::os::raw::c_int; 2usize],
+}
+#[allow(clippy::unnecessary_operation, clippy::identity_op)]
+const _: () = {
+    ["Size of __fsid_t"][::std::mem::size_of::<__fsid_t>() - 8usize];
+    ["Alignment of __fsid_t"][::std::mem::align_of::<__fsid_t>() - 4usize];
+    ["Offset of field: __fsid_t::__val"][::std::mem::offset_of!(__fsid_t, __val) - 0usize];
+};
+pub type __clock_t = ::std::os::raw::c_long;
+pub type __rlim_t = ::std::os::raw::c_ulong;
+pub type __rlim64_t = ::std::os::raw::c_ulong;
+pub type __id_t = ::std::os::raw::c_uint;
+pub type __time_t = ::std::os::raw::c_long;
+pub type __useconds_t = ::std::os::raw::c_uint;
+pub type __suseconds_t = ::std::os::raw::c_long;
+pub type __suseconds64_t = ::std::os::raw::c_long;
+pub type __daddr_t = ::std::os::raw::c_int;
+pub type __key_t = ::std::os::raw::c_int;
+pub type __clockid_t = ::std::os::raw::c_int;
+pub type __timer_t = *mut ::std::os::raw::c_void;
+pub type __blksize_t = ::std::os::raw::c_long;
+pub type __blkcnt_t = ::std::os::raw::c_long;
+pub type __blkcnt64_t = ::std::os::raw::c_long;
+pub type __fsblkcnt_t = ::std::os::raw::c_ulong;
+pub type __fsblkcnt64_t = ::std::os::raw::c_ulong;
+pub type __fsfilcnt_t = ::std::os::raw::c_ulong;
+pub type __fsfilcnt64_t = ::std::os::raw::c_ulong;
+pub type __fsword_t = ::std::os::raw::c_long;
+pub type __ssize_t = ::std::os::raw::c_long;
+pub type __syscall_slong_t = ::std::os::raw::c_long;
+pub type __syscall_ulong_t = ::std::os::raw::c_ulong;
+pub type __loff_t = __off64_t;
+pub type __caddr_t = *mut ::std::os::raw::c_char;
+pub type __intptr_t = ::std::os::raw::c_long;
+pub type __socklen_t = ::std::os::raw::c_uint;
+pub type __sig_atomic_t = ::std::os::raw::c_int;
+pub type int_least8_t = __int_least8_t;
+pub type int_least16_t = __int_least16_t;
+pub type int_least32_t = __int_least32_t;
+pub type int_least64_t = __int_least64_t;
+pub type uint_least8_t = __uint_least8_t;
+pub type uint_least16_t = __uint_least16_t;
+pub type uint_least32_t = __uint_least32_t;
+pub type uint_least64_t = __uint_least64_t;
+pub type int_fast8_t = ::std::os::raw::c_schar;
+pub type int_fast16_t = ::std::os::raw::c_long;
+pub type int_fast32_t = ::std::os::raw::c_long;
+pub type int_fast64_t = ::std::os::raw::c_long;
+pub type uint_fast8_t = ::std::os::raw::c_uchar;
+pub type uint_fast16_t = ::std::os::raw::c_ulong;
+pub type uint_fast32_t = ::std::os::raw::c_ulong;
+pub type uint_fast64_t = ::std::os::raw::c_ulong;
+pub type intmax_t = __intmax_t;
+pub type uintmax_t = __uintmax_t;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct pocket_field_t {
+    pub id: i64,
+    pub server_id: i64,
+    pub user_id: i64,
+    pub group_id: i64,
+    pub server_group_id: i64,
+    pub group_field_id: i64,
+    pub server_group_field_id: i64,
+    pub title: *mut ::std::os::raw::c_char,
+    pub value: *mut ::std::os::raw::c_char,
+    pub is_hidden: bool,
+    pub synchronized: bool,
+    pub deleted: bool,
+    pub timestamp_creation: u64,
+}
+#[allow(clippy::unnecessary_operation, clippy::identity_op)]
+const _: () = {
+    ["Size of pocket_field_t"][::std::mem::size_of::<pocket_field_t>() - 88usize];
+    ["Alignment of pocket_field_t"][::std::mem::align_of::<pocket_field_t>() - 8usize];
+    ["Offset of field: pocket_field_t::id"][::std::mem::offset_of!(pocket_field_t, id) - 0usize];
+    ["Offset of field: pocket_field_t::server_id"]
+        [::std::mem::offset_of!(pocket_field_t, server_id) - 8usize];
+    ["Offset of field: pocket_field_t::user_id"]
+        [::std::mem::offset_of!(pocket_field_t, user_id) - 16usize];
+    ["Offset of field: pocket_field_t::group_id"]
+        [::std::mem::offset_of!(pocket_field_t, group_id) - 24usize];
+    ["Offset of field: pocket_field_t::server_group_id"]
+        [::std::mem::offset_of!(pocket_field_t, server_group_id) - 32usize];
+    ["Offset of field: pocket_field_t::group_field_id"]
+        [::std::mem::offset_of!(pocket_field_t, group_field_id) - 40usize];
+    ["Offset of field: pocket_field_t::server_group_field_id"]
+        [::std::mem::offset_of!(pocket_field_t, server_group_field_id) - 48usize];
+    ["Offset of field: pocket_field_t::title"]
+        [::std::mem::offset_of!(pocket_field_t, title) - 56usize];
+    ["Offset of field: pocket_field_t::value"]
+        [::std::mem::offset_of!(pocket_field_t, value) - 64usize];
+    ["Offset of field: pocket_field_t::is_hidden"]
+        [::std::mem::offset_of!(pocket_field_t, is_hidden) - 72usize];
+    ["Offset of field: pocket_field_t::synchronized"]
+        [::std::mem::offset_of!(pocket_field_t, synchronized) - 73usize];
+    ["Offset of field: pocket_field_t::deleted"]
+        [::std::mem::offset_of!(pocket_field_t, deleted) - 74usize];
+    ["Offset of field: pocket_field_t::timestamp_creation"]
+        [::std::mem::offset_of!(pocket_field_t, timestamp_creation) - 80usize];
+};
+unsafe extern "C" {
+    pub fn pocket_field_new() -> *mut pocket_field_t;
+}
+unsafe extern "C" {
+    pub fn pocket_field_new_with_params(
+        id: i64,
+        server_id: i64,
+        user_id: i64,
+        group_id: i64,
+        server_group_id: i64,
+        group_field_id: i64,
+        server_group_field_id: i64,
+        title: *const ::std::os::raw::c_char,
+        value: *const ::std::os::raw::c_char,
+        is_hidden: bool,
+        synchronized: bool,
+        deleted: bool,
+        timestamp_creation: u64,
+    ) -> *mut pocket_field_t;
+}
+unsafe extern "C" {
+    pub fn pocket_field_is_null(field: *const pocket_field_t) -> bool;
+}
+unsafe extern "C" {
+    pub fn pocket_field_free(field: *mut pocket_field_t);
+}
 pub type wchar_t = ::std::os::raw::c_int;
 pub type _Float32 = f32;
 pub type _Float64 = f64;
@@ -357,97 +521,6 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn wcstombs(__s: *mut ::std::os::raw::c_char, __pwcs: *const wchar_t, __n: usize) -> usize;
 }
-pub type __u_char = ::std::os::raw::c_uchar;
-pub type __u_short = ::std::os::raw::c_ushort;
-pub type __u_int = ::std::os::raw::c_uint;
-pub type __u_long = ::std::os::raw::c_ulong;
-pub type __int8_t = ::std::os::raw::c_schar;
-pub type __uint8_t = ::std::os::raw::c_uchar;
-pub type __int16_t = ::std::os::raw::c_short;
-pub type __uint16_t = ::std::os::raw::c_ushort;
-pub type __int32_t = ::std::os::raw::c_int;
-pub type __uint32_t = ::std::os::raw::c_uint;
-pub type __int64_t = ::std::os::raw::c_long;
-pub type __uint64_t = ::std::os::raw::c_ulong;
-pub type __int_least8_t = __int8_t;
-pub type __uint_least8_t = __uint8_t;
-pub type __int_least16_t = __int16_t;
-pub type __uint_least16_t = __uint16_t;
-pub type __int_least32_t = __int32_t;
-pub type __uint_least32_t = __uint32_t;
-pub type __int_least64_t = __int64_t;
-pub type __uint_least64_t = __uint64_t;
-pub type __quad_t = ::std::os::raw::c_long;
-pub type __u_quad_t = ::std::os::raw::c_ulong;
-pub type __intmax_t = ::std::os::raw::c_long;
-pub type __uintmax_t = ::std::os::raw::c_ulong;
-pub type __dev_t = ::std::os::raw::c_ulong;
-pub type __uid_t = ::std::os::raw::c_uint;
-pub type __gid_t = ::std::os::raw::c_uint;
-pub type __ino_t = ::std::os::raw::c_ulong;
-pub type __ino64_t = ::std::os::raw::c_ulong;
-pub type __mode_t = ::std::os::raw::c_uint;
-pub type __nlink_t = ::std::os::raw::c_ulong;
-pub type __off_t = ::std::os::raw::c_long;
-pub type __off64_t = ::std::os::raw::c_long;
-pub type __pid_t = ::std::os::raw::c_int;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct __fsid_t {
-    pub __val: [::std::os::raw::c_int; 2usize],
-}
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of __fsid_t"][::std::mem::size_of::<__fsid_t>() - 8usize];
-    ["Alignment of __fsid_t"][::std::mem::align_of::<__fsid_t>() - 4usize];
-    ["Offset of field: __fsid_t::__val"][::std::mem::offset_of!(__fsid_t, __val) - 0usize];
-};
-pub type __clock_t = ::std::os::raw::c_long;
-pub type __rlim_t = ::std::os::raw::c_ulong;
-pub type __rlim64_t = ::std::os::raw::c_ulong;
-pub type __id_t = ::std::os::raw::c_uint;
-pub type __time_t = ::std::os::raw::c_long;
-pub type __useconds_t = ::std::os::raw::c_uint;
-pub type __suseconds_t = ::std::os::raw::c_long;
-pub type __suseconds64_t = ::std::os::raw::c_long;
-pub type __daddr_t = ::std::os::raw::c_int;
-pub type __key_t = ::std::os::raw::c_int;
-pub type __clockid_t = ::std::os::raw::c_int;
-pub type __timer_t = *mut ::std::os::raw::c_void;
-pub type __blksize_t = ::std::os::raw::c_long;
-pub type __blkcnt_t = ::std::os::raw::c_long;
-pub type __blkcnt64_t = ::std::os::raw::c_long;
-pub type __fsblkcnt_t = ::std::os::raw::c_ulong;
-pub type __fsblkcnt64_t = ::std::os::raw::c_ulong;
-pub type __fsfilcnt_t = ::std::os::raw::c_ulong;
-pub type __fsfilcnt64_t = ::std::os::raw::c_ulong;
-pub type __fsword_t = ::std::os::raw::c_long;
-pub type __ssize_t = ::std::os::raw::c_long;
-pub type __syscall_slong_t = ::std::os::raw::c_long;
-pub type __syscall_ulong_t = ::std::os::raw::c_ulong;
-pub type __loff_t = __off64_t;
-pub type __caddr_t = *mut ::std::os::raw::c_char;
-pub type __intptr_t = ::std::os::raw::c_long;
-pub type __socklen_t = ::std::os::raw::c_uint;
-pub type __sig_atomic_t = ::std::os::raw::c_int;
-pub type int_least8_t = __int_least8_t;
-pub type int_least16_t = __int_least16_t;
-pub type int_least32_t = __int_least32_t;
-pub type int_least64_t = __int_least64_t;
-pub type uint_least8_t = __uint_least8_t;
-pub type uint_least16_t = __uint_least16_t;
-pub type uint_least32_t = __uint_least32_t;
-pub type uint_least64_t = __uint_least64_t;
-pub type int_fast8_t = ::std::os::raw::c_schar;
-pub type int_fast16_t = ::std::os::raw::c_long;
-pub type int_fast32_t = ::std::os::raw::c_long;
-pub type int_fast64_t = ::std::os::raw::c_long;
-pub type uint_fast8_t = ::std::os::raw::c_uchar;
-pub type uint_fast16_t = ::std::os::raw::c_ulong;
-pub type uint_fast32_t = ::std::os::raw::c_ulong;
-pub type uint_fast64_t = ::std::os::raw::c_ulong;
-pub type intmax_t = __intmax_t;
-pub type uintmax_t = __uintmax_t;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct pocket_t {
@@ -539,79 +612,6 @@ unsafe extern "C" {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct pocket_field_t {
-    pub id: i64,
-    pub server_id: i64,
-    pub user_id: i64,
-    pub group_id: i64,
-    pub server_group_id: i64,
-    pub group_field_id: i64,
-    pub server_group_field_id: i64,
-    pub title: *mut ::std::os::raw::c_char,
-    pub value: *mut ::std::os::raw::c_char,
-    pub is_hidden: bool,
-    pub synchronized: bool,
-    pub deleted: bool,
-    pub timestamp_creation: u64,
-}
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of pocket_field_t"][::std::mem::size_of::<pocket_field_t>() - 88usize];
-    ["Alignment of pocket_field_t"][::std::mem::align_of::<pocket_field_t>() - 8usize];
-    ["Offset of field: pocket_field_t::id"][::std::mem::offset_of!(pocket_field_t, id) - 0usize];
-    ["Offset of field: pocket_field_t::server_id"]
-        [::std::mem::offset_of!(pocket_field_t, server_id) - 8usize];
-    ["Offset of field: pocket_field_t::user_id"]
-        [::std::mem::offset_of!(pocket_field_t, user_id) - 16usize];
-    ["Offset of field: pocket_field_t::group_id"]
-        [::std::mem::offset_of!(pocket_field_t, group_id) - 24usize];
-    ["Offset of field: pocket_field_t::server_group_id"]
-        [::std::mem::offset_of!(pocket_field_t, server_group_id) - 32usize];
-    ["Offset of field: pocket_field_t::group_field_id"]
-        [::std::mem::offset_of!(pocket_field_t, group_field_id) - 40usize];
-    ["Offset of field: pocket_field_t::server_group_field_id"]
-        [::std::mem::offset_of!(pocket_field_t, server_group_field_id) - 48usize];
-    ["Offset of field: pocket_field_t::title"]
-        [::std::mem::offset_of!(pocket_field_t, title) - 56usize];
-    ["Offset of field: pocket_field_t::value"]
-        [::std::mem::offset_of!(pocket_field_t, value) - 64usize];
-    ["Offset of field: pocket_field_t::is_hidden"]
-        [::std::mem::offset_of!(pocket_field_t, is_hidden) - 72usize];
-    ["Offset of field: pocket_field_t::synchronized"]
-        [::std::mem::offset_of!(pocket_field_t, synchronized) - 73usize];
-    ["Offset of field: pocket_field_t::deleted"]
-        [::std::mem::offset_of!(pocket_field_t, deleted) - 74usize];
-    ["Offset of field: pocket_field_t::timestamp_creation"]
-        [::std::mem::offset_of!(pocket_field_t, timestamp_creation) - 80usize];
-};
-unsafe extern "C" {
-    pub fn pocket_field_new() -> *mut pocket_field_t;
-}
-unsafe extern "C" {
-    pub fn pocket_field_new_with_params(
-        id: i64,
-        server_id: i64,
-        user_id: i64,
-        group_id: i64,
-        server_group_id: i64,
-        group_field_id: i64,
-        server_group_field_id: i64,
-        title: *const ::std::os::raw::c_char,
-        value: *const ::std::os::raw::c_char,
-        is_hidden: bool,
-        synchronized: bool,
-        deleted: bool,
-        timestamp_creation: u64,
-    ) -> *mut pocket_field_t;
-}
-unsafe extern "C" {
-    pub fn pocket_field_is_null(field: *const pocket_field_t) -> bool;
-}
-unsafe extern "C" {
-    pub fn pocket_field_free(field: *mut pocket_field_t);
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct pocket_field_controller_t {
     pub pocket: *mut pocket_t,
     pub reachability: bool,
@@ -634,13 +634,13 @@ unsafe extern "C" {
     pub fn pocket_field_controller_new(pocket: *mut pocket_t) -> *mut pocket_field_controller_t;
 }
 unsafe extern "C" {
-    pub fn pocket_field_controller_free(self_: *mut pocket_field_controller_t);
+    pub fn pocket_field_controller_free(self_: *const pocket_field_controller_t);
 }
 unsafe extern "C" {
     pub fn pocket_field_controller_init(self_: *mut pocket_field_controller_t);
 }
 unsafe extern "C" {
-    pub fn pocket_field_controller_get_list_field(
+    pub fn pocket_field_controller_get_list(
         self_: *const pocket_field_controller_t,
         group_id: i64,
         search: *const ::std::os::raw::c_char,
@@ -648,25 +648,31 @@ unsafe extern "C" {
     ) -> *mut *mut pocket_field_t;
 }
 unsafe extern "C" {
-    pub fn pocket_field_controller_persist_field(
+    pub fn pocket_field_controller_free_list(
+        list: *mut *mut pocket_field_t,
+        count: ::std::os::raw::c_int,
+    );
+}
+unsafe extern "C" {
+    pub fn pocket_field_controller_persist(
         self_: *const pocket_field_controller_t,
         f: *const pocket_field_t,
     ) -> pocket_stat_t;
 }
 unsafe extern "C" {
-    pub fn pocket_field_controller_del_field(
+    pub fn pocket_field_controller_del(
         self_: *const pocket_field_controller_t,
         f: *mut pocket_field_t,
     ) -> pocket_stat_t;
 }
 unsafe extern "C" {
-    pub fn pocket_field_controller_size_filed(
+    pub fn pocket_field_controller_size(
         self_: *const pocket_field_controller_t,
         group_id: i64,
     ) -> i32;
 }
 unsafe extern "C" {
-    pub fn pocket_field_controller_get_filed(
+    pub fn pocket_field_controller_get(
         self_: *const pocket_field_controller_t,
         group_id: i64,
     ) -> *mut pocket_field_t;
@@ -745,6 +751,104 @@ unsafe extern "C" {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+pub struct pocket_group_controller_t {
+    pub pocket: *mut pocket_t,
+    pub reachability: bool,
+    pub view_group: *mut ::std::os::raw::c_void,
+    pub view_group_field: *mut ::std::os::raw::c_void,
+}
+#[allow(clippy::unnecessary_operation, clippy::identity_op)]
+const _: () = {
+    ["Size of pocket_group_controller_t"]
+        [::std::mem::size_of::<pocket_group_controller_t>() - 32usize];
+    ["Alignment of pocket_group_controller_t"]
+        [::std::mem::align_of::<pocket_group_controller_t>() - 8usize];
+    ["Offset of field: pocket_group_controller_t::pocket"]
+        [::std::mem::offset_of!(pocket_group_controller_t, pocket) - 0usize];
+    ["Offset of field: pocket_group_controller_t::reachability"]
+        [::std::mem::offset_of!(pocket_group_controller_t, reachability) - 8usize];
+    ["Offset of field: pocket_group_controller_t::view_group"]
+        [::std::mem::offset_of!(pocket_group_controller_t, view_group) - 16usize];
+    ["Offset of field: pocket_group_controller_t::view_group_field"]
+        [::std::mem::offset_of!(pocket_group_controller_t, view_group_field) - 24usize];
+};
+unsafe extern "C" {
+    pub fn pocket_group_controller_new(pocket: *mut pocket_t) -> *mut pocket_group_controller_t;
+}
+unsafe extern "C" {
+    pub fn pocket_group_controller_free(self_: *const pocket_group_controller_t);
+}
+unsafe extern "C" {
+    pub fn pocket_group_controller_init(self_: *mut pocket_group_controller_t);
+}
+unsafe extern "C" {
+    pub fn pocket_group_controller_get_list(
+        self_: *const pocket_group_controller_t,
+        field_controller: *const pocket_field_controller_t,
+        group_id: i64,
+        search: *const ::std::os::raw::c_char,
+        count: *mut ::std::os::raw::c_int,
+    ) -> *mut *mut pocket_group_t;
+}
+unsafe extern "C" {
+    pub fn pocket_group_controller_free_list(
+        list: *mut *mut pocket_group_t,
+        count: ::std::os::raw::c_int,
+    );
+}
+unsafe extern "C" {
+    pub fn pocket_group_controller_count_child(
+        self_: *const pocket_group_controller_t,
+        group: *const pocket_group_t,
+    ) -> i32;
+}
+unsafe extern "C" {
+    pub fn pocket_group_controller_del(
+        self_: *const pocket_group_controller_t,
+        group_field_controller: *const pocket_group_field_controller_t,
+        field_controller: *const pocket_field_controller_t,
+        group: *const pocket_group_t,
+    ) -> pocket_stat_t;
+}
+unsafe extern "C" {
+    pub fn pocket_group_controller_persist(
+        self_: *const pocket_group_controller_t,
+        group: *const pocket_group_t,
+    ) -> pocket_stat_t;
+}
+unsafe extern "C" {
+    pub fn pocket_group_controller_get(
+        self_: *const pocket_group_controller_t,
+        group_id: i64,
+    ) -> *mut pocket_group_t;
+}
+unsafe extern "C" {
+    pub fn pocket_group_controller_data_export(
+        full_path_file_export: *const ::std::os::raw::c_char,
+    ) -> bool;
+}
+unsafe extern "C" {
+    pub fn pocket_group_controller_data_import(
+        full_path_file_import: *const ::std::os::raw::c_char,
+    ) -> bool;
+}
+unsafe extern "C" {
+    pub fn pocket_group_controller_data_import_legacy(
+        full_path_file_import: *const ::std::os::raw::c_char,
+    ) -> bool;
+}
+unsafe extern "C" {
+    pub fn pocket_group_controller_clean_show_list(controller: *mut pocket_group_controller_t);
+}
+unsafe extern "C" {
+    pub fn pocket_group_controller_fill_show_list(
+        controller: *mut pocket_group_controller_t,
+        group: *const pocket_group_t,
+        insert: bool,
+    );
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct pocket_group_field_t {
     pub new_insertion: bool,
     pub id: i64,
@@ -807,135 +911,48 @@ unsafe extern "C" {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct pocket_group_controller_t {
+pub struct pocket_group_field_controller_t {
     pub pocket: *mut pocket_t,
     pub reachability: bool,
-    pub view_group: *mut ::std::os::raw::c_void,
     pub view_group_field: *mut ::std::os::raw::c_void,
-    pub show_list: *mut ::std::os::raw::c_void,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
-    ["Size of pocket_group_controller_t"]
-        [::std::mem::size_of::<pocket_group_controller_t>() - 40usize];
-    ["Alignment of pocket_group_controller_t"]
-        [::std::mem::align_of::<pocket_group_controller_t>() - 8usize];
-    ["Offset of field: pocket_group_controller_t::pocket"]
-        [::std::mem::offset_of!(pocket_group_controller_t, pocket) - 0usize];
-    ["Offset of field: pocket_group_controller_t::reachability"]
-        [::std::mem::offset_of!(pocket_group_controller_t, reachability) - 8usize];
-    ["Offset of field: pocket_group_controller_t::view_group"]
-        [::std::mem::offset_of!(pocket_group_controller_t, view_group) - 16usize];
-    ["Offset of field: pocket_group_controller_t::view_group_field"]
-        [::std::mem::offset_of!(pocket_group_controller_t, view_group_field) - 24usize];
-    ["Offset of field: pocket_group_controller_t::show_list"]
-        [::std::mem::offset_of!(pocket_group_controller_t, show_list) - 32usize];
-};
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct pocket_show_list_t {
-    pub fields: *mut *mut pocket_group_field_t,
-    pub count: usize,
-}
-#[allow(clippy::unnecessary_operation, clippy::identity_op)]
-const _: () = {
-    ["Size of pocket_show_list_t"][::std::mem::size_of::<pocket_show_list_t>() - 16usize];
-    ["Alignment of pocket_show_list_t"][::std::mem::align_of::<pocket_show_list_t>() - 8usize];
-    ["Offset of field: pocket_show_list_t::fields"]
-        [::std::mem::offset_of!(pocket_show_list_t, fields) - 0usize];
-    ["Offset of field: pocket_show_list_t::count"]
-        [::std::mem::offset_of!(pocket_show_list_t, count) - 8usize];
+    ["Size of pocket_group_field_controller_t"]
+        [::std::mem::size_of::<pocket_group_field_controller_t>() - 24usize];
+    ["Alignment of pocket_group_field_controller_t"]
+        [::std::mem::align_of::<pocket_group_field_controller_t>() - 8usize];
+    ["Offset of field: pocket_group_field_controller_t::pocket"]
+        [::std::mem::offset_of!(pocket_group_field_controller_t, pocket) - 0usize];
+    ["Offset of field: pocket_group_field_controller_t::reachability"]
+        [::std::mem::offset_of!(pocket_group_field_controller_t, reachability) - 8usize];
+    ["Offset of field: pocket_group_field_controller_t::view_group_field"]
+        [::std::mem::offset_of!(pocket_group_field_controller_t, view_group_field) - 16usize];
 };
 unsafe extern "C" {
-    pub fn pocket_group_controller_new(pocket: *mut pocket_t) -> *mut pocket_group_controller_t;
+    pub fn pocket_group_field_controller_new(
+        pocket: *mut pocket_t,
+    ) -> *mut pocket_group_field_controller_t;
 }
 unsafe extern "C" {
-    pub fn pocket_group_controller_free(self_: *mut pocket_group_controller_t);
+    pub fn pocket_group_field_controller_free(self_: *const pocket_group_field_controller_t);
 }
 unsafe extern "C" {
-    pub fn pocket_group_controller_init(self_: *mut pocket_group_controller_t);
+    pub fn pocket_group_field_controller_init(self_: *mut pocket_group_field_controller_t);
 }
 unsafe extern "C" {
-    pub fn pocket_group_controller_get_list_group(
-        self_: *const pocket_group_controller_t,
-        field_controller: *const pocket_field_controller_t,
+    pub fn pocket_group_field_controller_get_list(
+        self_: *const pocket_group_field_controller_t,
         group_id: i64,
         search: *const ::std::os::raw::c_char,
         count: *mut ::std::os::raw::c_int,
-    ) -> *mut *mut pocket_group_t;
+    ) -> *mut *mut pocket_group_field_t;
 }
 unsafe extern "C" {
-    pub fn pocket_group_controller_count_child(
-        self_: *const pocket_group_controller_t,
-        group: *const pocket_group_t,
-    ) -> i32;
-}
-unsafe extern "C" {
-    pub fn pocket_group_controller_del_group(
-        self_: *const pocket_group_controller_t,
-        field_controller: *const pocket_field_controller_t,
-        group: *const pocket_group_t,
-    ) -> pocket_stat_t;
-}
-unsafe extern "C" {
-    pub fn pocket_group_controller_persist_group(
-        self_: *mut pocket_group_controller_t,
-        group: *const pocket_group_t,
-    ) -> pocket_stat_t;
-}
-unsafe extern "C" {
-    pub fn pocket_group_controller_get_group(
-        self_: *mut pocket_group_controller_t,
-        group_id: i64,
-    ) -> *mut pocket_group_t;
-}
-unsafe extern "C" {
-    pub fn pocket_group_controller_get_last_id_group_field(
-        self_: *mut pocket_group_controller_t,
-    ) -> i64;
-}
-unsafe extern "C" {
-    pub fn pocket_group_controller_data_export(
-        full_path_file_export: *const ::std::os::raw::c_char,
-    ) -> bool;
-}
-unsafe extern "C" {
-    pub fn pocket_group_controller_data_import(
-        full_path_file_import: *const ::std::os::raw::c_char,
-    ) -> bool;
-}
-unsafe extern "C" {
-    pub fn pocket_group_controller_data_import_legacy(
-        full_path_file_import: *const ::std::os::raw::c_char,
-    ) -> bool;
-}
-unsafe extern "C" {
-    pub fn pocket_group_controller_clean_show_list(controller: *mut pocket_group_controller_t);
-}
-unsafe extern "C" {
-    pub fn pocket_group_controller_fill_show_list(
-        controller: *mut pocket_group_controller_t,
-        group: *const pocket_group_t,
-        insert: bool,
+    pub fn pocket_group_field_controller_free_list(
+        list: *mut *mut pocket_group_field_t,
+        count: ::std::os::raw::c_int,
     );
-}
-unsafe extern "C" {
-    pub fn pocket_group_controller_get_show_list() -> *mut pocket_show_list_t;
-}
-unsafe extern "C" {
-    pub fn pocket_group_controller_add_to_show_list(
-        self_: *mut pocket_group_controller_t,
-        group_field: *const pocket_group_field_t,
-    ) -> bool;
-}
-unsafe extern "C" {
-    pub fn pocket_group_controller_del_from_show_list(
-        self_: *mut pocket_group_controller_t,
-        id_group_field: i64,
-    ) -> bool;
-}
-unsafe extern "C" {
-    pub fn pocket_group_controller_size_show_list(self_: *const pocket_group_controller_t) -> u8;
 }
 pub const user_stat_t_USER_STAT_NOT_ACTIVE: user_stat_t = 1;
 pub const user_stat_t_USER_STAT_ACTIVE: user_stat_t = 0;
