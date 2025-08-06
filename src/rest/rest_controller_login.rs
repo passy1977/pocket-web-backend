@@ -80,8 +80,7 @@ pub fn login(&self, data_transport: Json<DataTransport>) -> HttpResponse {
             .data(email)
             .build();
     }
-
-
+    
     HttpResponseHelper::ok()
         .path("/home")
         .title("Home")

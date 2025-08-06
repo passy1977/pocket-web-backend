@@ -93,6 +93,7 @@ impl RestController {
 
         let mut session = get_session!(data_transport.session_id, "Session not found");
 
+
         let split: Vec<&str> = data_transport.path.split("/").collect();
 
         if split.len() < 4 {
@@ -129,7 +130,10 @@ impl RestController {
         }
 
         match from.as_str() {
-            "home" => self.home(data_transport),
+            "home" => {
+                session.update_timestamp_last_update();
+                self.home(data_transport)
+            },
             _ => HttpResponseHelper::forbidden()
                 .error("fron not valid")
                 .build()

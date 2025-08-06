@@ -1,13 +1,13 @@
-use std::ffi::CString;
+use crate::bindings::{pocket_field_controller_free_list, pocket_field_controller_get_list, pocket_field_controller_t, pocket_field_t, pocket_group_controller_free_list, pocket_group_controller_get_list, pocket_group_controller_t, pocket_group_field_controller_free_list, pocket_group_field_controller_get_list, pocket_group_field_controller_t, pocket_group_field_t, pocket_group_t};
+use crate::models::field::Fields;
+use crate::models::group::Groups;
+use crate::models::group_field::GroupFields;
 use crate::models::rests::DataTransport;
 use crate::services::data::Data;
 use actix_web::web::Json;
 use actix_web::HttpResponse;
+use std::ffi::CString;
 use std::sync::Arc;
-use crate::bindings::{pocket_field_controller_free_list, pocket_field_controller_get_list, pocket_field_controller_t, pocket_field_free, pocket_field_t, pocket_group_controller_free_list, pocket_group_controller_get_list, pocket_group_controller_t, pocket_group_field_controller_free, pocket_group_field_controller_free_list, pocket_group_field_controller_get_list, pocket_group_field_controller_t, pocket_group_field_t, pocket_group_free, pocket_group_t};
-use crate::models::field::Fields;
-use crate::models::group::Groups;
-use crate::models::group_field::GroupFields;
 
 pub struct RestController {
     pub(super) data: Data
