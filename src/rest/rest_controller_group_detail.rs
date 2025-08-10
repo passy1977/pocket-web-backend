@@ -14,7 +14,7 @@ impl RestController {
         let mut session = get_session!(data_transport.session_id, "Session not found");
 
         let mut id = "".to_string();
-        let (idGroup, search) = match split_id_group_and_search(&data_transport, &mut id) {
+        let (id_group, search) = match split_id_group_and_search(&data_transport, &mut id) {
             Ok((id_group, search)) => (id_group, search),
             Err(e) => return HttpResponseHelper::internal_server_error()
                 .error(e)
@@ -33,7 +33,7 @@ impl RestController {
         let group_field_controller = get_group_field_controller!(session);
 
         let group = unsafe {
-            let group_ptr = pocket_group_controller_get(group_controller, idGroup);
+            let group_ptr = pocket_group_controller_get(group_controller, id_group);
             if group_ptr.is_null() {
                 return HttpResponseHelper::internal_server_error()
                     .error("Group not found")
@@ -45,7 +45,7 @@ impl RestController {
 
 
         let mut title = "New group".to_string();
-        if(id > 0) {
+        if id > 0 {
             title = group.title.clone().unwrap();
         }
 
@@ -61,7 +61,7 @@ impl RestController {
             .title(title)
             .session_id(session.session_id)
             .groups(groups)
-            .group_fields(get_list_group_field(group_field_controller, idGroup, &search))
+            .group_fields(get_list_group_field(group_field_controller, id_group, &search))
             .build()
     }
 
