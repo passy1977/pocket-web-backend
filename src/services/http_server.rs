@@ -20,11 +20,11 @@ pub async fn home(data_transport: web::Json<DataTransport>) -> impl Responder {
 }
 
 pub async fn field_detail(data_transport: web::Json<DataTransport>) -> impl Responder {
-    RestController::share().group_detail(data_transport)
+    RestController::share().field_detail(data_transport)
 }
 
 pub async fn group_detail(data_transport: web::Json<DataTransport>) -> impl Responder {
-    RestController::share().field_detail(data_transport)
+    RestController::share().group_detail(data_transport)
 }
 
 

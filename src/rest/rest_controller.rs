@@ -13,13 +13,13 @@ pub struct RestController {
     pub(super) data: Data
 }
 
-pub fn split_id_group_and_search(data_transport: &Json<DataTransport>) -> crate::utils::Result<(i64, String)> {
+pub fn split_id_group_and_search(data_transport: &Json<DataTransport>, other: &mut String) -> crate::utils::Result<(i64, String)> {
     match &data_transport.data {
         None => Err("No data send"),
         Some(data) => {
             let split: Vec<&str> = data.split("|").collect();
 
-            if split.len() != 2 {
+            if split.len() < 2 {
                 return Err("group_id is mandatory")
             }
 
@@ -28,7 +28,18 @@ pub fn split_id_group_and_search(data_transport: &Json<DataTransport>) -> crate:
                 Err(_) => return Err("group_id parse error"),
             };
 
-            Ok((id_group, split[1].to_string()))
+            let search = split[1].to_string();
+
+
+            if split.len() > 2 {
+                other.clear();
+                for str in split[2 ..].iter() {
+                    other.push_str(str);
+                    other.push_str("|");
+                }
+            }
+
+            Ok((id_group, search))
         }
     }
 
