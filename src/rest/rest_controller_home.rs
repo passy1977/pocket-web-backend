@@ -1,6 +1,6 @@
 use std::ptr::null_mut;
 
-use crate::bindings::{pocket_field_controller_init, pocket_field_controller_new, pocket_group_controller_init, pocket_group_controller_new, pocket_group_controller_t};
+use crate::bindings::{pocket_field_controller_init, pocket_field_controller_new, pocket_group_controller_init, pocket_group_controller_new};
 use crate::models::rests::DataTransport;
 use crate::rest::rest_controller::*;
 use crate::services::http_response_helper::HttpResponseHelper;

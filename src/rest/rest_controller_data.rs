@@ -2,7 +2,7 @@ use crate::bindings::{pocket_field_controller_del, pocket_field_controller_init,
 use crate::models::field::Field;
 use crate::models::group::Group;
 use crate::models::rests::DataTransport;
-use crate::rest::rest_controller::{split_id_group_and_search, RestController};
+use crate::rest::rest_controller::RestController;
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;
 use crate::{get_field_controller, get_group_controller, get_group_field_controller, get_session};
