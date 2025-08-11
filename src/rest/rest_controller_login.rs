@@ -48,15 +48,15 @@ pub fn login(&self, data_transport: Json<DataTransport>) -> HttpResponse {
     if let Ok(config_json) = &self.data.load_config_json(&email)
     {
         unsafe {
-                if !pocket_initialize(session.pocket,
+                if session.pocket.is_null() || !pocket_initialize(session.pocket,
                                     CString::from_str(&data_dir_path).unwrap().as_ptr(),
                                     CString::from_str(&config_json).unwrap().as_ptr(),
                                     true,
                                     CString::from_str(&passwd).unwrap().as_ptr()
-            ) {
+            ) || !(*session.pocket).is_valid() {
                     return HttpResponseHelper::not_acceptable()
                         .session_id(session.session_id)
-                        .error("Server data wrong format")
+                        .error("Server data wrong format or session non correctly init")
                         .build()
             }
 

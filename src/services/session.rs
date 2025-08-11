@@ -5,6 +5,14 @@ use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 use ulid::Ulid;
 
+
+ 
+impl pocket_t {
+    pub fn is_valid(&self) -> bool {
+        !self.session.is_null()
+    }
+}
+
 #[derive(Clone)]
 pub struct Session {
     /// Unique identifier (ulid) for users who are using the client

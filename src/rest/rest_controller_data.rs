@@ -2,7 +2,7 @@ use crate::bindings::{pocket_field_controller_del, pocket_field_controller_init,
 use crate::models::field::Field;
 use crate::models::group::Group;
 use crate::models::rests::DataTransport;
-use crate::rest::rest_controller::RestController;
+use crate::rest::rest_controller::{split_id_group_and_search, RestController};
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;
 use crate::{get_field_controller, get_group_controller, get_group_field_controller, get_session};
@@ -89,7 +89,7 @@ fn field_handler(field_controller: *mut pocket_field_controller_t, data_transpor
 
 impl RestController {
 
-    pub fn data(&self, data_transport: Json<DataTransport>) -> HttpResponse {
+    pub fn data(&self, mut data_transport: Json<DataTransport>) -> HttpResponse {
 
         let mut session = get_session!(data_transport.session_id, "Session not found");
 
@@ -131,7 +131,26 @@ impl RestController {
 
         match from.as_str() {
             "home" => {
-                session.update_timestamp_last_update();
+
+                // let mut id = "".to_string();
+                // let (id_group, search) = match split_id_group_and_search(&data_transport, &mut id) {
+                //     Ok((id_group, search)) => (id_group, search),
+                //     Err(e) => return HttpResponseHelper::internal_server_error()
+                //         .error(e)
+                //         .build()
+                // };
+
+                // let id = match id.replace("|", "").parse::<i64>() {
+                //     Ok(number) => number,
+                //     Err(e) => return HttpResponseHelper::internal_server_error()
+                //         .error(e.to_string())
+                //         .build()
+                // };
+
+
+                // data_transport.data = Some(format!("{id}|{search}"));
+                
+                // session.update_timestamp_last_update();
                 self.home(data_transport)
             },
             _ => HttpResponseHelper::forbidden()
