@@ -56,7 +56,7 @@ pub fn login(&self, data_transport: Json<DataTransport>) -> HttpResponse {
             ) || !(*session.pocket).is_valid() {
                     return HttpResponseHelper::not_acceptable()
                         .session_id(session.session_id)
-                        .error("Server data wrong format or session non correctly init")
+                        .error("Wrong password or server not available")
                         .build()
             }
 
