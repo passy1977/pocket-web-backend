@@ -60,6 +60,7 @@ impl RestController {
             .session_id(session.session_id)
             .groups(groups)
             .group_fields(get_list_group_field(group_field_controller, id, &search))
+            .data(search)
             .build()
     }
 
