@@ -282,6 +282,8 @@ pocket_group_t* pocket_group_controller_get(const pocket_group_controller_t* sel
     {
         return convert(*group_opt);
     }
+
+    
     return nullptr;
 }
 catch(const runtime_error& e)

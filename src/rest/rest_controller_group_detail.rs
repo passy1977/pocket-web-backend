@@ -1,5 +1,5 @@
 use crate::bindings::{pocket_group_controller_get, pocket_group_controller_init, pocket_group_controller_new, pocket_group_field_controller_init, pocket_group_field_controller_new};
-use crate::models::group::Groups;
+use crate::models::group::{Group, Groups};
 use crate::models::rests::DataTransport;
 use crate::rest::rest_controller::{get_list_group_field, split_id_group_and_search, RestController};
 use crate::services::http_response_helper::HttpResponseHelper;
@@ -33,11 +33,9 @@ impl RestController {
         let group_field_controller = get_group_field_controller!(session);
 
         let group = unsafe {
-            let group_ptr = pocket_group_controller_get(group_controller, id_group);
+            let group_ptr = pocket_group_controller_get(group_controller, id);
             if group_ptr.is_null() {
-                return HttpResponseHelper::internal_server_error()
-                    .error("Group not found")
-                    .build()
+                Group::new()
             } else {
                 (*group_ptr).to_group()
             }
@@ -45,7 +43,7 @@ impl RestController {
 
 
         let mut title = "New group".to_string();
-        if id > 0 {
+        if id > 0 && group.title.is_some() {
             title = group.title.clone().unwrap();
         }
 
@@ -61,7 +59,7 @@ impl RestController {
             .title(title)
             .session_id(session.session_id)
             .groups(groups)
-            .group_fields(get_list_group_field(group_field_controller, id_group, &search))
+            .group_fields(get_list_group_field(group_field_controller, id, &search))
             .build()
     }
 
