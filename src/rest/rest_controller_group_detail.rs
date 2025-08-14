@@ -14,7 +14,7 @@ impl RestController {
         let mut session = get_session!(data_transport.session_id, "Session not found");
 
         let mut id = "".to_string();
-        let (id_group, search) = match split_id_group_and_search(&data_transport, &mut id) {
+        let (_id_group, search) = match split_id_group_and_search(&data_transport, &mut id) {
             Ok((id_group, search)) => (id_group, search),
             Err(e) => return HttpResponseHelper::internal_server_error()
                 .error(e)
