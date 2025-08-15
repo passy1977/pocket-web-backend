@@ -954,6 +954,18 @@ unsafe extern "C" {
         count: ::std::os::raw::c_int,
     );
 }
+unsafe extern "C" {
+    pub fn pocket_group_field_controller_del(
+        self_: *const pocket_group_field_controller_t,
+        group_field: *const pocket_group_field_t,
+    ) -> pocket_stat_t;
+}
+unsafe extern "C" {
+    pub fn pocket_group_field_controller_persist(
+        self_: *const pocket_group_field_controller_t,
+        group_field: *const pocket_group_field_t,
+    ) -> pocket_stat_t;
+}
 pub const user_stat_t_USER_STAT_NOT_ACTIVE: user_stat_t = 1;
 pub const user_stat_t_USER_STAT_ACTIVE: user_stat_t = 0;
 pub const user_stat_t_USER_STAT_DELETED: user_stat_t = 2;

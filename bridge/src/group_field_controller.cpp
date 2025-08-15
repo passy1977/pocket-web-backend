@@ -29,11 +29,18 @@ using controllers::session;
 using views::view;
 
 #include "pocket-pods/group-field.hpp"
-using pods::group_field;
+using namespace pods;
 
 #include <new>
 #include <ranges>
 using namespace std;
+
+namespace
+{
+
+constexpr char APP_TAG[] = "group_field_controller";
+
+}
 
 extern pocket_group_field_t* convert(const group_field::ptr& group);
 
@@ -111,4 +118,80 @@ void pocket_group_field_controller_free_list(pocket_group_field_t** list, int co
     }
 
     delete [] list;
+}
+
+pocket_stat_t pocket_group_field_controller_del(const pocket_group_field_controller_t* self, const pocket_group_field_t* group_field) try
+{
+    if (!self || !group_field) return ERROR;
+
+    auto session = static_cast<class session*>(self->pocket->session);
+    auto logged_user = static_cast<user::opt_ptr *>(self->pocket->user);
+
+    const auto view_group_field = static_cast<view<struct group_field> *>(self->view_group_field);
+
+    view_group_field->del(group_field->id);
+
+    session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
+    session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
+    if(auto&& user = session->send_data(*logged_user); user)
+    {
+        if (self->pocket->user)
+        {
+            delete[] static_cast<uint8_t *>(self->pocket->user);
+        }
+        self->pocket->user = new uint8_t[sizeof(user)];
+        memcpy(self->pocket->user, &user, sizeof(user));
+        return OK;
+    }
+    else
+    {
+        return static_cast<pocket_stat_t>(session->get_status());
+    }
+
+}
+catch(const runtime_error& e)
+{
+    error(APP_TAG, e.what());
+    return ERROR;
+}
+
+pocket_stat_t pocket_group_field_controller_persist(const pocket_group_field_controller_t* self, const pocket_group_field_t* group_field) try
+{
+    if (!self || !group_field) return ERROR;
+
+    auto session = static_cast<class session*>(self->pocket->session);
+    const auto logged_user = static_cast<user::opt_ptr *>(self->pocket->user);
+
+    const auto view_group_field = static_cast<view<struct group_field> *>(self->view_group_field);
+
+    auto gf = make_unique<struct group_field>();
+    gf->server_id = group_field->server_id;
+    gf->group_id = group_field->group_id;
+    gf->server_group_id = group_field->server_group_id;
+    gf->title = group_field->title;
+    gf->is_hidden = group_field->is_hidden;
+    gf->deleted = group_field->deleted;
+    gf->timestamp_creation = group_field->timestamp_creation;
+    gf->user_id = logged_user->value()->id;
+    gf->synchronized = false;
+    gf->id = view_group_field->persist(gf);
+
+    session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
+    session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
+    if(auto&& user = session->send_data(*logged_user); user)
+    {
+        if (self->pocket->user)
+        {
+            delete[] static_cast<uint8_t *>(self->pocket->user);
+        }
+        self->pocket->user = new uint8_t[sizeof(user)];
+        memcpy(self->pocket->user, &user, sizeof(user));
+    }
+
+    return static_cast<pocket_stat_t>(session->get_status());
+}
+catch(const runtime_error& e)
+{
+    error(APP_TAG, e.what());
+    return ERROR;
 }

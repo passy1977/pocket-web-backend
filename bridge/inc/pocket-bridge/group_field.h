@@ -23,6 +23,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 typedef struct {
     bool new_insertion;
     int64_t id;
@@ -50,5 +55,9 @@ pocket_group_field_t* pocket_group_field_new_with_params(int64_t id,
                                                       uint64_t timestamp_creation);
 
 void pocket_group_field_free(pocket_group_field_t* group_field);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //GROUP_FIELD_H

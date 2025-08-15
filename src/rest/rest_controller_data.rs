@@ -1,4 +1,4 @@
-use crate::bindings::{pocket_field_controller_del, pocket_field_controller_init, pocket_field_controller_new, pocket_field_controller_persist, pocket_field_controller_t, pocket_group_controller_del, pocket_group_controller_init, pocket_group_controller_new, pocket_group_controller_persist, pocket_group_controller_t, pocket_group_field_controller_init, pocket_group_field_controller_new, pocket_group_field_controller_t, pocket_stat_t_OK};
+use crate::bindings::{pocket_field_controller_del, pocket_field_controller_init, pocket_field_controller_new, pocket_field_controller_persist, pocket_field_controller_t, pocket_group_controller_del, pocket_group_controller_init, pocket_group_controller_new, pocket_group_controller_persist, pocket_group_controller_t, pocket_group_field_controller_del, pocket_group_field_controller_init, pocket_group_field_controller_new, pocket_group_field_controller_persist, pocket_group_field_controller_t, pocket_stat_t_OK};
 use crate::models::field::Field;
 use crate::models::group::Group;
 use crate::models::rests::DataTransport;
@@ -8,8 +8,9 @@ use crate::services::session::Sessions;
 use crate::{get_field_controller, get_group_controller, get_group_field_controller, get_session};
 use actix_web::web::Json;
 use actix_web::HttpResponse;
+use crate::models::group_field::GroupField;
 
-fn group_handler(group_controller: *mut pocket_group_controller_t, group_field_controller: *mut pocket_group_field_controller_t,  field_controller: *mut pocket_field_controller_t, data_transport: &Json<DataTransport>, _kind: &String, err : &mut Option<&str>) -> bool {
+fn group_handler(group_controller: *mut pocket_group_controller_t, group_field_controller: *mut pocket_group_field_controller_t, field_controller: *mut pocket_field_controller_t, data_transport: &Json<DataTransport>, _kind: &String, err : &mut Option<&str>) -> bool {
     if data_transport.groups.is_none() {
         return false;
     }
@@ -46,8 +47,39 @@ fn group_handler(group_controller: *mut pocket_group_controller_t, group_field_c
     true
 }
 
-fn group_field_handler(_group_controller: *mut pocket_group_controller_t, _field_controller: *mut pocket_field_controller_t,  _data_transport: &Json<DataTransport>, _kind: &String, _err : &mut Option<&str>) -> bool {
+fn group_field_handler(group_field_controller: *mut pocket_group_field_controller_t, data_transport: &Json<DataTransport>, _kind: &String, err : &mut Option<&str>) -> bool {
+    if data_transport.groups.is_none() {
+        return false;
+    }
 
+    if err.is_some() {
+        return false;
+    }
+
+    for group_field in data_transport.group_fields.clone().unwrap() {
+        let GroupField { id, server_id, deleted, .. } = group_field;
+        return match (id, server_id, deleted) {
+            (id, _server_id @ 0, _deleted @ false) if id > 0 => {
+                //new
+                unsafe {
+                    pocket_group_field_controller_persist(group_field_controller, group_field.to_pocket_group_field_t()) == pocket_stat_t_OK
+                }
+            }
+            (id, server_id, _deleted @ false) if id > 0 && server_id > 0 => {
+                //modify
+                unsafe {
+                    pocket_group_field_controller_persist(group_field_controller, group_field.to_pocket_group_field_t()) == pocket_stat_t_OK
+                }
+            }
+            (id, _, _deleted @ true) if id > 0 => {
+                //delete
+                unsafe {
+                    pocket_group_field_controller_del(group_field_controller, group_field.to_pocket_group_field_t()) == pocket_stat_t_OK
+                }
+            }
+            (_, _, _) => false
+        }
+    }
     true
 }
 
@@ -103,10 +135,8 @@ impl RestController {
         }
 
         let ref from = split[1].to_string();
-        let ref kind = split[2].to_string();
+        let ref _kind = split[2].to_string();
         let ref action = split[3].to_string();
-
-        let mut err : Option<&str> = None;
 
         let group_controller = get_group_controller!(session);
 
@@ -114,14 +144,19 @@ impl RestController {
 
         let field_controller = get_field_controller!(session);
 
-        match kind.as_str() {
-            "group" => group_handler(group_controller, group_field_controller, field_controller, &data_transport, &action, &mut err),
-            "groupField" => group_field_handler(group_controller, field_controller, &data_transport, &action, &mut err),
-            "field" => field_handler(field_controller, &data_transport, &action, &mut err),
-            _ => return HttpResponseHelper::forbidden()
-                .error("kind not valid")
-                .build()
-        };
+        let mut err : Option<&str> = None;
+
+        if data_transport.groups.is_some() {
+            group_handler(group_controller, group_field_controller, field_controller, &data_transport, &action, &mut err);
+        }
+
+        if data_transport.group_fields.is_some() {
+            group_field_handler(group_field_controller, &data_transport, &action, &mut err);
+        }
+
+        if data_transport.fields.is_some() {
+            field_handler(field_controller, &data_transport, &action, &mut err);
+        }
 
         if err.is_some() {
             return HttpResponseHelper::forbidden()
@@ -130,7 +165,7 @@ impl RestController {
         }
 
         match from.as_str() {
-            "home" => {
+            "home" | "" => {
                 session.update_timestamp_last_update();
                 self.home(data_transport)
             },

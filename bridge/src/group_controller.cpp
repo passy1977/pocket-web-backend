@@ -27,7 +27,6 @@ using namespace pocket;
 #include "pocket-controllers/session.hpp"
 using controllers::session;
 
-
 #include "pocket-views/view-group.hpp"
 using views::view;
 
@@ -192,19 +191,6 @@ pocket_stat_t pocket_group_controller_persist(const pocket_group_controller_t* s
 
     const auto view_group = static_cast<view<struct group> *>(self->view_group);
 
-    // struct group zzz {
-    //     .id = group->id,
-    //     .server_id = group->server_id,
-    //     .group_id = group->group_id,
-    //     .server_group_id = group->server_group_id,
-    //     .title = group->title,
-    //     .icon = group->icon,
-    //     .note = group->note,
-    //     .synchronized = group->synchronized,
-    //     .deleted = group->deleted,
-    //     .timestamp_creation = group->timestamp_creation
-    // };
-
     auto g = make_unique<struct group>();
     g->server_id = group->server_id;
     g->group_id = group->group_id;
@@ -217,40 +203,6 @@ pocket_stat_t pocket_group_controller_persist(const pocket_group_controller_t* s
     g->user_id = logged_user->value()->id;
     g->synchronized = false;
     g->id = view_group->persist(g);
-
-    // for (NSNumber *key in showList)
-    // {
-    //     GroupField *gfObjC = showList[key];
-    //     auto&& gf = convert(gfObjC);
-    //     gf->synchronized = false;
-    //     if(gfObjC.newInsertion)
-    //     {
-    //         gf->id = 0;
-    //         gf->user_id = user._id;
-    //         gf->group_id = g->id;
-    //         gf->server_group_id = g->server_id;
-    //     }
-    //     gf->id = viewGroupField->persist(gf);
-    //     gfObjC._id = static_cast<uint32_t>(gf->id);
-    //
-    //     if(gfObjC.newInsertion)
-    //     {
-    //         Field *fObjC = [Field new];
-    //         fObjC.title = gfObjC.title;
-    //         fObjC.value = @"";
-    //         fObjC.isHidden = gf->is_hidden;
-    //         auto&& f = convert(fObjC);
-    //         f->user_id = user._id;
-    //         f->group_id = g->id;
-    //         f->server_group_id = g->server_id;
-    //         f->group_field_id = gf->id;
-    //         f->server_group_id = gf->server_id;
-    //         f->synchronized = false;
-    //
-    //         f->id = viewField->persist(f);
-    //         fObjC._id = static_cast<uint32_t>(f->id);
-    //     }
-    // }
 
     session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
     session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
