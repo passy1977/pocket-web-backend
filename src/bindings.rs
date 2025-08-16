@@ -656,13 +656,13 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn pocket_field_controller_persist(
         self_: *const pocket_field_controller_t,
-        f: *const pocket_field_t,
+        field: *mut pocket_field_t,
     ) -> pocket_stat_t;
 }
 unsafe extern "C" {
     pub fn pocket_field_controller_del(
         self_: *const pocket_field_controller_t,
-        f: *mut pocket_field_t,
+        field: *const pocket_field_t,
     ) -> pocket_stat_t;
 }
 unsafe extern "C" {
@@ -813,7 +813,12 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn pocket_group_controller_persist(
         self_: *const pocket_group_controller_t,
-        group: *const pocket_group_t,
+        group: *mut pocket_group_t,
+    ) -> pocket_stat_t;
+}
+unsafe extern "C" {
+    pub fn pocket_group_controller_send_data(
+        self_: *const pocket_group_controller_t,
     ) -> pocket_stat_t;
 }
 unsafe extern "C" {
@@ -836,16 +841,6 @@ unsafe extern "C" {
     pub fn pocket_group_controller_data_import_legacy(
         full_path_file_import: *const ::std::os::raw::c_char,
     ) -> bool;
-}
-unsafe extern "C" {
-    pub fn pocket_group_controller_clean_show_list(controller: *mut pocket_group_controller_t);
-}
-unsafe extern "C" {
-    pub fn pocket_group_controller_fill_show_list(
-        controller: *mut pocket_group_controller_t,
-        group: *const pocket_group_t,
-        insert: bool,
-    );
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -963,7 +958,7 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn pocket_group_field_controller_persist(
         self_: *const pocket_group_field_controller_t,
-        group_field: *const pocket_group_field_t,
+        group_field: *mut pocket_group_field_t,
     ) -> pocket_stat_t;
 }
 pub const user_stat_t_USER_STAT_NOT_ACTIVE: user_stat_t = 1;

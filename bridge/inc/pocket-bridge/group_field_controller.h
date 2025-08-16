@@ -42,7 +42,7 @@ pocket_group_field_t** pocket_group_field_controller_get_list(const pocket_group
 void pocket_group_field_controller_free_list(pocket_group_field_t** list, int count);
 
 pocket_stat_t pocket_group_field_controller_del(const pocket_group_field_controller_t* self, const pocket_group_field_t* group_field);
-pocket_stat_t pocket_group_field_controller_persist(const pocket_group_field_controller_t* self, const pocket_group_field_t* group_field);
+pocket_stat_t pocket_group_field_controller_persist(const pocket_group_field_controller_t* self, pocket_group_field_t* group_field);
 
 #ifdef __cplusplus
 }

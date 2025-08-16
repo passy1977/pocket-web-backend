@@ -148,7 +148,6 @@ pocket_stat_t pocket_group_controller_del(const pocket_group_controller_t* self,
     if (!self || !group_field_controller || !field_controller || !group) return ERROR;
 
     auto session = static_cast<class session*>(self->pocket->session);
-    auto logged_user = static_cast<user::opt_ptr *>(self->pocket->user);
 
     const auto view_group = static_cast<view<struct group> *>(self->view_group);
     const auto view_group_field = static_cast<view<group_field> *>(group_field_controller->view_group_field);
@@ -158,23 +157,7 @@ pocket_stat_t pocket_group_controller_del(const pocket_group_controller_t* self,
     view_field->del_by_group_id(group->id);
     view_group->del(group->id);
 
-    session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
-    session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
-    if(auto&& user = session->send_data(*logged_user); user)
-    {
-        if (self->pocket->user)
-        {
-            delete[] static_cast<uint8_t *>(self->pocket->user);
-        }
-        self->pocket->user = new uint8_t[sizeof(user)];
-        memcpy(self->pocket->user, &user, sizeof(user));
-        return OK;
-    }
-    else
-    {
-        return static_cast<pocket_stat_t>(session->get_status());
-    }
-
+    return READY;
 }
 catch(const runtime_error& e)
 {
@@ -182,7 +165,7 @@ catch(const runtime_error& e)
     return ERROR;
 }
 
-pocket_stat_t pocket_group_controller_persist(const pocket_group_controller_t* self, const pocket_group_t* group) try
+pocket_stat_t pocket_group_controller_persist(const pocket_group_controller_t* self, pocket_group_t* group) try
 {
     if (!self || !group) return ERROR;
 
@@ -204,6 +187,23 @@ pocket_stat_t pocket_group_controller_persist(const pocket_group_controller_t* s
     g->synchronized = false;
     g->id = view_group->persist(g);
 
+    group->id = g->id;
+
+    return READY;
+}
+catch(const runtime_error& e)
+{
+    error(APP_TAG, e.what());
+    return ERROR;
+}
+
+pocket_stat_t pocket_group_controller_send_data(const pocket_group_controller_t* self) try
+{
+    if (!self) return ERROR;
+
+    auto session = static_cast<class session*>(self->pocket->session);
+    const auto logged_user = static_cast<user::opt_ptr *>(self->pocket->user);
+
     session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
     session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
     if(auto&& user = session->send_data(*logged_user); user)
@@ -223,6 +223,7 @@ catch(const runtime_error& e)
     error(APP_TAG, e.what());
     return ERROR;
 }
+
 
 pocket_group_t* pocket_group_controller_get(const pocket_group_controller_t* self, int64_t group_id) try
 {
@@ -244,11 +245,6 @@ catch(const runtime_error& e)
     return nullptr;
 }
 
-// int64_t pocket_group_controller_get_last_id_group_field(void)
-// {
-//
-//     return 0; // Placeholder
-// }
 
 bool pocket_group_controller_data_export(const char* full_path_file_export)
 {
@@ -270,14 +266,4 @@ bool pocket_group_controller_data_import_legacy(const char* full_path_file_impor
     if (!full_path_file_import) return false;
 
     return true; // Placeholder
-}
-
-void pocket_group_controller_clean_show_list(pocket_group_controller_t* controller)
-{
-
-}
-
-void pocket_group_controller_fill_show_list(pocket_group_controller_t* controller, const pocket_group_t *group, bool insert)
-{
-
 }

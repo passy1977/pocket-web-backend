@@ -55,14 +55,13 @@ pocket_group_t** pocket_group_controller_get_list(const pocket_group_controller_
 void pocket_group_controller_free_list(pocket_group_t** list, int count);
 int32_t pocket_group_controller_count_child(const pocket_group_controller_t* self, const pocket_group_t* group);
 pocket_stat_t pocket_group_controller_del(const pocket_group_controller_t* self, const pocket_group_field_controller_t* group_field_controller, const pocket_field_controller_t* field_controller, const pocket_group_t* group);
-pocket_stat_t pocket_group_controller_persist(const pocket_group_controller_t* self, const pocket_group_t* group);
+pocket_stat_t pocket_group_controller_persist(const pocket_group_controller_t* self, pocket_group_t* group);
+pocket_stat_t pocket_group_controller_send_data(const pocket_group_controller_t* self);
 pocket_group_t* pocket_group_controller_get(const pocket_group_controller_t* self, int64_t group_id);
-// int64_t pocket_group_controller_get_last_id_group_field(pocket_group_controller_t* self);
+
 bool pocket_group_controller_data_export(const char* full_path_file_export);
 bool pocket_group_controller_data_import(const char* full_path_file_import);
 bool pocket_group_controller_data_import_legacy(const char* full_path_file_import);
-void pocket_group_controller_clean_show_list(pocket_group_controller_t* controller);
-void pocket_group_controller_fill_show_list(pocket_group_controller_t* controller, const pocket_group_t *group, bool insert);
 
 
 #ifdef __cplusplus

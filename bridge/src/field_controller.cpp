@@ -123,39 +123,46 @@ void pocket_field_controller_free_list(pocket_field_t** list, int count)
 }
 
 
-pocket_stat_t pocket_field_controller_persist(const pocket_field_controller_t* self, const pocket_field_t* f)
-{
-
-    return OK;
-}
-
-pocket_stat_t pocket_field_controller_del(const pocket_field_controller_t* self, pocket_field_t* field) try
+pocket_stat_t pocket_field_controller_persist(const pocket_field_controller_t* self, pocket_field_t* field) try
 {
     if (!self || !field) return ERROR;
 
     auto session = static_cast<class session*>(self->pocket->session);
-    auto logged_user = static_cast<user::opt_ptr *>(self->pocket->user);
+    const auto logged_user = static_cast<user::opt_ptr *>(self->pocket->user);
 
+    const auto view_field = static_cast<view<struct group_field> *>(self->view_field);
+
+    auto f = make_unique<struct group_field>();
+    f->server_id = field->server_id;
+    f->group_id = field->group_id;
+    f->server_group_id = field->server_group_id;
+    f->title = field->title;
+    f->is_hidden = field->is_hidden;
+    f->deleted = field->deleted;
+    f->timestamp_creation = field->timestamp_creation;
+    f->user_id = logged_user->value()->id;
+    f->synchronized = false;
+    f->id = view_field->persist(f);
+
+    field->id = f->id;
+
+    return READY;
+}
+catch(const runtime_error& e)
+{
+    error(APP_TAG, e.what());
+    return ERROR;
+}
+
+pocket_stat_t pocket_field_controller_del(const pocket_field_controller_t* self, const pocket_field_t* field) try
+{
+    if (!self || !field) return ERROR;
+    
     const auto view_field = static_cast<view<struct field> *>(self->view_field);
 
     view_field->del(field->id);
 
-    session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
-    session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
-    if(auto&& user = session->send_data(*logged_user); user)
-    {
-        if (self->pocket->user)
-        {
-            delete[] static_cast<uint8_t *>(self->pocket->user);
-        }
-        self->pocket->user = new uint8_t[sizeof(user)];
-        memcpy(self->pocket->user, &user, sizeof(user));
-        return OK;
-    }
-    else
-    {
-        return static_cast<pocket_stat_t>(session->get_status());
-    }
+    return READY;
 }
 catch(const runtime_error& e)
 {

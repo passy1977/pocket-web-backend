@@ -131,22 +131,7 @@ pocket_stat_t pocket_group_field_controller_del(const pocket_group_field_control
 
     view_group_field->del(group_field->id);
 
-    session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
-    session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
-    if(auto&& user = session->send_data(*logged_user); user)
-    {
-        if (self->pocket->user)
-        {
-            delete[] static_cast<uint8_t *>(self->pocket->user);
-        }
-        self->pocket->user = new uint8_t[sizeof(user)];
-        memcpy(self->pocket->user, &user, sizeof(user));
-        return OK;
-    }
-    else
-    {
-        return static_cast<pocket_stat_t>(session->get_status());
-    }
+    return READY;
 
 }
 catch(const runtime_error& e)
@@ -155,7 +140,7 @@ catch(const runtime_error& e)
     return ERROR;
 }
 
-pocket_stat_t pocket_group_field_controller_persist(const pocket_group_field_controller_t* self, const pocket_group_field_t* group_field) try
+pocket_stat_t pocket_group_field_controller_persist(const pocket_group_field_controller_t* self, pocket_group_field_t* group_field) try
 {
     if (!self || !group_field) return ERROR;
 
@@ -176,19 +161,9 @@ pocket_stat_t pocket_group_field_controller_persist(const pocket_group_field_con
     gf->synchronized = false;
     gf->id = view_group_field->persist(gf);
 
-    session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
-    session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
-    if(auto&& user = session->send_data(*logged_user); user)
-    {
-        if (self->pocket->user)
-        {
-            delete[] static_cast<uint8_t *>(self->pocket->user);
-        }
-        self->pocket->user = new uint8_t[sizeof(user)];
-        memcpy(self->pocket->user, &user, sizeof(user));
-    }
+    group_field->id = gf->id;
 
-    return static_cast<pocket_stat_t>(session->get_status());
+    return READY;
 }
 catch(const runtime_error& e)
 {

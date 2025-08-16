@@ -1,4 +1,4 @@
-use crate::bindings::{pocket_field_controller_del, pocket_field_controller_init, pocket_field_controller_new, pocket_field_controller_persist, pocket_field_controller_t, pocket_group_controller_del, pocket_group_controller_init, pocket_group_controller_new, pocket_group_controller_persist, pocket_group_controller_t, pocket_group_field_controller_del, pocket_group_field_controller_init, pocket_group_field_controller_new, pocket_group_field_controller_persist, pocket_group_field_controller_t, pocket_stat_t_OK};
+use crate::bindings::{pocket_field_controller_del, pocket_field_controller_init, pocket_field_controller_new, pocket_field_controller_persist, pocket_field_controller_t, pocket_group_controller_del, pocket_group_controller_init, pocket_group_controller_new, pocket_group_controller_persist, pocket_group_controller_send_data, pocket_group_controller_t, pocket_group_field_controller_del, pocket_group_field_controller_init, pocket_group_field_controller_new, pocket_group_field_controller_persist, pocket_group_field_controller_t, pocket_stat_t_OK, pocket_stat_t_READY};
 use crate::models::field::Field;
 use crate::models::group::Group;
 use crate::models::rests::DataTransport;
@@ -172,6 +172,13 @@ impl RestController {
 
         if data_transport.fields.is_some() {
             field_handler(field_controller, &data_transport, &from, &kind, &action, &mut err);
+        }
+
+        unsafe  {
+            let rc = pocket_group_controller_send_data(group_controller);
+            if rc != pocket_stat_t_OK && rc != pocket_stat_t_READY {
+                println!("Impossible to send data rc:{rc}");
+            }
         }
 
         if err.is_some() {
