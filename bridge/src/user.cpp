@@ -19,6 +19,9 @@
 
 #include "pocket-bridge/user.h"
 
+#include "pocket-pods/user.hpp"
+using pocket::pods::user;
+
 #include <new>
 #include <cstring>
 
@@ -39,7 +42,7 @@ pocket_user_t* pocket_user_init()
     return user;
 }
 
-pocket_user_t* pocket_user_init_with_id(uint32_t id,
+pocket_user_t* pocket_user_init_with_params(int64_t id,
                                         const char *email,
                                         const char *name,
                                         const char *passwd,
@@ -91,4 +94,17 @@ void pocket_user_free(pocket_user_t *user)
 
         delete user;
     }
+}
+
+pocket_user_t* convert(const user::opt_ptr& user)
+{
+    if (!user.has_value()) return nullptr;
+
+    return ::pocket_user_init_with_params(
+                                    user.value()->id,
+                                    user.value()->email.c_str(),
+                                    user.value()->name.c_str(),
+                                    user.value()->passwd.c_str(),
+                                    user.value()->timestamp_last_update,
+                                    static_cast<user_stat_t>(user.value()->status));
 }

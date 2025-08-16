@@ -20,6 +20,7 @@
 #include "pocket-bridge/field_controller.h"
 
 #include "pocket-bridge/group.h"
+#include "pocket-bridge/user.h"
 #include "pocket/globals.hpp"
 using namespace pocket;
 
@@ -128,11 +129,12 @@ pocket_stat_t pocket_field_controller_persist(const pocket_field_controller_t* s
     if (!self || !field) return ERROR;
 
     auto session = static_cast<class session*>(self->pocket->session);
-    const auto logged_user = static_cast<user::opt_ptr *>(self->pocket->user);
+    const auto logged_user = static_cast<pocket_user_t*>(self->pocket->user);
 
     const auto view_field = static_cast<view<struct group_field> *>(self->view_field);
 
     auto f = make_unique<struct group_field>();
+    f->id = field->id;
     f->server_id = field->server_id;
     f->group_id = field->group_id;
     f->server_group_id = field->server_group_id;
@@ -140,7 +142,7 @@ pocket_stat_t pocket_field_controller_persist(const pocket_field_controller_t* s
     f->is_hidden = field->is_hidden;
     f->deleted = field->deleted;
     f->timestamp_creation = field->timestamp_creation;
-    f->user_id = logged_user->value()->id;
+    f->user_id = logged_user->id;
     f->synchronized = false;
     f->id = view_field->persist(f);
 

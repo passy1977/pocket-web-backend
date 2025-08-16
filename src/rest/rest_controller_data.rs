@@ -1,4 +1,4 @@
-use crate::bindings::{pocket_field_controller_del, pocket_field_controller_init, pocket_field_controller_new, pocket_field_controller_persist, pocket_field_controller_t, pocket_group_controller_del, pocket_group_controller_init, pocket_group_controller_new, pocket_group_controller_persist, pocket_group_controller_send_data, pocket_group_controller_t, pocket_group_field_controller_del, pocket_group_field_controller_init, pocket_group_field_controller_new, pocket_group_field_controller_persist, pocket_group_field_controller_t, pocket_stat_t_OK, pocket_stat_t_READY};
+use crate::bindings::{pocket_field_controller_del, pocket_field_controller_init, pocket_field_controller_new, pocket_field_controller_persist, pocket_field_controller_t, pocket_group_controller_del, pocket_group_controller_init, pocket_group_controller_new, pocket_group_controller_persist, pocket_send_data, pocket_group_controller_t, pocket_group_field_controller_del, pocket_group_field_controller_init, pocket_group_field_controller_new, pocket_group_field_controller_persist, pocket_group_field_controller_t, pocket_stat_t_OK, pocket_stat_t_READY};
 use crate::models::field::Field;
 use crate::models::group::Group;
 use crate::models::rests::DataTransport;
@@ -19,28 +19,42 @@ fn group_handler(group_controller: *mut pocket_group_controller_t, group_field_c
         return false;
     }
 
-    for group in data_transport.groups.clone().unwrap() {
+    for mut group in data_transport.groups.clone().unwrap() {
+
+        let group_c = group.to_pocket_group_t();
+
         let Group { id, server_id, deleted, .. } = group;
-        return match (id, server_id, deleted) {
+        match (id, server_id, deleted) {
             (id, _server_id @ 0, _deleted @ false) if id > 0 => {
                 //new
                 unsafe {
-                    pocket_group_controller_persist(group_controller, group.to_pocket_group_t()) == pocket_stat_t_OK
+                    let rc = pocket_group_controller_persist(group_controller, group_c);
+                    if rc == pocket_stat_t_OK || rc == pocket_stat_t_READY {
+                        group.id = (*group_c).id;
+                    } else {
+                        return false
+                    }
                 }
             }
             (id, server_id, _deleted @ false) if id > 0 && server_id > 0 => {
                 //modify
                 unsafe {
-                    pocket_group_controller_persist(group_controller, group.to_pocket_group_t()) == pocket_stat_t_OK
+                    let rc = pocket_group_controller_persist(group_controller, group_c);
+                    if rc != pocket_stat_t_OK && rc != pocket_stat_t_READY {
+                        return false
+                    }
                 }
             }
             (id, _, _deleted @ true) if id > 0 => {
                 //delete
                 unsafe {
-                    pocket_group_controller_del(group_controller, group_field_controller, field_controller, group.to_pocket_group_t()) == pocket_stat_t_OK
+                    let rc = pocket_group_controller_del(group_controller, group_field_controller, field_controller, group_c);
+                    if rc != pocket_stat_t_OK && rc != pocket_stat_t_READY {
+                        return false
+                    }
                 }
             }
-            (_, _, _) => false
+            (_, _, _) => return false
         }
     }
 
@@ -73,27 +87,40 @@ fn group_field_handler(group_field_controller: *mut pocket_group_field_controlle
             group_field.server_group_id = tuple.1;
         }
 
+        let group_field_c = group_field.to_pocket_group_field_t();
+
         let GroupField { id, server_id, deleted, .. } = group_field;
-        return match (id, server_id, deleted) {
+        match (id, server_id, deleted) {
             (id, _server_id @ 0, _deleted @ false) if id > 0 => {
                 //new
                 unsafe {
-                    pocket_group_field_controller_persist(group_field_controller, group_field.to_pocket_group_field_t()) == pocket_stat_t_OK
+                    let rc = pocket_group_field_controller_persist(group_field_controller, group_field_c);
+                    if rc == pocket_stat_t_OK || rc == pocket_stat_t_READY {
+                        group_field.id = (*group_field_c).id;
+                    } else {
+                        return false
+                    }
                 }
             }
             (id, server_id, _deleted @ false) if id > 0 && server_id > 0 => {
                 //modify
                 unsafe {
-                    pocket_group_field_controller_persist(group_field_controller, group_field.to_pocket_group_field_t()) == pocket_stat_t_OK
+                    let rc = pocket_group_field_controller_persist(group_field_controller, group_field_c);
+                    if rc != pocket_stat_t_OK && rc != pocket_stat_t_READY {
+                        return false
+                    }
                 }
             }
             (id, _, _deleted @ true) if id > 0 => {
                 //delete
                 unsafe {
-                    pocket_group_field_controller_del(group_field_controller, group_field.to_pocket_group_field_t()) == pocket_stat_t_OK
+                    let rc = pocket_group_field_controller_del(group_field_controller, group_field_c);
+                    if rc != pocket_stat_t_OK && rc != pocket_stat_t_READY {
+                        return false
+                    }
                 }
             }
-            (_, _, _) => false
+            (_, _, _) => return false
         }
     }
     true
@@ -108,28 +135,42 @@ fn field_handler(field_controller: *mut pocket_field_controller_t, data_transpor
         return false;
     }
 
-    for field in data_transport.fields.clone().unwrap() {
+    for mut field in data_transport.fields.clone().unwrap() {
+
+        let field_c = field.to_pocket_field_t();
+
         let Field { id, server_id, deleted, .. } = field;
-        return match (id, server_id, deleted) {
+        match (id, server_id, deleted) {
             (id, _server_id @ 0, _deleted @ false) if id > 0 => {
                 //new
                 unsafe {
-                    pocket_field_controller_persist(field_controller, field.to_pocket_field_t()) == pocket_stat_t_OK
+                    let rc = pocket_field_controller_persist(field_controller, field_c);
+                    if rc == pocket_stat_t_OK || rc == pocket_stat_t_READY {
+                        field.id = (*field_c).id;
+                    } else {
+                        return false
+                    }
                 }
             }
             (id, server_id, _deleted @ false) if id > 0 && server_id > 0 => {
                 //modify
                 unsafe {
-                    pocket_field_controller_persist(field_controller, field.to_pocket_field_t()) == pocket_stat_t_OK
+                    let rc = pocket_field_controller_persist(field_controller, field_c);
+                    if rc != pocket_stat_t_OK && rc != pocket_stat_t_READY {
+                        return false
+                    }
                 }
             }
             (id, _, _deleted @ true) if id > 0 => {
                 //delete
                 unsafe {
-                    pocket_field_controller_del(field_controller, field.to_pocket_field_t()) == pocket_stat_t_OK
+                    let rc = pocket_field_controller_del(field_controller, field_c);
+                    if rc != pocket_stat_t_OK && rc != pocket_stat_t_READY {
+                        return false
+                    }
                 }
             }
-            (_, _, _) => false
+            (_, _, _) => return false
         }
     }
     true
@@ -175,7 +216,7 @@ impl RestController {
         }
 
         unsafe  {
-            let rc = pocket_group_controller_send_data(group_controller);
+            let rc = pocket_send_data(session.pocket);
             if rc != pocket_stat_t_OK && rc != pocket_stat_t_READY {
                 println!("Impossible to send data rc:{rc}");
             }

@@ -19,11 +19,13 @@
 
 #include "pocket-bridge/group_field.h"
 
+#include "pocket-pods/group-field.hpp"
+using pocket::pods::group_field;
+
 #include <new>
 #include <cstring>
 
-#include "pocket-pods/group-field.hpp"
-using pocket::pods::group_field;
+
 
 using namespace std;
 

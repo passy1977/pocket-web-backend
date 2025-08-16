@@ -817,11 +817,6 @@ unsafe extern "C" {
     ) -> pocket_stat_t;
 }
 unsafe extern "C" {
-    pub fn pocket_group_controller_send_data(
-        self_: *const pocket_group_controller_t,
-    ) -> pocket_stat_t;
-}
-unsafe extern "C" {
     pub fn pocket_group_controller_get(
         self_: *const pocket_group_controller_t,
         group_id: i64,
@@ -995,8 +990,8 @@ unsafe extern "C" {
     pub fn pocket_user_init() -> *mut pocket_user_t;
 }
 unsafe extern "C" {
-    pub fn pocket_user_init_with_id(
-        id: u32,
+    pub fn pocket_user_init_with_params(
+        id: i64,
         email: *const ::std::os::raw::c_char,
         name: *const ::std::os::raw::c_char,
         passwd: *const ::std::os::raw::c_char,

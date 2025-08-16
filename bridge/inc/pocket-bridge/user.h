@@ -45,7 +45,7 @@ typedef struct {
 } pocket_user_t;
 
 pocket_user_t* pocket_user_init(void);
-pocket_user_t* pocket_user_init_with_id(uint32_t id,
+pocket_user_t* pocket_user_init_with_params(int64_t id,
                                             const char *email,
                                             const char *name,
                                             const char *passwd,

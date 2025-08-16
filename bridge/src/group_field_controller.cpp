@@ -31,6 +31,8 @@ using views::view;
 #include "pocket-pods/group-field.hpp"
 using namespace pods;
 
+#include "pocket-bridge/user.h"
+
 #include <new>
 #include <ranges>
 using namespace std;
@@ -145,11 +147,12 @@ pocket_stat_t pocket_group_field_controller_persist(const pocket_group_field_con
     if (!self || !group_field) return ERROR;
 
     auto session = static_cast<class session*>(self->pocket->session);
-    const auto logged_user = static_cast<user::opt_ptr *>(self->pocket->user);
+    const auto logged_user = static_cast<pocket_user_t*>(self->pocket->user);
 
     const auto view_group_field = static_cast<view<struct group_field> *>(self->view_group_field);
 
     auto gf = make_unique<struct group_field>();
+    gf->id = group_field->id;
     gf->server_id = group_field->server_id;
     gf->group_id = group_field->group_id;
     gf->server_group_id = group_field->server_group_id;
@@ -157,7 +160,7 @@ pocket_stat_t pocket_group_field_controller_persist(const pocket_group_field_con
     gf->is_hidden = group_field->is_hidden;
     gf->deleted = group_field->deleted;
     gf->timestamp_creation = group_field->timestamp_creation;
-    gf->user_id = logged_user->value()->id;
+    gf->user_id = logged_user->id;
     gf->synchronized = false;
     gf->id = view_group_field->persist(gf);
 

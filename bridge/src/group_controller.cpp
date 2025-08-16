@@ -34,6 +34,8 @@ using views::view;
 #include "pocket-pods/group-field.hpp"
 using namespace pods;
 
+#include "pocket-bridge/user.h"
+
 #include <new>
 #include <ranges>
 using namespace std;
@@ -170,11 +172,12 @@ pocket_stat_t pocket_group_controller_persist(const pocket_group_controller_t* s
     if (!self || !group) return ERROR;
 
     auto session = static_cast<class session*>(self->pocket->session);
-    const auto logged_user = static_cast<user::opt_ptr *>(self->pocket->user);
+    const auto logged_user = static_cast<pocket_user_t*>(self->pocket->user);
 
     const auto view_group = static_cast<view<struct group> *>(self->view_group);
 
     auto g = make_unique<struct group>();
+    g->id = group->id;
     g->server_id = group->server_id;
     g->group_id = group->group_id;
     g->server_group_id = group->server_group_id;
@@ -183,7 +186,7 @@ pocket_stat_t pocket_group_controller_persist(const pocket_group_controller_t* s
     g->note = group->note;
     g->deleted = group->deleted;
     g->timestamp_creation = group->timestamp_creation;
-    g->user_id = logged_user->value()->id;
+    g->user_id = logged_user->id;
     g->synchronized = false;
     g->id = view_group->persist(g);
 
@@ -196,34 +199,6 @@ catch(const runtime_error& e)
     error(APP_TAG, e.what());
     return ERROR;
 }
-
-pocket_stat_t pocket_group_controller_send_data(const pocket_group_controller_t* self) try
-{
-    if (!self) return ERROR;
-
-    auto session = static_cast<class session*>(self->pocket->session);
-    const auto logged_user = static_cast<user::opt_ptr *>(self->pocket->user);
-
-    session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
-    session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
-    if(auto&& user = session->send_data(*logged_user); user)
-    {
-        if (self->pocket->user)
-        {
-            delete[] static_cast<uint8_t *>(self->pocket->user);
-        }
-        self->pocket->user = new uint8_t[sizeof(user)];
-        memcpy(self->pocket->user, &user, sizeof(user));
-    }
-
-    return static_cast<pocket_stat_t>(session->get_status());
-}
-catch(const runtime_error& e)
-{
-    error(APP_TAG, e.what());
-    return ERROR;
-}
-
 
 pocket_group_t* pocket_group_controller_get(const pocket_group_controller_t* self, int64_t group_id) try
 {

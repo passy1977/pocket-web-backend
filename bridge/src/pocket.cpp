@@ -31,6 +31,8 @@ using pods::user;
 
 #include "pocket-bridge/pocket.h"
 
+#include "pocket-bridge/user.h"
+
 #include <memory>
 #include <new>
 #include <cstring>
@@ -40,6 +42,8 @@ namespace
 {
     constexpr char APP_TAG[] = "POCKET";
 }
+
+extern pocket_user_t* convert(const user::opt_ptr& user);
 
 pocket_t* pocket_new(void)
 {
@@ -161,12 +165,12 @@ pocket_stat_t pocket_login(pocket_t* self, const char* email, const char* passwd
     if(auto&& user = session->login(email, passwd, POCKET_ENABLE_AES); user.has_value())
     {
         session->send_data(user);
+
         if (self->user)
         {
-            delete[] static_cast<uint8_t *>(self->user);
+            pocket_user_free(static_cast<pocket_user_t*>(self->user));
         }
-        self->user = new uint8_t[sizeof(user)];
-        memcpy(self->user, &user, sizeof(user));
+        self->user = convert(user);
 
         return OK;
     }
@@ -201,10 +205,29 @@ bool pocket_copy_field(pocket_t* self, int64_t field_id_src, int64_t group_id_ds
     return OK;
 }
 
-pocket_stat_t pocket_send_data(pocket_t* self)
+pocket_stat_t pocket_send_data(pocket_t* self)  try
 {
-    return OK;
+    if (!self || self->user == nullptr) return ERROR;
+
+    auto session = static_cast<class session*>(self->session);
+    const auto logged_user = optional{make_unique<struct user>(*static_cast<struct user*>(self->user))};
+
+    session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
+    session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
+    if(auto&& user = session->send_data(logged_user); user.has_value())
+    {
+        pocket_user_free(static_cast<pocket_user_t*>(self->user));
+        self->user = convert(user);
+    }
+
+    return static_cast<pocket_stat_t>(session->get_status());
 }
+catch(const runtime_error& e)
+{
+    error(APP_TAG, e.what());
+    return ERROR;
+}
+
 
 const char* pocket_aes_decrypt(pocket_t* self, const char encrypted[])
 {
