@@ -10,7 +10,7 @@ use actix_web::web::Json;
 use actix_web::HttpResponse;
 use crate::models::group_field::GroupField;
 
-fn group_handler(group_controller: *mut pocket_group_controller_t, group_field_controller: *mut pocket_group_field_controller_t, field_controller: *mut pocket_field_controller_t, data_transport: &Json<DataTransport>, _kind: &String, err : &mut Option<&str>) -> bool {
+fn group_handler(group_controller: *mut pocket_group_controller_t, group_field_controller: *mut pocket_group_field_controller_t, field_controller: *mut pocket_field_controller_t, data_transport: &Json<DataTransport>, _from: &String, _kind: &String, _action: &String, err : &mut Option<&str>) -> bool {
     if data_transport.groups.is_none() {
         return false;
     }
@@ -47,7 +47,7 @@ fn group_handler(group_controller: *mut pocket_group_controller_t, group_field_c
     true
 }
 
-fn group_field_handler(group_field_controller: *mut pocket_group_field_controller_t, data_transport: &Json<DataTransport>, _kind: &String, err : &mut Option<&str>) -> bool {
+fn group_field_handler(group_field_controller: *mut pocket_group_field_controller_t, data_transport: &Json<DataTransport>, from: &String, _kind: &String, _action: &String, err : &mut Option<&str>) -> bool {
     if data_transport.groups.is_none() {
         return false;
     }
@@ -56,7 +56,23 @@ fn group_field_handler(group_field_controller: *mut pocket_group_field_controlle
         return false;
     }
 
-    for group_field in data_transport.group_fields.clone().unwrap() {
+    let mut tuple: (i64, i64) = (0, 0);
+    if from == "group_detail" {
+        tuple = if let Some(group) = data_transport.groups.clone().unwrap().get(0) {
+            (group.id, group.server_id)
+        } else {
+            return false;
+        };
+    }
+
+
+    for mut group_field in data_transport.group_fields.clone().unwrap() {
+
+        if from == "group_detail" {
+            group_field.group_id = tuple.0;
+            group_field.server_group_id = tuple.1;
+        }
+
         let GroupField { id, server_id, deleted, .. } = group_field;
         return match (id, server_id, deleted) {
             (id, _server_id @ 0, _deleted @ false) if id > 0 => {
@@ -83,7 +99,7 @@ fn group_field_handler(group_field_controller: *mut pocket_group_field_controlle
     true
 }
 
-fn field_handler(field_controller: *mut pocket_field_controller_t, data_transport: &Json<DataTransport>, _kind: &String, err : &mut Option<&str>) -> bool {
+fn field_handler(field_controller: *mut pocket_field_controller_t, data_transport: &Json<DataTransport>, _from: &String, _kind: &String, _action: &String, err : &mut Option<&str>) -> bool {
     if data_transport.fields.is_none() {
         return false;
     }
@@ -135,7 +151,7 @@ impl RestController {
         }
 
         let ref from = split[1].to_string();
-        let ref _kind = split[2].to_string();
+        let ref kind = split[2].to_string();
         let ref action = split[3].to_string();
 
         let group_controller = get_group_controller!(session);
@@ -147,15 +163,15 @@ impl RestController {
         let mut err : Option<&str> = None;
 
         if data_transport.groups.is_some() {
-            group_handler(group_controller, group_field_controller, field_controller, &data_transport, &action, &mut err);
+            group_handler(group_controller, group_field_controller, field_controller, &data_transport, &from, &kind, &action, &mut err);
         }
 
         if data_transport.group_fields.is_some() {
-            group_field_handler(group_field_controller, &data_transport, &action, &mut err);
+            group_field_handler(group_field_controller, &data_transport, &from, &kind, &action, &mut err);
         }
 
         if data_transport.fields.is_some() {
-            field_handler(field_controller, &data_transport, &action, &mut err);
+            field_handler(field_controller, &data_transport, &from, &kind, &action, &mut err);
         }
 
         if err.is_some() {
@@ -165,7 +181,7 @@ impl RestController {
         }
 
         match from.as_str() {
-            "home" | "" => {
+            "home" | "group_detail" => {
                 session.update_timestamp_last_update();
                 self.home(data_transport)
             },
