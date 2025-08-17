@@ -15,6 +15,10 @@ fn group_handler(group_controller: *mut pocket_group_controller_t, group_field_c
         return false;
     }
 
+    if  data_transport.groups.clone().unwrap().is_empty() {
+        return true;
+    }
+
     if err.is_some() {
         return false;
     }
@@ -62,8 +66,12 @@ fn group_handler(group_controller: *mut pocket_group_controller_t, group_field_c
 }
 
 fn group_field_handler(group_field_controller: *mut pocket_group_field_controller_t, data_transport: &Json<DataTransport>, from: &String, _kind: &String, _action: &String, err : &mut Option<&str>) -> bool {
-    if data_transport.groups.is_none() {
+    if data_transport.group_fields.is_none() {
         return false;
+    }
+
+    if  data_transport.group_fields.clone().unwrap().is_empty() {
+        return true;
     }
 
     if err.is_some() {
@@ -91,7 +99,7 @@ fn group_field_handler(group_field_controller: *mut pocket_group_field_controlle
 
         let GroupField { id, server_id, deleted, .. } = group_field;
         match (id, server_id, deleted) {
-            (id, _server_id @ 0, _deleted @ false) if id > 0 => {
+            (id, _server_id @ 0, _deleted @ false) if id <= 0 => {
                 //new
                 unsafe {
                     let rc = pocket_group_field_controller_persist(group_field_controller, group_field_c);
@@ -102,7 +110,7 @@ fn group_field_handler(group_field_controller: *mut pocket_group_field_controlle
                     }
                 }
             }
-            (id, server_id, _deleted @ false) if id > 0 && server_id > 0 => {
+            (id, server_id, _deleted @ false) if id > 0 => {
                 //modify
                 unsafe {
                     let rc = pocket_group_field_controller_persist(group_field_controller, group_field_c);
@@ -126,16 +134,34 @@ fn group_field_handler(group_field_controller: *mut pocket_group_field_controlle
     true
 }
 
-fn field_handler(field_controller: *mut pocket_field_controller_t, data_transport: &Json<DataTransport>, _from: &String, _kind: &String, _action: &String, err : &mut Option<&str>) -> bool {
+fn field_handler(field_controller: *mut pocket_field_controller_t, data_transport: &Json<DataTransport>, from: &String, _kind: &String, _action: &String, err : &mut Option<&str>) -> bool {
     if data_transport.fields.is_none() {
         return false;
+    }
+
+    if  data_transport.fields.clone().unwrap().is_empty() {
+        return true;
     }
 
     if err.is_some() {
         return false;
     }
 
+    let mut tuple: (i64, i64) = (0, 0);
+    if from == "group_detail" {
+        tuple = if let Some(group) = data_transport.groups.clone().unwrap().get(0) {
+            (group.id, group.server_id)
+        } else {
+            return false;
+        };
+    }
+    
     for mut field in data_transport.fields.clone().unwrap() {
+
+        if from == "group_detail" {
+            field.group_id = tuple.0;
+            field.server_group_id = tuple.1;
+        }
 
         let field_c = field.to_pocket_field_t();
 
@@ -228,15 +254,9 @@ impl RestController {
                 .build()
         }
 
-        match from.as_str() {
-            "home" | "group_detail" => {
-                session.update_timestamp_last_update();
-                self.home(data_transport)
-            },
-            _ => HttpResponseHelper::forbidden()
-                .error("fron not valid")
-                .build()
-        }
+
+        session.update_timestamp_last_update();
+        self.home(data_transport)
 
     }
 

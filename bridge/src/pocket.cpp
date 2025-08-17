@@ -44,6 +44,7 @@ namespace
 }
 
 extern pocket_user_t* convert(const user::opt_ptr& user);
+extern user::opt_ptr convert(const pocket_user_t* pocket_user);
 
 pocket_t* pocket_new(void)
 {
@@ -210,7 +211,7 @@ pocket_stat_t pocket_send_data(pocket_t* self)  try
     if (!self || self->user == nullptr) return ERROR;
 
     auto session = static_cast<class session*>(self->session);
-    const auto logged_user = optional{make_unique<struct user>(*static_cast<struct user*>(self->user))};
+    const auto logged_user = convert(static_cast<pocket_user_t*>(self->user));
 
     session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
     session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);

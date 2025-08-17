@@ -134,6 +134,14 @@ pocket_stat_t pocket_field_controller_persist(const pocket_field_controller_t* s
     const auto view_field = static_cast<view<struct group_field> *>(self->view_field);
 
     auto f = make_unique<struct group_field>();
+    if (field->id < 0)
+    {
+        f->id = 0;
+    }
+    else
+    {
+        f->id = field->id;
+    }
     f->id = field->id;
     f->server_id = field->server_id;
     f->group_id = field->group_id;
@@ -144,10 +152,16 @@ pocket_stat_t pocket_field_controller_persist(const pocket_field_controller_t* s
     f->timestamp_creation = field->timestamp_creation;
     f->user_id = logged_user->id;
     f->synchronized = false;
-    f->id = view_field->persist(f);
+    auto id = view_field->persist(f);
 
-    field->id = f->id;
-
+    if (field->id < 0)
+    {
+        field->id = id;
+    }
+    else
+    {
+        field->id = f->id;
+    }
     return READY;
 }
 catch(const runtime_error& e)

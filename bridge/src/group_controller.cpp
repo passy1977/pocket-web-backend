@@ -177,7 +177,14 @@ pocket_stat_t pocket_group_controller_persist(const pocket_group_controller_t* s
     const auto view_group = static_cast<view<struct group> *>(self->view_group);
 
     auto g = make_unique<struct group>();
-    g->id = group->id;
+    if (group->id < 0)
+    {
+        g->id = 0;
+    }
+    else
+    {
+        g->id = group->id;
+    }
     g->server_id = group->server_id;
     g->group_id = group->group_id;
     g->server_group_id = group->server_group_id;
@@ -188,9 +195,16 @@ pocket_stat_t pocket_group_controller_persist(const pocket_group_controller_t* s
     g->timestamp_creation = group->timestamp_creation;
     g->user_id = logged_user->id;
     g->synchronized = false;
-    g->id = view_group->persist(g);
+    auto id = view_group->persist(g);
 
-    group->id = g->id;
+    if (group->id < 0)
+    {
+        group->id = id;
+    }
+    else
+    {
+        group->id = g->id;
+    }
 
     return READY;
 }

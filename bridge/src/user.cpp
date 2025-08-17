@@ -46,7 +46,7 @@ pocket_user_t* pocket_user_init_with_params(int64_t id,
                                         const char *email,
                                         const char *name,
                                         const char *passwd,
-                                        uint64_t timestamp_last_update,
+                                        int64_t timestamp_last_update,
                                         user_stat_t status) {
     auto user = new(nothrow) pocket_user_t;
     if (!user) return nullptr;
@@ -107,4 +107,18 @@ pocket_user_t* convert(const user::opt_ptr& user)
                                     user.value()->passwd.c_str(),
                                     user.value()->timestamp_last_update,
                                     static_cast<user_stat_t>(user.value()->status));
+}
+
+user::opt_ptr convert(const pocket_user_t* pocket_user)
+{
+    if (pocket_user == nullptr) return nullptr;
+
+    return {make_unique<struct user>(
+            pocket_user->id,
+            pocket_user->email,
+            pocket_user->name,
+            pocket_user->passwd,
+            static_cast<user::stat>(pocket_user->status),
+            static_cast<int64_t>(pocket_user->timestamp_last_update)
+         )};
 }
