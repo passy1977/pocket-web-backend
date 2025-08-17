@@ -72,7 +72,10 @@ pocket_group_t* pocket_group_new_with_params(int64_t id,
     group->server_group_id = server_group_id;
 
     group->title = strdup(title);
-    group->icon = strdup(icon);
+    if(icon)
+    {
+        group->icon = strdup(icon);
+    }
     group->note = strdup(note);
 
     if (!group->title || !group->icon || !group->note)
