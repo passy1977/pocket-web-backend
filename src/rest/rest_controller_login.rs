@@ -4,7 +4,7 @@ use actix_web::HttpResponse;
 use actix_web::web::Json;
 use crate::bindings::{pocket_initialize, pocket_login};
 use crate::constants::Stats;
-use crate::models::rests::DataTransport;
+use crate::models::data_transport::DataTransport;
 use crate::rest::rest_controller::RestController;
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;

@@ -1,7 +1,7 @@
 use crate::models::field::Fields;
 use crate::models::group::Groups;
 use crate::models::group_field::GroupFields;
-use crate::models::rests::DataTransport;
+use crate::models::data_transport::DataTransport;
 use crate::utils::Result;
 use actix_web::HttpResponse;
 

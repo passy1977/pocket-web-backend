@@ -2,7 +2,7 @@ use std::{ffi::CString, str::FromStr};
 
 use actix_web::{web::Json, HttpResponse};
 
-use crate::{bindings::pocket_initialize, models::rests::DataTransport, rest::rest_controller::RestController, services::session::Sessions, utils::aes_encrypt};
+use crate::{bindings::pocket_initialize, models::data_transport::DataTransport, rest::rest_controller::RestController, services::session::Sessions, utils::aes_encrypt};
 use crate::services::http_response_helper::HttpResponseHelper;
 
 impl RestController {

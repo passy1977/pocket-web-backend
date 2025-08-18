@@ -1,6 +1,6 @@
 use crate::bindings::{pocket_group_controller_get, pocket_group_controller_init, pocket_group_controller_new, pocket_group_field_controller_init, pocket_group_field_controller_new};
 use crate::models::group::{Group, Groups};
-use crate::models::rests::DataTransport;
+use crate::models::data_transport::DataTransport;
 use crate::rest::rest_controller::{get_list_group_field, split_id_group_and_search, RestController};
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;

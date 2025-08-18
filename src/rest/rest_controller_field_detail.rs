@@ -1,4 +1,4 @@
-use crate::models::rests::DataTransport;
+use crate::models::data_transport::DataTransport;
 use crate::rest::rest_controller::RestController;
 use crate::services::http_response_helper::HttpResponseHelper;
 use actix_web::web::Json;

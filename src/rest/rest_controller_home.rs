@@ -1,5 +1,5 @@
 use crate::bindings::{pocket_field_controller_init, pocket_field_controller_new, pocket_group_controller_init, pocket_group_controller_new};
-use crate::models::rests::DataTransport;
+use crate::models::data_transport::DataTransport;
 use crate::rest::rest_controller::*;
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;

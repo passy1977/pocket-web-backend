@@ -1,5 +1,5 @@
 
-use crate::{models::rests::DataTransport, rest::rest_controller::RestController};
+use crate::{models::data_transport::DataTransport, rest::rest_controller::RestController};
 use actix_web::{web, Responder};
 
 
@@ -59,10 +59,10 @@ pub mod server {
                 .route("/v5/pocket/hello/{session_id}", web::get().to(hello))
                 .route("/v5/pocket/login", web::post().to(login))
                 .route("/v5/pocket/registration", web::post().to(registration))
-                .route("/v5/pocket/home", web::post().to(home))
+                .route("/v5/pocket/home", web::put().to(home))
                 .route("/v5/pocket/data", web::post().to(data))
-                .route("/v5/pocket/field_detail", web::post().to(field_detail))
-                .route("/v5/pocket/group_detail", web::post().to(group_detail))
+                .route("/v5/pocket/field_detail", web::put().to(field_detail))
+                .route("/v5/pocket/group_detail", web::put().to(group_detail))
                 .route("/v5/pocket/debug", web::post().to(debug))
                 .service(fs::Files::new("/", "./statics").index_file("index.html"))
             })
