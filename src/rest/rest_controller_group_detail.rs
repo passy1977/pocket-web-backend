@@ -14,7 +14,7 @@ impl RestController {
         let mut session = get_session!(data_transport.session_id, "Session not found");
 
         let mut id = "".to_string();
-        let (_id_group, search) = match split_id_group_and_search(&data_transport, &mut id) {
+        let (id_group, search) = match split_id_group_and_search(&data_transport, &mut id) {
             Ok((id_group, search)) => (id_group, search),
             Err(e) => return HttpResponseHelper::internal_server_error()
                 .error(e)
@@ -51,15 +51,13 @@ impl RestController {
         groups.push(group);
         let groups = Ok(groups);
 
-
-
         session.update_timestamp_last_update();
         HttpResponseHelper::ok()
             .path("/group-detail")
             .title(title)
             .session_id(session.session_id)
             .groups(groups)
-            .group_fields(get_list_group_field(group_field_controller, id, &search))
+            .group_fields(get_list_group_field(group_field_controller, if id > 0 { id } else { id_group }, &search))
             .data(search)
             .build()
     }

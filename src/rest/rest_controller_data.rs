@@ -10,7 +10,7 @@ use actix_web::web::Json;
 use actix_web::HttpResponse;
 use crate::models::group_field::GroupField;
 
-fn group_handler(group_controller: *mut pocket_group_controller_t, group_field_controller: *mut pocket_group_field_controller_t, field_controller: *mut pocket_field_controller_t, data_transport: &Json<DataTransport>, _from: &String, _kind: &String, _action: &String, err : &mut Option<&str>) -> bool {
+fn group_handler(group_controller: *mut pocket_group_controller_t, group_field_controller: *mut pocket_group_field_controller_t, field_controller: *mut pocket_field_controller_t, data_transport: &mut Json<DataTransport>, _from: &String, _kind: &String, _action: &String, err : &mut Option<&str>) -> bool {
     if data_transport.groups.is_none() {
         return false;
     }
@@ -23,13 +23,14 @@ fn group_handler(group_controller: *mut pocket_group_controller_t, group_field_c
         return false;
     }
 
-    for mut group in data_transport.groups.clone().unwrap() {
+    let mut new_groups = data_transport.groups.clone().unwrap();
+    for group in &mut new_groups {
 
         let group_c = group.to_pocket_group_t();
 
         let Group { id, server_id: _server_id, deleted, .. } = group;
         match (id, _server_id, deleted) {
-            (id, _server_id @ 0, _deleted @ false) if id <= 0 => {
+            (id, _server_id @ 0, _deleted @ false) if *id <= 0 => {
                 //new
                 unsafe {
                     let rc = pocket_group_controller_persist(group_controller, group_c);
@@ -40,7 +41,7 @@ fn group_handler(group_controller: *mut pocket_group_controller_t, group_field_c
                     }
                 }
             }
-            (id, _, _deleted @ false) if id > 0 => {
+            (id, _, _deleted @ false) if *id > 0 => {
                 //modify
                 unsafe {
                     let rc = pocket_group_controller_persist(group_controller, group_c);
@@ -62,10 +63,12 @@ fn group_handler(group_controller: *mut pocket_group_controller_t, group_field_c
         }
     }
 
+    data_transport.groups = Some(new_groups);
+
     true
 }
 
-fn group_field_handler(group_field_controller: *mut pocket_group_field_controller_t, data_transport: &Json<DataTransport>, _from: &String, _kind: &String, _action: &String, err : &mut Option<&str>) -> bool {
+fn group_field_handler(group_field_controller: *mut pocket_group_field_controller_t, data_transport: &mut Json<DataTransport>, _from: &String, _kind: &String, _action: &String, err : &mut Option<&str>) -> bool {
     if data_transport.group_fields.is_none() {
         return false;
     }
@@ -92,8 +95,8 @@ fn group_field_handler(group_field_controller: *mut pocket_group_field_controlle
         return false;
     };
 
-
-    for mut group_field in data_transport.group_fields.clone().unwrap() {
+    let mut new_group_fields = data_transport.group_fields.clone().unwrap();
+    for ref mut group_field in &mut new_group_fields {
 
         // if from == "group_detail" {
         group_field.group_id = tuple.0;
@@ -104,7 +107,7 @@ fn group_field_handler(group_field_controller: *mut pocket_group_field_controlle
 
         let GroupField { id, server_id: _server_id, deleted, .. } = group_field;
         match (id, _server_id, deleted) {
-            (id, _server_id @ 0, _deleted @ false) if id <= 0 => {
+            (id, _server_id @ 0, _deleted @ false) if *id <= 0 => {
                 //new
                 unsafe {
                     let rc = pocket_group_field_controller_persist(group_field_controller, group_field_c);
@@ -115,7 +118,7 @@ fn group_field_handler(group_field_controller: *mut pocket_group_field_controlle
                     }
                 }
             }
-            (id, _, _deleted @ false) if id > 0 => {
+            (id, _, _deleted @ false) if *id > 0 => {
                 //modify
                 unsafe {
                     let rc = pocket_group_field_controller_persist(group_field_controller, group_field_c);
@@ -136,10 +139,13 @@ fn group_field_handler(group_field_controller: *mut pocket_group_field_controlle
             (_, _, _) => return false
         }
     }
+
+    data_transport.group_fields = Some(new_group_fields);
+
     true
 }
 
-fn field_handler(field_controller: *mut pocket_field_controller_t, data_transport: &Json<DataTransport>, _from: &String, _kind: &String, _action: &String, err : &mut Option<&str>) -> bool {
+fn field_handler(field_controller: *mut pocket_field_controller_t, data_transport: &mut Json<DataTransport>, _from: &String, _kind: &String, _action: &String, err : &mut Option<&str>) -> bool {
     if data_transport.fields.is_none() {
         return false;
     }
@@ -166,8 +172,9 @@ fn field_handler(field_controller: *mut pocket_field_controller_t, data_transpor
     } else {
         return false;
     };
-    
-    for mut field in data_transport.fields.clone().unwrap() {
+
+    let mut new_fields = data_transport.fields.clone().unwrap();
+    for ref mut field in &mut new_fields {
 
         // if from == "group_detail" {
         field.group_id = tuple.0;
@@ -178,7 +185,7 @@ fn field_handler(field_controller: *mut pocket_field_controller_t, data_transpor
 
         let Field { id, server_id: _server_id, deleted, .. } = field;
         match (id, _server_id, deleted) {
-            (id, _server_id @ 0, _deleted @ false) if id <= 0 => {
+            (id, _server_id @ 0, _deleted @ false) if *id <= 0 => {
                 //new
                 unsafe {
                     let rc = pocket_field_controller_persist(field_controller, field_c);
@@ -189,7 +196,7 @@ fn field_handler(field_controller: *mut pocket_field_controller_t, data_transpor
                     }
                 }
             }
-            (id, _, _deleted @ false) if id > 0 => {
+            (id, _, _deleted @ false) if *id > 0 => {
                 //modify
                 unsafe {
                     let rc = pocket_field_controller_persist(field_controller, field_c);
@@ -210,12 +217,15 @@ fn field_handler(field_controller: *mut pocket_field_controller_t, data_transpor
             (_, _, _) => return false
         }
     }
+
+    data_transport.fields = Some(new_fields);
+
     true
 }
 
 impl RestController {
 
-    pub fn data(&self, data_transport: Json<DataTransport>) -> HttpResponse {
+    pub fn data(&self, mut data_transport: Json<DataTransport>) -> HttpResponse {
 
         let mut session = get_session!(data_transport.session_id, "Session not found");
 
@@ -241,15 +251,15 @@ impl RestController {
         let mut err : Option<&str> = None;
 
         if data_transport.groups.is_some() {
-            group_handler(group_controller, group_field_controller, field_controller, &data_transport, &from, &kind, &action, &mut err);
+            group_handler(group_controller, group_field_controller, field_controller, &mut data_transport, &from, &kind, &action, &mut err);
         }
 
         if data_transport.group_fields.is_some() {
-            group_field_handler(group_field_controller, &data_transport, &from, &kind, &action, &mut err);
+            group_field_handler(group_field_controller, &mut data_transport, &from, &kind, &action, &mut err);
         }
 
         if data_transport.fields.is_some() {
-            field_handler(field_controller, &data_transport, &from, &kind, &action, &mut err);
+            field_handler(field_controller, &mut data_transport, &from, &kind, &action, &mut err);
         }
 
         unsafe  {
