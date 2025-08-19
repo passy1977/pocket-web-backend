@@ -197,7 +197,14 @@ pocket_stat_t pocket_group_controller_persist(const pocket_group_controller_t* s
 	{
 		g->icon = "";
 	}
-    g->note = group->note;
+	if(group->note)
+	{
+		g->note = group->note;
+	}
+	else
+	{
+		g->note = "";
+	}
     g->deleted = group->deleted;
     g->timestamp_creation = group->timestamp_creation;
     g->user_id = logged_user->id;

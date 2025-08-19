@@ -76,9 +76,19 @@ pocket_group_t* pocket_group_new_with_params(int64_t id,
     {
         group->icon = strdup(icon);
     }
-    group->note = strdup(note);
-
-    if (!group->title || !group->icon || !group->note)
+    else
+    {
+        group->icon = nullptr;
+    }
+    if(note)
+    {
+        group->note = strdup(note);
+    }
+    else
+    {
+        group->note = nullptr;
+    }
+    if (!group->title)
     {
         pocket_group_free(group);
         return nullptr;

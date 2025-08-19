@@ -9,6 +9,7 @@ use crate::{get_field_controller, get_group_controller, get_group_field_controll
 use actix_web::web::Json;
 use actix_web::HttpResponse;
 use crate::models::group_field::GroupField;
+use crate::utils::are_sets_equal;
 
 fn group_handler(group_controller: *mut pocket_group_controller_t, group_field_controller: *mut pocket_group_field_controller_t, field_controller: *mut pocket_field_controller_t, data_transport: &mut Json<DataTransport>, _from: &String, _kind: &String, _action: &String, err : &mut Option<&str>) -> bool {
     if data_transport.groups.is_none() {
@@ -27,6 +28,9 @@ fn group_handler(group_controller: *mut pocket_group_controller_t, group_field_c
     for group in &mut new_groups {
 
         let group_c = group.to_pocket_group_t();
+        if group_c.is_null() {
+            return false;
+        }
 
         let Group { id, server_id: _server_id, deleted, .. } = group;
         match (id, _server_id, deleted) {
@@ -104,6 +108,9 @@ fn group_field_handler(group_field_controller: *mut pocket_group_field_controlle
         // }
 
         let group_field_c = group_field.to_pocket_group_field_t();
+        if group_field_c.is_null() {
+            return false;
+        }
 
         let GroupField { id, server_id: _server_id, deleted, .. } = group_field;
         match (id, _server_id, deleted) {
@@ -182,6 +189,9 @@ fn field_handler(field_controller: *mut pocket_field_controller_t, data_transpor
         // }
 
         let field_c = field.to_pocket_field_t();
+        if field_c.is_null() {
+            return false;
+        }
 
         let Field { id, server_id: _server_id, deleted, .. } = field;
         match (id, _server_id, deleted) {
@@ -251,7 +261,17 @@ impl RestController {
         let mut err : Option<&str> = None;
 
         if data_transport.groups.is_some() {
+            let original_groups = data_transport.groups.clone().unwrap();
+
             group_handler(group_controller, group_field_controller, field_controller, &mut data_transport, &from, &kind, &action, &mut err);
+
+            if !are_sets_equal(&original_groups, &data_transport.groups.clone().unwrap()) {
+                let tmp = data_transport.groups.clone().unwrap();
+                let Group{id, group_id, .. } = tmp.get(0).unwrap();
+                data_transport.data = Some(format!("{group_id}|{id}").to_string());
+            }
+
+
         }
 
         if data_transport.group_fields.is_some() {

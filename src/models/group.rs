@@ -52,7 +52,7 @@ impl pocket_group_t {
 }
 
 #[warn(dead_code)]
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq, Hash)]
 pub struct Group {
     pub id: i64,
     pub server_id: i64,

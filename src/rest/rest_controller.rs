@@ -82,25 +82,25 @@ pub fn get_list_group_field(group_field_controller: *const pocket_group_field_co
     unsafe {
 
         let mut count = Box::new(0i32);
-        let groups_fields_ptr = pocket_group_field_controller_get_list(
+        let group_fields_ptr = pocket_group_field_controller_get_list(
             group_field_controller,
             group_id,
             CString::new(search.clone()).expect("search::new failed").as_ptr(),
             count.as_mut()
         );
-        if groups_fields_ptr.is_null() {
+        if group_fields_ptr.is_null() {
             return Err("Groups it's null")
         }
 
         for i in 0i32..*count {
-            let group_field_ptr = *groups_fields_ptr.offset(i as isize);
+            let group_field_ptr = *group_fields_ptr.offset(i as isize);
             if !group_field_ptr.is_null() {
                 let pocket_group_field: pocket_group_field_t = std::ptr::read(group_field_ptr);
                 ret.push(pocket_group_field.to_group_field());
             }
         }
 
-        pocket_group_field_controller_free_list(groups_fields_ptr, *count);
+        pocket_group_field_controller_free_list(group_fields_ptr, *count);
     }
 
     Ok(ret)

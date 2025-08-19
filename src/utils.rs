@@ -1,6 +1,6 @@
 use std::{error, fmt};
 use std::ffi::{CStr, CString};
-
+use std::hash::Hash;
 use crate::bindings::{free, pocket_aes_encrypt, pocket_sha512_encrypt, pocket_t};
 
 pub(crate) type Result<T, E = &'static str> = std::result::Result<T, E>;
@@ -83,4 +83,15 @@ pub fn sha512_encrypt(str: &String) -> String {
 
         ret
     }
+}
+
+pub fn are_sets_equal<T>(a: &[T], b: &[T]) -> bool
+where T: PartialEq + Eq + Hash + Clone
+{
+    use std::collections::HashSet;
+
+    let set_a: HashSet<_> = a.iter().cloned().collect();
+    let set_b: HashSet<_> = b.iter().cloned().collect();
+
+    set_a == set_b
 }
