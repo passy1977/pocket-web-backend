@@ -68,6 +68,34 @@ impl Stats {
             _ => Error
         }
     }
+
+    pub(crate) fn to_string(status : pocket_stat_t) -> &'static str {
+        match status {
+            bindings::pocket_stat_t_READY => "Ready",
+            bindings::pocket_stat_t_BUSY => "Busy",
+            bindings::pocket_stat_t_USER_NOT_FOUND => "UserNotFound",
+            bindings::pocket_stat_t_WRONG_SIZE_TOKEN => "WrongSizeToken",
+            bindings::pocket_stat_t_DEVICE_ID_NOT_MATCH => "DeviceIdNotMatch",
+            bindings::pocket_stat_t_DEVICE_NOT_FOUND => "DeviceNotFound",
+            bindings::pocket_stat_t_SECRET_NOT_MATCH => "SecretNotMatch",
+            bindings::pocket_stat_t_PASSWD_ERROR => "PasswdError",
+            bindings::pocket_stat_t_TIMESTAMP_LAST_UPDATE_NOT_MATCH => "TimestampLastUpdateNotMatch",
+            bindings::pocket_stat_t_CACHE_NOT_FOND => "CacheNotFound",
+            bindings::pocket_stat_t_SECRET_EMPTY => "SecretEmpty",
+            bindings::pocket_stat_t_TIMESTAMP_LAST_NOT_PARSABLE => "TimestampLastNotParsable",
+            bindings::pocket_stat_t_ERROR => "Error",
+            bindings::pocket_stat_t_JSON_PARSING_ERROR => "JsonParsingError",
+            bindings::pocket_stat_t_DB_GROUP_ERROR => "DbGroupError",
+            bindings::pocket_stat_t_DB_GROUP_FIELD_ERROR=> "DbGroupFieldError",
+            bindings::pocket_stat_t_DB_FIELD_ERROR => "DbFieldError",
+            bindings::pocket_stat_t_DB_GENERIC_ERROR => "DbGenericError",
+            bindings::pocket_stat_t_NO_NETWORK => "NoNetwork",
+            bindings::pocket_stat_t_MAP_ID_ERROR => "MapIdError",
+            bindings::pocket_stat_t_LOCAL_DEVICE_ID_NOT_MATCH => "LocalDeviceIdNotMatch",
+            bindings::pocket_stat_t_OK => "Ok",
+            _ => "Unhandled error"
+        }
+    }
 }
 
 impl PartialEq<pocket_stat_t> for Stats {

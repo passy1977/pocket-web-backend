@@ -286,7 +286,7 @@ impl RestController {
         unsafe  {
             let rc = pocket_send_data(session.pocket);
             if rc != pocket_stat_t_OK && rc != pocket_stat_t_READY {
-                println!("Impossible to send data rc:{rc} {}", Stats::from(rc));
+                println!("Impossible to send data rc:{}({rc})", Stats::to_string(rc));
             }
         }
 
