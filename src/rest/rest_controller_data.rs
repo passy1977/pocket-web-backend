@@ -8,6 +8,7 @@ use crate::services::session::Sessions;
 use crate::{get_field_controller, get_group_controller, get_group_field_controller, get_session};
 use actix_web::web::Json;
 use actix_web::HttpResponse;
+use crate::constants::Stats;
 use crate::models::group_field::GroupField;
 use crate::utils::are_sets_equal;
 
@@ -285,7 +286,7 @@ impl RestController {
         unsafe  {
             let rc = pocket_send_data(session.pocket);
             if rc != pocket_stat_t_OK && rc != pocket_stat_t_READY {
-                println!("Impossible to send data rc:{rc}");
+                println!("Impossible to send data rc:{rc} {}", Stats::from(rc));
             }
         }
 
