@@ -160,9 +160,13 @@ pocket_stat_t pocket_login(pocket_t* self, const char* email, const char* passwd
 
     auto session = static_cast<class session*>(self->session);
 
-
+#ifdef SYNCHRONIZER_TIMEOUT
     session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
+#endif
+
+#ifdef SYNCHRONIZER_CONNECT_TIMEOUT
     session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
+#endif
     if(auto&& user = session->login(email, passwd, POCKET_ENABLE_AES); user.has_value())
     {
         session->send_data(user);
@@ -213,8 +217,13 @@ pocket_stat_t pocket_send_data(pocket_t* self)  try
     auto session = static_cast<class session*>(self->session);
     const auto logged_user = convert(static_cast<pocket_user_t*>(self->user));
 
+#ifdef SYNCHRONIZER_TIMEOUT
     session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
+#endif
+
+#ifdef SYNCHRONIZER_CONNECT_TIMEOUT
     session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
+#endif
     if(auto&& user = session->send_data(logged_user); user.has_value())
     {
         pocket_user_free(static_cast<pocket_user_t*>(self->user));

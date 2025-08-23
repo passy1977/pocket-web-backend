@@ -115,8 +115,8 @@ user::opt_ptr convert(const pocket_user_t* pocket_user)
 
     return {make_unique<struct user>(
             pocket_user->id,
-            pocket_user->email,
             pocket_user->name,
+            pocket_user->email,
             pocket_user->passwd,
             static_cast<user::stat>(pocket_user->status),
             static_cast<int64_t>(pocket_user->timestamp_last_update)
