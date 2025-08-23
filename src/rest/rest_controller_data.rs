@@ -181,13 +181,17 @@ fn field_handler(field_controller: *mut pocket_field_controller_t, data_transpor
         return false;
     };
 
+    let mut idx = 0;
     let mut new_fields = data_transport.fields.clone().unwrap();
     for ref mut field in &mut new_fields {
 
-        // if from == "group_detail" {
-        field.group_id = tuple.0;
-        field.server_group_id = tuple.1;
-        // }
+        if let Some(group_field) = data_transport.group_fields.clone().unwrap().get(idx) {
+            field.group_field_id = group_field.id;
+            field.server_group_field_id= group_field.server_id;
+        } else {
+            return false;
+        }
+
 
         let field_c = field.to_pocket_field_t();
         if field_c.is_null() {
@@ -227,6 +231,7 @@ fn field_handler(field_controller: *mut pocket_field_controller_t, data_transpor
             }
             (_, _, _) => return false
         }
+        idx += 1;
     }
 
     data_transport.fields = Some(new_fields);
