@@ -13,7 +13,7 @@ pub struct RestController {
     pub(super) data: Data
 }
 
-pub fn split_id_group_and_search(data_transport: &Json<DataTransport>, other: &mut String) -> crate::utils::Result<(i64, String)> {
+pub fn split_group_id_and_search(data_transport: &Json<DataTransport>, other: &mut String) -> crate::utils::Result<(i64, String)> {
     match &data_transport.data {
         None => Err("No data send"),
         Some(data) => {

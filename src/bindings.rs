@@ -7,6 +7,8 @@ pub struct __BindgenComplex<T> {
     pub im: T,
 }
 pub const DEVICE_AES_CBC_IV: &[u8; 17] = b"1234567890123456\0";
+pub const SYNCHRONIZER_TIMEOUT: u32 = 5;
+pub const SYNCHRONIZER_CONNECT_TIMEOUT: u32 = 10;
 pub const _STDINT_H: u32 = 1;
 pub const _FEATURES_H: u32 = 1;
 pub const __GLIBC_USE_ISOC2Y: u32 = 0;

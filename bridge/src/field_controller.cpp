@@ -189,13 +189,13 @@ catch(const runtime_error& e)
     return ERROR;
 }
 
-int32_t pocket_field_controller_size(const pocket_field_controller_t* self, pocket_stat_t group_id)
+int32_t pocket_field_controller_size(const pocket_field_controller_t* self, int64_t group_id)
 {
 
     return 0;
 }
 
-pocket_field_t* pocket_field_controller_get(const pocket_field_controller_t* self, pocket_stat_t group_id)
+pocket_field_t* pocket_field_controller_get(const pocket_field_controller_t* self, int64_t group_id)
 {
 
     return nullptr;

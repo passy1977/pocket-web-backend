@@ -1,7 +1,7 @@
 use crate::bindings::{pocket_group_controller_get, pocket_group_controller_init, pocket_group_controller_new, pocket_group_field_controller_init, pocket_group_field_controller_new};
 use crate::models::group::{Group, Groups};
 use crate::models::data_transport::DataTransport;
-use crate::rest::rest_controller::{get_list_group_field, split_id_group_and_search, RestController};
+use crate::rest::rest_controller::{get_list_group_field, split_group_id_and_search, RestController};
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;
 use crate::{get_group_controller, get_group_field_controller, get_session};
@@ -14,7 +14,7 @@ impl RestController {
         let mut session = get_session!(data_transport.session_id, "Session not found");
 
         let mut id = "".to_string();
-        let (id_group, search) = match split_id_group_and_search(&data_transport, &mut id) {
+        let (group_id, search) = match split_group_id_and_search(&data_transport, &mut id) {
             Ok((id_group, search)) => (id_group, search),
             Err(e) => return HttpResponseHelper::internal_server_error()
                 .error(e)
@@ -57,7 +57,7 @@ impl RestController {
             .title(title)
             .session_id(session.session_id)
             .groups(groups)
-            .group_fields(get_list_group_field(group_field_controller, if id > 0 { id } else { id_group }, &search))
+            .group_fields(get_list_group_field(group_field_controller, if id > 0 { id } else { group_id }, &search))
             .data(search)
             .build()
     }
