@@ -192,21 +192,25 @@ catch(const runtime_error& e)
 
 pocket_stat_t pocket_logout(pocket_t* self, bool soft_logout)
 {
+    //TODO: not impl
     return OK;
 }
 
 pocket_stat_t pocket_change_passwd(pocket_t* self, const char* full_path_file, const char* new_passwd)
 {
+    //TODO: not impl
     return OK;
 }
 
 bool pocket_copy_group(pocket_t* self, int64_t group_id_src, int64_t group_id_dst, bool move)
 {
+    //TODO: not impl
     return true;
 }
 
 bool pocket_copy_field(pocket_t* self, int64_t field_id_src, int64_t group_id_dst, bool move)
 {
+    //TODO: not impl
     return OK;
 }
 

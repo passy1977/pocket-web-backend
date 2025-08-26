@@ -678,12 +678,6 @@ unsafe extern "C" {
     ) -> pocket_stat_t;
 }
 unsafe extern "C" {
-    pub fn pocket_field_controller_size(
-        self_: *const pocket_field_controller_t,
-        group_id: i64,
-    ) -> i32;
-}
-unsafe extern "C" {
     pub fn pocket_field_controller_get(
         self_: *const pocket_field_controller_t,
         group_id: i64,

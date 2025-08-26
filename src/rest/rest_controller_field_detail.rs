@@ -1,7 +1,7 @@
-use crate::bindings::pocket_field_controller_new;
+use crate::bindings::{pocket_field_controller_new, pocket_field_free};
 use crate::bindings::{pocket_field_controller_get, pocket_field_controller_init};
 use crate::models::data_transport::DataTransport;
-use crate::models::field::{Field, Fields};
+use crate::models::field::Fields;
 use crate::rest::rest_controller::{split_group_id_and_search, RestController};
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;
@@ -35,9 +35,13 @@ impl RestController {
         let field = unsafe {
             let field_ptr = pocket_field_controller_get(field_controller, id);
             if field_ptr.is_null() {
-                Field::new()
+                return HttpResponseHelper::internal_server_error()
+                .error("Field not found".to_string())
+                .build()
             } else {
-                (*field_ptr).to_field()
+                let ret = (*field_ptr).to_field();
+                pocket_field_free(field_ptr);
+                ret
             }
         };
 

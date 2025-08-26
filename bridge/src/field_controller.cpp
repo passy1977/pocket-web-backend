@@ -189,17 +189,25 @@ catch(const runtime_error& e)
     return ERROR;
 }
 
-int32_t pocket_field_controller_size(const pocket_field_controller_t* self, int64_t group_id)
+pocket_field_t* pocket_field_controller_get(const pocket_field_controller_t* self, int64_t id) try
 {
+    if (!self) return nullptr;
 
-    return 0;
-}
+    const auto view_field = static_cast<view<struct field> *>(self->view_field);
 
-pocket_field_t* pocket_field_controller_get(const pocket_field_controller_t* self, int64_t group_id)
-{
-
+    auto&&field_opt = view_field->get(id);
+    if(field_opt)
+    {
+        return convert(*field_opt);
+    }
     return nullptr;
 }
+catch(const runtime_error& e)
+{
+    error(APP_TAG, e.what());
+    return nullptr;
+}
+
 
 int32_t pocket_field_controller_count_child(const pocket_field_controller_t* self, const pocket_group_t* group) try
 {

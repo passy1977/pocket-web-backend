@@ -175,24 +175,33 @@ fn field_handler(field_controller: *mut pocket_field_controller_t, data_transpor
     //     };
     // }
 
-    let tuple= if let Some(group) = data_transport.groups.clone().unwrap().get(0) {
-        (group.id, group.server_id)
+    
+    let tuple= if data_transport.groups.is_some() {
+        if let Some(group) = data_transport.groups.clone().unwrap().get(0) {
+            Some((group.id, group.server_id))
+        } else {
+            None
+        }
     } else {
-        return false;
+        None
     };
 
     let mut idx = 0;
     let mut new_fields = data_transport.fields.clone().unwrap();
     for ref mut field in &mut new_fields {
 
-        field.group_id = tuple.0;
-        field.server_group_id = tuple.1;
-
-        if let Some(group_field) = data_transport.group_fields.clone().unwrap().get(idx) {
-            field.group_field_id = group_field.id;
-            field.server_group_field_id= group_field.server_id;
-        } else {
-            return false;
+        if let Some((group_id, server_group_id)) = tuple {
+            field.group_id = group_id;
+            field.server_group_id = server_group_id;
+        }
+        
+        if data_transport.group_fields.is_some() {
+            if let Some(group_field) = data_transport.group_fields.clone().unwrap().get(idx) {
+                field.group_field_id = group_field.id;
+                field.server_group_field_id= group_field.server_id;
+            } else {
+                return false;
+            }
         }
 
 

@@ -50,7 +50,6 @@ pocket_field_t** pocket_field_controller_get_list(const pocket_field_controller_
 void pocket_field_controller_free_list(pocket_field_t** list, int count);
 pocket_stat_t pocket_field_controller_persist(const pocket_field_controller_t* self, pocket_field_t* field);
 pocket_stat_t pocket_field_controller_del(const pocket_field_controller_t* self, const pocket_field_t* field);
-int32_t pocket_field_controller_size(const pocket_field_controller_t* self, int64_t group_id);
 pocket_field_t* pocket_field_controller_get(const pocket_field_controller_t* self, int64_t group_id);
 int32_t pocket_field_controller_count_child(const pocket_field_controller_t* self, const pocket_group_t* field);
 

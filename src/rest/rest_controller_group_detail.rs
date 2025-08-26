@@ -1,5 +1,5 @@
-use crate::bindings::{pocket_group_controller_get, pocket_group_controller_init, pocket_group_controller_new, pocket_group_field_controller_init, pocket_group_field_controller_new};
-use crate::models::group::{Group, Groups};
+use crate::bindings::{pocket_group_free, pocket_group_controller_get, pocket_group_controller_init, pocket_group_controller_new, pocket_group_field_controller_init, pocket_group_field_controller_new};
+use crate::models::group::Groups;
 use crate::models::data_transport::DataTransport;
 use crate::rest::rest_controller::{get_list_group_field, split_group_id_and_search, RestController};
 use crate::services::http_response_helper::HttpResponseHelper;
@@ -35,9 +35,13 @@ impl RestController {
         let group = unsafe {
             let group_ptr = pocket_group_controller_get(group_controller, id);
             if group_ptr.is_null() {
-                Group::new()
+                return HttpResponseHelper::internal_server_error()
+                .error("Group not found".to_string())
+                .build()
             } else {
-                (*group_ptr).to_group()
+                let ret = (*group_ptr).to_group();
+                pocket_group_free(group_ptr);
+                ret
             }
         };
 
