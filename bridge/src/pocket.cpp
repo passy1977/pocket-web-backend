@@ -153,7 +153,7 @@ catch (const runtime_error& e)
 
 pocket_stat_t pocket_login(pocket_t* self, const char* email, const char* passwd) try
 {
-    if(email == nullptr || passwd == nullptr)
+    if(self == nullptr && email == nullptr || passwd == nullptr)
     {
         return ERROR;
     }
@@ -196,10 +196,50 @@ pocket_stat_t pocket_logout(pocket_t* self, bool soft_logout)
     return OK;
 }
 
-pocket_stat_t pocket_change_passwd(pocket_t* self, const char* full_path_file, const char* new_passwd)
+pocket_stat_t pocket_change_passwd(pocket_t* self, const char* path_file, const char* config_json, const char* new_passwd) try
 {
-    //TODO: not impl
-    return OK;
+    if(self == nullptr || new_passwd == nullptr)
+    {
+        return ERROR;
+    }
+
+    auto session = static_cast<class session*>(self->session);
+
+    session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
+    session->set_synchronizer_connect_timeout(0);
+    if( auto&& user_opt = session->change_passwd(convert(static_cast<pocket_user_t*>(self->user)), path_file, new_passwd, POCKET_ENABLE_AES); user_opt.has_value())
+    {
+        self->user = convert(user_opt);
+
+        if(self->aes)
+        {
+            delete static_cast<class aes*>(self->aes);
+            self->aes = nullptr;
+        }
+        self->aes = new(nothrow) class aes(DEVICE_AES_CBC_IV, new_passwd);
+        if(self->aes == nullptr)
+        {
+            if(self->session)
+            {
+                delete static_cast<class session*>(self->session);
+                self->session = nullptr;
+            }
+            error(APP_TAG, "Impossible alloc aes");
+            return ERROR;
+        }
+
+        return pocket_logout(self, true);
+    }
+    else
+    {
+        return static_cast<pocket_stat_t>(session->get_status());
+    }
+}
+catch(const runtime_error& e)
+{
+    auto session = static_cast<class session*>(self->session);
+    error(APP_TAG, e.what());
+    return static_cast<pocket_stat_t>(session->get_status());
 }
 
 bool pocket_copy_group(pocket_t* self, int64_t group_id_src, int64_t group_id_dst, bool move)

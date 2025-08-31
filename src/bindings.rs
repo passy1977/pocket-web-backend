@@ -582,7 +582,8 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn pocket_change_passwd(
         self_: *mut pocket_t,
-        full_path_file: *const ::std::os::raw::c_char,
+        path_file: *const ::std::os::raw::c_char,
+        config_json: *const ::std::os::raw::c_char,
         new_passwd: *const ::std::os::raw::c_char,
     ) -> pocket_stat_t;
 }

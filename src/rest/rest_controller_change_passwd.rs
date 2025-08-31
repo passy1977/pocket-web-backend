@@ -1,10 +1,10 @@
-use crate::models::data_transport::{self, DataTransport};
+use crate::models::data_transport::DataTransport;
 use crate::rest::rest_controller::RestController;
 use crate::services::http_response_helper::HttpResponseHelper;
+use crate::services::session::Sessions;
+use crate::get_session;
 use actix_web::web::Json;
 use actix_web::HttpResponse;
-use crate::{get_session};
-use crate::services::session::Sessions;
 
 impl RestController {
 
