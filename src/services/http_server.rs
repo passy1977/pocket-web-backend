@@ -27,7 +27,6 @@ pub async fn group_detail(data_transport: web::Json<DataTransport>) -> impl Resp
     RestController::share().group_detail(data_transport)
 }
 
-
 pub async fn debug(data_transport: web::Json<DataTransport>) -> impl Responder {
     RestController::share().debug(data_transport)
 }
@@ -36,10 +35,28 @@ pub async fn data(data_transport: web::Json<DataTransport>) -> impl Responder {
     RestController::share().data(data_transport)
 }
 
+pub async fn change_passwd(data_transport: web::Json<DataTransport>) -> impl Responder {
+    RestController::share().change_passwd(data_transport)
+}
 
+pub async fn close_session(data_transport: web::Json<DataTransport>) -> impl Responder {
+    RestController::share().close_session(data_transport)
+}
+
+pub async fn export_data(data_transport: web::Json<DataTransport>) -> impl Responder {
+    RestController::share().export_data(data_transport)
+}
+
+pub async fn import_data(data_transport: web::Json<DataTransport>) -> impl Responder {
+    RestController::share().import_data(data_transport)
+}
+
+pub async fn logout(data_transport: web::Json<DataTransport>) -> impl Responder {
+    RestController::share().logout(data_transport)
+}
 
 pub mod server {
-    use crate::services::http_server::{debug, field_detail, group_detail, hello, login, home, registration, data};
+    use crate::services::http_server::{debug, field_detail, group_detail, hello, login, home, registration, data, change_passwd, close_session, export_data, import_data, logout};
     use actix_cors::Cors;
     use actix_files as fs;
     use actix_web::{web, App, HttpServer};
@@ -64,13 +81,16 @@ pub mod server {
                 .route("/v5/pocket/field_detail", web::put().to(field_detail))
                 .route("/v5/pocket/group_detail", web::put().to(group_detail))
                 .route("/v5/pocket/debug", web::post().to(debug))
+                .route("/v5/pocket/change_passwd", web::put().to(change_passwd))
+                .route("/v5/pocket/close_session", web::put().to(close_session))
+                .route("/v5/pocket/export_data", web::put().to(export_data))
+                .route("/v5/pocket/import_data", web::put().to(import_data))
+                .route("/v5/pocket/logout", web::put().to(logout))
                 .service(fs::Files::new("/", "./statics").index_file("index.html"))
             })
             .bind((ip, port))?
             .run()
             .await
-        
-        
     }
 }
 
