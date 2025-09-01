@@ -190,10 +190,32 @@ catch(const runtime_error& e)
     return static_cast<pocket_stat_t>(static_cast<session*>(self->session)->get_status());
 }
 
-pocket_stat_t pocket_logout(pocket_t* self, bool soft_logout)
+pocket_stat_t pocket_logout(pocket_t* self, bool soft_logout) try
 {
-    //TODO: not impl
+    auto session = static_cast<class session*>(self->session);
+    const auto user = convert(static_cast<pocket_user_t*>(self->user));
+
+    session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
+    session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
+
+    if(!soft_logout)
+    {
+        // [[NSUserDefaults standardUserDefaults] removeObjectForKey: KEY_DEVICE];
+        // [[NSUserDefaults standardUserDefaults] synchronize];
+        return session->logout(user) ? OK : static_cast<pocket_stat_t>(session->get_status());
+    }
+    else
+    {
+        return session->soft_logout(user) ? OK : static_cast<pocket_stat_t>(session->get_status());
+    }
+
     return OK;
+}
+catch(const runtime_error& e)
+{
+    auto session = static_cast<class session*>(self->session);
+    error(APP_TAG, e.what());
+    return static_cast<pocket_stat_t>(session->get_status());
 }
 
 pocket_stat_t pocket_change_passwd(pocket_t* self, const char* path_file, const char* config_json, const char* new_passwd) try
@@ -242,16 +264,76 @@ catch(const runtime_error& e)
     return static_cast<pocket_stat_t>(session->get_status());
 }
 
-bool pocket_copy_group(pocket_t* self, int64_t group_id_src, int64_t group_id_dst, bool move)
+bool pocket_copy_group(pocket_t* self, int64_t group_id_src, int64_t group_id_dst, bool move) try
 {
-    //TODO: not impl
-    return true;
+    if(self == nullptr)
+    {
+        return ERROR;
+    }
+
+    auto session = static_cast<class session*>(self->session);
+    const auto user = convert(static_cast<pocket_user_t*>(self->user));
+
+    bool ret = session->copy_group(user, static_cast<int64_t>(group_id_src), static_cast<int64_t>(group_id_dst), move);
+    if(ret)
+    {
+        if(auto u = session->send_data(user); u.has_value())
+        {
+            if (self->user)
+            {
+                pocket_user_free(static_cast<pocket_user_t*>(self->user));
+            }
+            self->user = convert(user);
+        }
+        else
+        {
+            ret = false;
+        }
+    }
+    
+    return ret;
+}
+catch(const runtime_error& e)
+{
+    error(APP_TAG, e.what());
+    return false;
 }
 
-bool pocket_copy_field(pocket_t* self, int64_t field_id_src, int64_t group_id_dst, bool move)
+
+bool pocket_copy_field(pocket_t* self, int64_t field_id_src, int64_t group_id_dst, bool move) try
 {
-    //TODO: not impl
-    return OK;
+        if(self == nullptr)
+    {
+        return ERROR;
+    }
+
+    auto session = static_cast<class session*>(self->session);
+    const auto user = convert(static_cast<pocket_user_t*>(self->user));
+
+    bool ret = session->copy_field(user, static_cast<int64_t>(field_id_src), static_cast<int64_t>(group_id_dst), move);
+    if(ret)
+    {
+        if(auto u = session->send_data(user); u.has_value())
+        {
+            if (self->user)
+            {
+                pocket_user_free(static_cast<pocket_user_t*>(self->user));
+            }
+            self->user = convert(user);
+        }
+        else
+        {
+            ret = false;
+        }
+    }
+    
+    return ret;
+
+}
+catch(const runtime_error& e)
+{
+    error(APP_TAG, e.what());
+    return false;
 }
 
 pocket_stat_t pocket_send_data(pocket_t* self)  try
