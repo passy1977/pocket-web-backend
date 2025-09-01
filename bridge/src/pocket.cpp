@@ -190,7 +190,7 @@ catch(const runtime_error& e)
     return static_cast<pocket_stat_t>(static_cast<session*>(self->session)->get_status());
 }
 
-pocket_stat_t pocket_logout(pocket_t* self, bool soft_logout) try
+pocket_stat_t pocket_logout(const pocket_t *self, bool soft_logout) try
 {
     auto session = static_cast<class session*>(self->session);
     const auto user = convert(static_cast<pocket_user_t*>(self->user));
@@ -218,7 +218,7 @@ catch(const runtime_error& e)
     return static_cast<pocket_stat_t>(session->get_status());
 }
 
-pocket_stat_t pocket_change_passwd(pocket_t* self, const char* path_file, const char* config_json, const char* new_passwd) try
+pocket_stat_t pocket_change_passwd(pocket_t* self, const char* full_path_file, const char* config_json, const char* new_passwd) try
 {
     if(self == nullptr || new_passwd == nullptr)
     {
@@ -229,7 +229,7 @@ pocket_stat_t pocket_change_passwd(pocket_t* self, const char* path_file, const 
 
     session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
     session->set_synchronizer_connect_timeout(0);
-    if( auto&& user_opt = session->change_passwd(convert(static_cast<pocket_user_t*>(self->user)), path_file, new_passwd, POCKET_ENABLE_AES); user_opt.has_value())
+    if( auto&& user_opt = session->change_passwd(convert(static_cast<pocket_user_t*>(self->user)), full_path_file, new_passwd, POCKET_ENABLE_AES); user_opt.has_value())
     {
         self->user = convert(user_opt);
 
@@ -365,7 +365,7 @@ catch(const runtime_error& e)
 }
 
 
-const char* pocket_aes_decrypt(pocket_t* self, const char encrypted[])
+const char* pocket_aes_decrypt(const pocket_t* self, const char encrypted[])
 {
     if (self == nullptr || encrypted == nullptr || self->aes == nullptr)
     {
@@ -385,7 +385,7 @@ const char* pocket_aes_decrypt(pocket_t* self, const char encrypted[])
     return ret;
 }
 
-const char* pocket_aes_encrypt(pocket_t* self, const char plain[])
+const char* pocket_aes_encrypt(const pocket_t* self, const char plain[])
 {
     if (self == nullptr || plain == nullptr || self->aes == nullptr)
     {

@@ -577,12 +577,12 @@ unsafe extern "C" {
     ) -> pocket_stat_t;
 }
 unsafe extern "C" {
-    pub fn pocket_logout(self_: *mut pocket_t, soft_logout: bool) -> pocket_stat_t;
+    pub fn pocket_logout(self_: *const pocket_t, soft_logout: bool) -> pocket_stat_t;
 }
 unsafe extern "C" {
     pub fn pocket_change_passwd(
         self_: *mut pocket_t,
-        path_file: *const ::std::os::raw::c_char,
+        full_path_file: *const ::std::os::raw::c_char,
         config_json: *const ::std::os::raw::c_char,
         new_passwd: *const ::std::os::raw::c_char,
     ) -> pocket_stat_t;
@@ -608,13 +608,13 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn pocket_aes_decrypt(
-        self_: *mut pocket_t,
+        self_: *const pocket_t,
         encrypted: *const ::std::os::raw::c_char,
     ) -> *const ::std::os::raw::c_char;
 }
 unsafe extern "C" {
     pub fn pocket_aes_encrypt(
-        self_: *mut pocket_t,
+        self_: *const pocket_t,
         plain: *const ::std::os::raw::c_char,
     ) -> *const ::std::os::raw::c_char;
 }

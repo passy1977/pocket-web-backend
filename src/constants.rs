@@ -12,6 +12,7 @@ pub(crate) mod conf {
 pub(crate)  mod data {
     pub const DATA_FOLDER : &str = ".pocket-web-backend";
     pub const DATA_FILE : &str = "data.json";
+    pub const EXPORT_DATA_CHANGE_PASSWD : &str = "export_data_change_passwd.json";
 }
 
 #[derive(Clone, Copy)]

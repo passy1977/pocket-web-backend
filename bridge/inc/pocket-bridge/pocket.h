@@ -43,15 +43,15 @@ void pocket_free(pocket_t* pocket);
 bool pocket_initialize_aes(pocket_t* self, const char* passwd);
 bool pocket_initialize(pocket_t* self, const char* base_path, const char* config_json, bool encrypted, const char* passwd);
 pocket_stat_t pocket_login(pocket_t* self, const char* email, const char* passwd);
-pocket_stat_t pocket_logout(pocket_t* self, bool soft_logout);
-pocket_stat_t pocket_change_passwd(pocket_t* self, const char* path_file, const char* config_json, const char* new_passwd);
+pocket_stat_t pocket_logout(const pocket_t *self, bool soft_logout);
+pocket_stat_t pocket_change_passwd(pocket_t* self, const char* full_path_file, const char* config_json, const char* new_passwd);
 bool pocket_copy_group(pocket_t* self, int64_t group_id_src, int64_t group_id_dst, bool move);
 bool pocket_copy_field(pocket_t* self, int64_t field_id_src, int64_t group_id_dst, bool move);
 pocket_stat_t pocket_send_data(pocket_t* self);
 
 
-const char* pocket_aes_decrypt(pocket_t* self, const char encrypted[]);
-const char* pocket_aes_encrypt(pocket_t* self, const char plain[]);
+const char* pocket_aes_decrypt(const pocket_t* self, const char encrypted[]);
+const char* pocket_aes_encrypt(const pocket_t* self, const char plain[]);
 const char* pocket_sha512_encrypt(const char str[]);
 
 #ifdef __cplusplus
