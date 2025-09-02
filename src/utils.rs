@@ -1,7 +1,7 @@
 use std::{error, fmt};
 use std::ffi::{CStr, CString};
 use std::hash::Hash;
-use crate::bindings::{free, pocket_aes_encrypt, pocket_sha512_encrypt, pocket_t};
+use crate::bindings::{free, pocket_aes_decrypt, pocket_aes_encrypt, pocket_sha512_encrypt, pocket_t};
 
 pub(crate) type Result<T, E = &'static str> = std::result::Result<T, E>;
 
@@ -65,6 +65,24 @@ pub fn aes_encrypt(pocket: *mut pocket_t, str: &String) -> String {
     }
 }
 
+pub fn aes_decrypt(pocket: *mut pocket_t, encrypted: &String) -> String {
+    unsafe {
+        let c_encrypted = CString::new(encrypted.to_string()).expect("CString::new failed");
+        let result_ptr = pocket_aes_decrypt(pocket, c_encrypted.as_ptr());
+
+        if result_ptr.is_null() {
+            panic!("pocket_aes_encrypt returned null");
+        }
+
+        let c_str = CStr::from_ptr(result_ptr);
+
+        let ret = c_str.to_string_lossy().into_owned().clone();
+
+        free(result_ptr.cast_mut().cast());
+
+        ret
+    }
+}
 
 pub fn sha512_encrypt(str: &String) -> String {
     unsafe {

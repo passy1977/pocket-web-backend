@@ -54,7 +54,7 @@ impl RestController {
         fields.push(field);
         let fields: crate::utils::Result<Fields> = Ok(fields);
 
-
+        session.update_timestamp_last_update();
         HttpResponseHelper::ok()
             .path("/field-detail")
             .title(title)

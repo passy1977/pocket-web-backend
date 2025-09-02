@@ -1,23 +1,24 @@
-use std::ffi::{CStr, CString};
+use std::ffi::CString;
 use std::path::MAIN_SEPARATOR;
-use std::str::FromStr;
-use crate::bindings::pocket_change_passwd;
+use crate::bindings::{pocket_change_passwd, pocket_user_t};
 use crate::constants::data::EXPORT_DATA_CHANGE_PASSWD;
 use crate::models::data_transport::DataTransport;
 use crate::rest::rest_controller::RestController;
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;
 use crate::get_session;
+use crate::utils::aes_decrypt;
 use actix_web::web::Json;
 use actix_web::HttpResponse;
 
 impl RestController {
 
     pub fn change_passwd(&self, data_transport: Json<DataTransport>) -> HttpResponse {
-        let session = get_session!(data_transport.session_id, "Session not found");
+        let mut session = get_session!(data_transport.session_id, "Session not found");
 
         if let Some(data) = &data_transport.data {
             if data.is_empty() {
+                session.update_timestamp_last_update();
                 HttpResponseHelper::ok()
                     .path("/change-passwd")
                     .title("Change password")
@@ -25,10 +26,29 @@ impl RestController {
                     .build()
             } else {
 
+                let pwd_split: Vec<&str> = data.split("|").collect();
+
+                if pwd_split.len() < 2 {
+                    return HttpResponseHelper::not_acceptable()
+                        .session_id(session.session_id)
+                        .error("passwd and newPasswd are mandatory")
+                        .build()
+                }
+                
+                let user = unsafe {(*((*session.pocket).user as *const pocket_user_t)).to_user() };
+
+                if user.passwd.trim() != pwd_split[0].trim() {
+                    return HttpResponseHelper::forbidden()
+                        .session_id(session.session_id)
+                        .error("passwd and old passwd don't match")
+                        .build()
+                }
+
+
                 let mut full_path_file = match self.data.dir_path.clone().as_path().to_str() {
                     None => return HttpResponseHelper::not_acceptable()
                         .session_id(session.session_id)
-                        .error("data_dit_path not found")
+                        .error("data_dir_path not found")
                         .build(),
                     Some(data_dir_path) => data_dir_path.to_string()
                 };
@@ -36,22 +56,29 @@ impl RestController {
                 full_path_file.push_str(EXPORT_DATA_CHANGE_PASSWD);
 
 
-                let config_json = "{}".to_string();
+                if let Ok(config_json) = &self.data.load_config_json(&user.email) {
+                    unsafe { 
+
+                        let config_json = aes_decrypt(session.pocket, config_json);
+
+                        pocket_change_passwd(session.pocket
+                        , CString::new(full_path_file).unwrap().as_ptr()
+                        , CString::new(config_json.as_str()).unwrap().as_ptr()
+                        , CString::new(data.as_str()).expect("").as_ptr()
+                    ) };
+                } else {
+                    return HttpResponseHelper::not_acceptable()
+                        .session_id(session.session_id)
+                        .error("config_json cannot be load")
+                        .build()
+                };
+
+       
 
 
-                let full_path_file = CString::(full_path_file).as_ptr();
-                let config_json = String::from_str(config_json.as_str()).unwrap().as_ptr();
-                let data = String::from_str(data).unwrap().as_ptr();
 
-                // pocket_change_passwd(session.pocket
-                //     , String::from_str(full_path_file).as_ptr()
-                //     , String::from_str(config_json)
-                //     , String::from_str(data)
-                // );
-
-                HttpResponseHelper::internal_server_error()
-                    .error("Todo")
-                    .build() 
+                session.update_timestamp_last_update();
+                self.home(data_transport)
             }
         } else {
             HttpResponseHelper::internal_server_error()

@@ -220,7 +220,7 @@ catch(const runtime_error& e)
 
 pocket_stat_t pocket_change_passwd(pocket_t* self, const char* full_path_file, const char* config_json, const char* new_passwd) try
 {
-    if(self == nullptr || new_passwd == nullptr)
+    if(self == nullptr || new_passwd == nullptr || strlen(new_passwd))
     {
         return ERROR;
     }

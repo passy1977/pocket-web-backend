@@ -4,7 +4,7 @@ use crate::bindings::{pocket_user_t};
 
 impl pocket_user_t {
 
-    pub fn to_field(&self) -> Option<User> {
+    pub fn to_user(&self) -> User {
         let email;
         let name;
         let passwd;
@@ -38,14 +38,14 @@ impl pocket_user_t {
         let name=  name.unwrap();
         let passwd= passwd.unwrap();
         
-        Some(User {
+        User {
             id: deref_user.id,
             email,
             name,
             passwd,
-            status: UserStat::from_uint(deref_user.status)?,
+            status: UserStat::from_uint(deref_user.status).unwrap(),
             timestamp_last_update: deref_user.timestamp_last_update
-        })
+        }
     }
 }
 
