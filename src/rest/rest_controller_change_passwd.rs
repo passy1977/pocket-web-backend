@@ -1,6 +1,6 @@
 use std::ffi::CString;
 use std::path::MAIN_SEPARATOR;
-use crate::bindings::{pocket_change_passwd, pocket_user_t};
+use crate::bindings::{pocket_change_passwd, pocket_logout, pocket_stat_t_OK, pocket_user_t};
 use crate::constants::data::EXPORT_DATA_CHANGE_PASSWD;
 use crate::models::data_transport::DataTransport;
 use crate::rest::rest_controller::RestController;
@@ -31,7 +31,7 @@ impl RestController {
                 if pwd_split.len() < 2 {
                     return HttpResponseHelper::not_acceptable()
                         .session_id(session.session_id)
-                        .error("passwd and newPasswd are mandatory")
+                        .error("Passwd and newPasswd are mandatory")
                         .build()
                 }
                 
@@ -40,7 +40,7 @@ impl RestController {
                 if user.passwd.trim() != pwd_split[0].trim() {
                     return HttpResponseHelper::forbidden()
                         .session_id(session.session_id)
-                        .error("passwd and old passwd don't match")
+                        .error("Passwd and old passwd don't match")
                         .build()
                 }
 
@@ -57,7 +57,7 @@ impl RestController {
 
 
                 if let Ok(config_json) = &self.data.load_config_json(&user.email) {
-                    unsafe { 
+                    let status = unsafe { 
 
                         let config_json = aes_decrypt(session.pocket, config_json);
 
@@ -66,19 +66,25 @@ impl RestController {
                         , CString::new(config_json.as_str()).unwrap().as_ptr()
                         , CString::new(data.as_str()).expect("").as_ptr()
                     ) };
+
+                    if status == pocket_stat_t_OK {
+                        unsafe {
+                            pocket_logout(session.pocket, true);
+                            return HttpResponseHelper::ok().session_id(session.session_id).build();
+                        }
+                    } else {
+                        return HttpResponseHelper::internal_server_error()
+                        .session_id(session.session_id)
+                        .error("Something's wrong, changing passwd failed")
+                        .build()
+                    }
+
                 } else {
                     return HttpResponseHelper::not_acceptable()
                         .session_id(session.session_id)
                         .error("config_json cannot be load")
                         .build()
                 };
-
-       
-
-
-
-                session.update_timestamp_last_update();
-                self.home(data_transport)
             }
         } else {
             HttpResponseHelper::internal_server_error()
