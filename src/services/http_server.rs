@@ -56,14 +56,14 @@ pub async fn logout(data_transport: web::Json<DataTransport>) -> impl Responder 
 }
 
 pub mod server {
-    use crate::services::http_server::{debug, field_detail, group_detail, hello, login, home, registration, data, change_passwd, close_session, export_data, import_data, logout};
+    use super::{debug, field_detail, group_detail, hello, login, home, registration, data, change_passwd, close_session, export_data, import_data, logout};
     use actix_cors::Cors;
     use actix_files as fs;
     use actix_web::{web, App, HttpServer};
     use std::io;
     use actix_web::middleware::Logger;
 
-    pub async fn start(ip: String, port: u16) -> io::Result<()> {
+    pub async fn start(ip: String, port: u16, max_threads: usize) -> io::Result<()> {
 
         env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
@@ -89,6 +89,7 @@ pub mod server {
                 .service(fs::Files::new("/", "./statics").index_file("index.html"))
             })
             .bind((ip, port))?
+            .workers(max_threads)
             .run()
             .await
     }

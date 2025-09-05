@@ -1,4 +1,4 @@
-use crate::bindings::{pocket_field_controller_free, pocket_field_controller_t, pocket_free, pocket_group_controller_free, pocket_group_controller_t, pocket_group_field_controller_t, pocket_new, pocket_t};
+use crate::bindings::{pocket_field_controller_free, pocket_field_controller_t, pocket_free, pocket_group_controller_free, pocket_group_controller_t, pocket_group_field_controller_free, pocket_group_field_controller_t, pocket_new, pocket_t};
 use std::collections::HashMap;
 use std::ptr::null_mut;
 use std::sync::{Arc, Mutex};
@@ -104,6 +104,10 @@ impl Sessions {
 
                     if !session.group_controller.is_null() {
                         pocket_group_controller_free(session.group_controller);
+                    }
+                                        
+                    if !session.group_field_controller.is_null() {
+                        pocket_group_field_controller_free(session.group_field_controller);
                     }
                     
                     if !session.field_controller.is_null() {

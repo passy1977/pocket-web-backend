@@ -29,8 +29,7 @@ async fn main() -> std::io::Result<()> {
         Err(err) => panic!("{}", err)
     };
     
-    let port = data.port;
-    let ip = data.ip.clone();
 
-    server::start(ip, port).await
+
+    server::start(data.ip.clone(), data.port, data.max_threads).await
 }

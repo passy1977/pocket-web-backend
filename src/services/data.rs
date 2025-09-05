@@ -24,7 +24,9 @@ pub struct Data {
     pub port: u16,
 
     #[serde(skip_serializing, skip_deserializing)]
-    pub(super) update : bool
+    pub(super) update : bool,
+
+    pub max_threads: usize
 }
 
 
@@ -66,7 +68,8 @@ impl Data {
             dir_path,
             ip: IP.to_string(),
             port: PORT,
-            update: false
+            update: false,
+            max_threads: MAX_BLOCKING_THREADS
         };
         
         if let Err(e) = ret.load() {
@@ -98,6 +101,7 @@ impl Data {
         self.ip = data.ip;
         self.port = data.port;
         self.update = false;
+        self.max_threads = data.max_threads;
 
         Ok(())
     }

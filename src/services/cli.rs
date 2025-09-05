@@ -11,6 +11,7 @@ pub struct Cli {
     /// Connection port
     pub port: Option<u16>,
 
+    pub max_threads: Option<usize>
 }
 
 impl Cli {
@@ -26,9 +27,16 @@ impl Cli {
             }
         }
         
-        if let Some(port) = cli.port.as_ref() {
-            if data.port != *port {
-                data.port = *port;
+        if let Some(port) = cli.port {
+            if data.port != port {
+                data.port = port;
+                data.update = true;
+            }
+        }
+
+        if let Some(max_threads) = cli.max_threads {
+            if data.max_threads != max_threads {
+                data.max_threads = max_threads;
                 data.update = true;
             }
         }

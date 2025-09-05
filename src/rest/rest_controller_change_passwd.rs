@@ -64,18 +64,31 @@ impl RestController {
                         pocket_change_passwd(session.pocket
                         , CString::new(full_path_file).unwrap().as_ptr()
                         , CString::new(config_json.as_str()).unwrap().as_ptr()
-                        , CString::new(data.as_str()).expect("").as_ptr()
+                        , CString::new(pwd_split[1].trim()).expect("").as_ptr()
                     ) };
 
                     if status == pocket_stat_t_OK {
                         unsafe {
-                            pocket_logout(session.pocket, true);
-                            return HttpResponseHelper::ok().session_id(session.session_id).build();
+                            if pocket_logout(session.pocket, true) == pocket_stat_t_OK {
+                                
+                                Sessions::share().remove(&session.session_id, true);
+
+                                return HttpResponseHelper::ok()
+                                .path("/login")
+                                .data("hello")
+                                .session_id(session.session_id).build();
+                            } else {
+                                return HttpResponseHelper::internal_server_error()
+                                .session_id(session.session_id)
+                                .error("Something's wrong server internal error, changing passwd failed")
+                                .build()
+                            }
+                            
                         }
                     } else {
                         return HttpResponseHelper::internal_server_error()
                         .session_id(session.session_id)
-                        .error("Something's wrong, changing passwd failed")
+                        .error("Something's wrong in data config parsing, changing passwd failed")
                         .build()
                     }
 

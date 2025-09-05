@@ -63,11 +63,24 @@ void pocket_free(pocket_t* pocket)
 {
     if (pocket == nullptr) return;
 
+    if (pocket->session)
+    {
+        delete static_cast<session *>(pocket->session);
+        pocket->session = nullptr;
+    }
+
     if (pocket->user)
     {
-        delete static_cast<user *>(pocket->user);
+        delete static_cast<pocket_user_t*>(pocket->user);
         pocket->user = nullptr;
     }
+
+    if (pocket->aes)
+    {
+        delete static_cast<aes *>(pocket->aes);
+        pocket->aes = nullptr;
+    }
+
 
     delete pocket;
     pocket = nullptr;
@@ -174,6 +187,7 @@ pocket_stat_t pocket_login(pocket_t* self, const char* email, const char* passwd
         if (self->user)
         {
             pocket_user_free(static_cast<pocket_user_t*>(self->user));
+            self->user = nullptr;
         }
         self->user = convert(user);
 
@@ -195,8 +209,13 @@ pocket_stat_t pocket_logout(const pocket_t *self, bool soft_logout) try
     auto session = static_cast<class session*>(self->session);
     const auto user = convert(static_cast<pocket_user_t*>(self->user));
 
+#ifdef SYNCHRONIZER_TIMEOUT
     session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
+#endif
+
+#ifdef SYNCHRONIZER_CONNECT_TIMEOUT
     session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
+#endif
 
     if(!soft_logout)
     {
@@ -227,8 +246,13 @@ pocket_stat_t pocket_change_passwd(pocket_t* self, const char* full_path_file, c
 
     auto session = static_cast<class session*>(self->session);
 
+#ifdef SYNCHRONIZER_TIMEOUT
     session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
+#endif
+
+#ifdef SYNCHRONIZER_CONNECT_TIMEOUT
     session->set_synchronizer_connect_timeout(0);
+#endif
     if( auto&& user_opt = session->change_passwd(convert(static_cast<pocket_user_t*>(self->user)), full_path_file, new_passwd, POCKET_ENABLE_AES); user_opt.has_value())
     {
         self->user = convert(user_opt);
@@ -282,6 +306,7 @@ bool pocket_copy_group(pocket_t* self, int64_t group_id_src, int64_t group_id_ds
             if (self->user)
             {
                 pocket_user_free(static_cast<pocket_user_t*>(self->user));
+                self->user = nullptr;
             }
             self->user = convert(user);
         }
@@ -318,6 +343,7 @@ bool pocket_copy_field(pocket_t* self, int64_t field_id_src, int64_t group_id_ds
             if (self->user)
             {
                 pocket_user_free(static_cast<pocket_user_t*>(self->user));
+                self->user = nullptr;
             }
             self->user = convert(user);
         }

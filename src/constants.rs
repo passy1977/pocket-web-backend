@@ -7,6 +7,7 @@ use crate::constants::Stats::{Busy, CacheNotFound, DbFieldError, DbGenericError,
 pub(crate) mod conf {
     pub const IP: &str = "127.0.0.1";
     pub const PORT :u16 = 8080;
+    pub const MAX_BLOCKING_THREADS: usize = 6;
 }
 
 pub(crate)  mod data {
