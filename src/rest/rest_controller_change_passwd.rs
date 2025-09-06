@@ -1,5 +1,6 @@
 use std::ffi::CString;
-use std::path::MAIN_SEPARATOR;
+use std::{fs, io::{Error, ErrorKind}};
+use std::path::{Path, MAIN_SEPARATOR};
 use crate::bindings::{pocket_change_passwd, pocket_logout, pocket_stat_t_OK, pocket_user_t};
 use crate::constants::data::EXPORT_DATA_CHANGE_PASSWD;
 use crate::models::data_transport::DataTransport;
@@ -12,6 +13,18 @@ use actix_web::web::Json;
 use actix_web::HttpResponse;
 
 impl RestController {
+
+    fn delete_file(&self, file: &String) -> Result<(), Error> {
+        let path = Path::new(file);
+
+        if path.exists() && path.is_file() {
+            fs::remove_file(path)?;
+        } else {
+            return Err(Error::new(ErrorKind::NotFound, "Impossible remove configuration file"));
+        }
+
+        Ok(())
+    }
 
     pub fn change_passwd(&self, data_transport: Json<DataTransport>) -> HttpResponse {
         let mut session = get_session!(data_transport.session_id, "Session not found");
@@ -62,15 +75,19 @@ impl RestController {
                         let config_json = aes_decrypt(session.pocket, config_json);
 
                         pocket_change_passwd(session.pocket
-                        , CString::new(full_path_file).unwrap().as_ptr()
+                        , CString::new(full_path_file.clone()).unwrap().as_ptr()
                         , CString::new(config_json.as_str()).unwrap().as_ptr()
                         , CString::new(pwd_split[1].trim()).expect("").as_ptr()
                     ) };
 
                     if status == pocket_stat_t_OK {
                         unsafe {
-                            if pocket_logout(session.pocket, true) == pocket_stat_t_OK {
-                                
+                            if pocket_logout(session.pocket) == pocket_stat_t_OK {
+
+                                if self.delete_file(&full_path_file).is_err() {
+                                    eprintln!("Impossible delete config file")
+                                }
+
                                 Sessions::share().remove(&session.session_id, true);
 
                                 return HttpResponseHelper::ok()
@@ -78,6 +95,11 @@ impl RestController {
                                 .data("logout")
                                 .session_id(session.session_id).build();
                             } else {
+                        
+                                if self.delete_file(&full_path_file).is_err() {
+                                    eprintln!("Impossible delete config file")
+                                }
+
                                 return HttpResponseHelper::internal_server_error()
                                 .session_id(session.session_id)
                                 .error("Something's wrong server internal error, changing passwd failed")
@@ -86,6 +108,11 @@ impl RestController {
                             
                         }
                     } else {
+                        
+                        if self.delete_file(&full_path_file).is_err() {
+                            eprintln!("Impossible delete config file")
+                        }
+
                         return HttpResponseHelper::internal_server_error()
                         .session_id(session.session_id)
                         .error("Something's wrong in data config parsing, changing passwd failed")
@@ -93,6 +120,10 @@ impl RestController {
                     }
 
                 } else {
+                    if self.delete_file(&full_path_file).is_err() {
+                        eprintln!("Impossible delete config file")
+                    }
+                
                     return HttpResponseHelper::not_acceptable()
                         .session_id(session.session_id)
                         .error("config_json cannot be load")

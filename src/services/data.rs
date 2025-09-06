@@ -153,5 +153,22 @@ impl Data {
         Ok(())
     }
 
+    pub fn remove_config_json(&self, email: &String) -> Result<(), Error> {
+                let email = sha512_encrypt(email);
+
+        let mut config_json_file = self.dir_path.clone();
+        config_json_file.push(email);
+        config_json_file.set_extension("json");
+        
+        let path = Path::new(&config_json_file);
+
+        if path.exists() && path.is_file() {
+            fs::remove_file(path)?;
+        } else {
+            return Err(Error::new(ErrorKind::NotFound, "Impossible remove configuration file"));
+        }
+            
+        Ok(())
+    }
 
 }

@@ -8,7 +8,6 @@ pub(crate) mod rest_controller_field_detail;
 mod rest_controller_data;
 mod rest_controller_macro;
 pub(crate) mod rest_controller_change_passwd;
-pub(crate) mod rest_controller_close_session;
 pub(crate) mod rest_controller_export_data;
 pub(crate) mod rest_controller_import_data;
 pub(crate) mod rest_controller_logout;
