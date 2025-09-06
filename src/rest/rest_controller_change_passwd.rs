@@ -75,7 +75,7 @@ impl RestController {
 
                                 return HttpResponseHelper::ok()
                                 .path("/login")
-                                .data("hello")
+                                .data("logout")
                                 .session_id(session.session_id).build();
                             } else {
                                 return HttpResponseHelper::internal_server_error()
