@@ -75,6 +75,14 @@
         "variant": "cpp",
         "filesystem": "cpp",
         "version": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "*.def": "cpp",
+        "charconv": "cpp",
+        "cassert": "cpp",
+        "cerrno": "cpp",
+        "cfloat": "cpp",
+        "climits": "cpp",
+        "format": "cpp",
+        "text_encoding": "cpp"
     }
 }

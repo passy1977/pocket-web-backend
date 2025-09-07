@@ -165,16 +165,6 @@ fn field_handler(field_controller: *mut pocket_field_controller_t, data_transpor
     if err.is_some() {
         return false;
     }
-
-    // let mut tuple: (i64, i64) = (0, 0);
-    // if from == "group_detail" {
-    //     tuple = if let Some(group) = data_transport.groups.clone().unwrap().get(0) {
-    //         (group.id, group.server_id)
-    //     } else {
-    //         return false;
-    //     };
-    // }
-
     
     let tuple= if data_transport.groups.is_some() {
         if let Some(group) = data_transport.groups.clone().unwrap().get(0) {

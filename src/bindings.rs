@@ -607,6 +607,24 @@ unsafe extern "C" {
     pub fn pocket_send_data(self_: *mut pocket_t) -> pocket_stat_t;
 }
 unsafe extern "C" {
+    pub fn pocket_group_controller_data_export(
+        self_: *const pocket_t,
+        full_path_file_export: *const ::std::os::raw::c_char,
+    ) -> bool;
+}
+unsafe extern "C" {
+    pub fn pocket_group_controller_data_import(
+        self_: *const pocket_t,
+        full_path_file_import: *const ::std::os::raw::c_char,
+    ) -> bool;
+}
+unsafe extern "C" {
+    pub fn pocket_group_controller_data_import_legacy(
+        self_: *const pocket_t,
+        full_path_file_import: *const ::std::os::raw::c_char,
+    ) -> bool;
+}
+unsafe extern "C" {
     pub fn pocket_aes_decrypt(
         self_: *const pocket_t,
         encrypted: *const ::std::os::raw::c_char,
@@ -828,21 +846,6 @@ unsafe extern "C" {
         self_: *const pocket_group_controller_t,
         group_id: i64,
     ) -> *mut pocket_group_t;
-}
-unsafe extern "C" {
-    pub fn pocket_group_controller_data_export(
-        full_path_file_export: *const ::std::os::raw::c_char,
-    ) -> bool;
-}
-unsafe extern "C" {
-    pub fn pocket_group_controller_data_import(
-        full_path_file_import: *const ::std::os::raw::c_char,
-    ) -> bool;
-}
-unsafe extern "C" {
-    pub fn pocket_group_controller_data_import_legacy(
-        full_path_file_import: *const ::std::os::raw::c_char,
-    ) -> bool;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]

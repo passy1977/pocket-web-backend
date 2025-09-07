@@ -1,5 +1,6 @@
 
-use crate::{models::data_transport::DataTransport, rest::rest_controller::RestController};
+use crate::{models::data_transport::DataTransport, rest::rest_controller::RestController, services::http_response_helper::HttpResponseHelper};
+use actix_multipart::Multipart;
 use actix_web::{web, Responder};
 
 
@@ -51,7 +52,18 @@ pub async fn logout(data_transport: web::Json<DataTransport>) -> impl Responder 
     RestController::share().logout(data_transport)
 }
 
+pub async fn upload(multipart: Multipart) -> impl Responder {
+
+    match RestController::share().upload(multipart).await {
+        Ok(response) => response,
+        Err(e) => HttpResponseHelper::internal_server_error()
+            .error(e.to_string())
+            .build()
+    }
+}
+
 pub mod server {
+    use crate::services::http_server::upload;
     use super::{debug, field_detail, group_detail, hello, login, home, registration, data, change_passwd, export_data, import_data, logout};
     use actix_cors::Cors;
     use actix_files as fs;
@@ -81,6 +93,7 @@ pub mod server {
                 .route("/v5/pocket/export_data", web::put().to(export_data))
                 .route("/v5/pocket/import_data", web::put().to(import_data))
                 .route("/v5/pocket/logout", web::put().to(logout))
+                .route("/v5/pocket/file-upload", web::post().to(upload))
                 .service(fs::Files::new("/", "./statics").index_file("index.html"))
             })
             .bind((ip, port))?

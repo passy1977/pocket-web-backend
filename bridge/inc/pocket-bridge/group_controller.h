@@ -58,9 +58,6 @@ pocket_stat_t pocket_group_controller_del(const pocket_group_controller_t* self,
 pocket_stat_t pocket_group_controller_persist(const pocket_group_controller_t* self, pocket_group_t* group);
 pocket_group_t* pocket_group_controller_get(const pocket_group_controller_t* self, int64_t group_id);
 
-bool pocket_group_controller_data_export(const char* full_path_file_export);
-bool pocket_group_controller_data_import(const char* full_path_file_import);
-bool pocket_group_controller_data_import_legacy(const char* full_path_file_import);
 
 
 #ifdef __cplusplus

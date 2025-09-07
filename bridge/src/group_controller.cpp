@@ -247,28 +247,3 @@ catch(const runtime_error& e)
     error(APP_TAG, e.what());
     return nullptr;
 }
-
-
-bool pocket_group_controller_data_export(const char* full_path_file_export)
-{
-    if (!full_path_file_export) return false;
-
-    //TODO: not impl
-    return true; // Placeholder
-}
-
-bool pocket_group_controller_data_import(const char* full_path_file_import)
-{
-    if (!full_path_file_import) return false;
-
-    //TODO: not impl
-    return true; // Placeholder
-}
-
-bool pocket_group_controller_data_import_legacy(const char* full_path_file_import)
-{
-    if (!full_path_file_import) return false;
-
-    //TODO: not impl
-    return true; // Placeholder
-}
