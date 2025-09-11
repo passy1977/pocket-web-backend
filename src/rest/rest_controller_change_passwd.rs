@@ -27,18 +27,14 @@ impl RestController {
     }
 
     pub fn change_passwd(&self, data_transport: Json<DataTransport>) -> HttpResponse {
-        let mut session = get_session!(data_transport.session_id, "Session not found");
+        let session = get_session!(data_transport.session_id, "Session not found");
 
         if let Some(data) = &data_transport.data {
             if data.is_empty() {
-                session.update_timestamp_last_update();
-                HttpResponseHelper::ok()
-                    .path("/change-passwd")
-                    .title("Change password")
-                    .session_id(session.session_id)
-                    .build()
+                HttpResponseHelper::internal_server_error()
+                    .error("Data it's mandatory")
+                    .build()  
             } else {
-
                 let pwd_split: Vec<&str> = data.split("|").collect();
 
                 if pwd_split.len() < 2 {

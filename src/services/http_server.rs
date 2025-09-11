@@ -91,9 +91,9 @@ pub mod server {
                 .route("/v5/pocket/debug", web::post().to(debug))
                 .route("/v5/pocket/change_passwd", web::put().to(change_passwd))
                 .route("/v5/pocket/export_data", web::put().to(export_data))
-                .route("/v5/pocket/import_data", web::put().to(import_data))
+                .route("/v5/pocket/import_data", web::post().to(import_data))
                 .route("/v5/pocket/logout", web::put().to(logout))
-                .route("/v5/pocket/file-upload", web::post().to(upload))
+                .route("/v5/pocket/upload", web::post().to(upload))
                 .service(fs::Files::new("/", "./statics").index_file("index.html"))
             })
             .bind((ip, port))?
