@@ -29,10 +29,24 @@ impl RestController {
     pub fn import_data(&self, data_transport: Json<DataTransport>) -> HttpResponse {
         let mut session = get_session!(data_transport.session_id, "Session not found");
 
-        session.update_timestamp_last_update();
-        HttpResponseHelper::internal_server_error()
-            .error("Not Implemented")
-            .build()
+        if let Some(data) = &data_transport.data {
+            if data.is_empty() {
+                HttpResponseHelper::internal_server_error()
+                    .error("Data it's mandatory")
+                    .build()  
+            } else {
+
+            session.update_timestamp_last_update();
+            HttpResponseHelper::internal_server_error()
+                .error("Not Implemented")
+                .build()
+        } 
+        
+        } else {
+            HttpResponseHelper::internal_server_error()
+            .error("Data it's mandatory")
+            .build()  
+        }
     }
 
     
