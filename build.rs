@@ -19,6 +19,7 @@ fn main() {
     println!("cargo:rustc-link-lib=ssl");
     println!("cargo:rustc-link-lib=crypto");
     println!("cargo:rustc-link-lib=sqlite3");
+    println!("cargo:rustc-link-lib=tinyxml2");
 
     // Tell cargo to invalidate the built crate whenever the wrapper changes
     println!("cargo:rerun-if-changed=bridge/inc/pocket/constants.h");

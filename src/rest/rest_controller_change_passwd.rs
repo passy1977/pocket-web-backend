@@ -1,10 +1,9 @@
 use std::ffi::CString;
-use std::{fs, io::{Error, ErrorKind}};
-use std::path::{Path, MAIN_SEPARATOR};
+use std::path::MAIN_SEPARATOR;
 use crate::bindings::{pocket_change_passwd, pocket_logout, pocket_stat_t_OK, pocket_user_t};
 use crate::constants::data::EXPORT_DATA_CHANGE_PASSWD;
 use crate::models::data_transport::DataTransport;
-use crate::rest::rest_controller::RestController;
+use crate::rest::rest_controller::{delete_file, RestController};
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;
 use crate::get_session;
@@ -14,17 +13,17 @@ use actix_web::HttpResponse;
 
 impl RestController {
 
-    fn delete_file(&self, file: &String) -> Result<(), Error> {
-        let path = Path::new(file);
+    // fn delete_file(&self, file: &String) -> Result<(), Error> {
+    //     let path = Path::new(file);
 
-        if path.exists() && path.is_file() {
-            fs::remove_file(path)?;
-        } else {
-            return Err(Error::new(ErrorKind::NotFound, "Impossible remove configuration file"));
-        }
+    //     if path.exists() && path.is_file() {
+    //         fs::remove_file(path)?;
+    //     } else {
+    //         return Err(Error::new(ErrorKind::NotFound, "Impossible remove configuration file"));
+    //     }
 
-        Ok(())
-    }
+    //     Ok(())
+    // }
 
     pub fn change_passwd(&self, data_transport: Json<DataTransport>) -> HttpResponse {
         let mut session = get_session!(data_transport.session_id, "Session not found");
@@ -84,7 +83,7 @@ impl RestController {
                         unsafe {
                             if pocket_logout(session.pocket) == pocket_stat_t_OK {
 
-                                if self.delete_file(&full_path_file).is_err() {
+                                if delete_file(&full_path_file).is_err() {
                                     eprintln!("Impossible delete config file")
                                 }
 
@@ -96,7 +95,7 @@ impl RestController {
                                 .session_id(session.session_id).build();
                             } else {
                         
-                                if self.delete_file(&full_path_file).is_err() {
+                                if delete_file(&full_path_file).is_err() {
                                     eprintln!("Impossible delete config file")
                                 }
 
@@ -109,7 +108,7 @@ impl RestController {
                         }
                     } else {
                         
-                        if self.delete_file(&full_path_file).is_err() {
+                        if delete_file(&full_path_file).is_err() {
                             eprintln!("Impossible delete config file")
                         }
 
@@ -120,7 +119,7 @@ impl RestController {
                     }
 
                 } else {
-                    if self.delete_file(&full_path_file).is_err() {
+                    if delete_file(&full_path_file).is_err() {
                         eprintln!("Impossible delete config file")
                     }
                 

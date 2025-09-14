@@ -1,19 +1,24 @@
+use std::io::Write;
+use std::ffi::CString;
+use std::path::MAIN_SEPARATOR;
 use std::str::from_utf8;
-
 use crate::{get_field_controller, get_group_controller, get_session};
 use crate::models::data_transport::DataTransport;
-use crate::rest::rest_controller::{get_list_field, get_list_group, RestController};
+use crate::rest::rest_controller::{delete_file, get_list_field, get_list_group, RestController};
 use crate::services::http_response_helper::HttpResponseHelper;
 use actix_multipart::Multipart;
 use actix_web::web::Json;
 use actix_web::{HttpResponse};
+use ulid::Ulid;
+use std::fs::File;
 use crate::services::session::Sessions;
 use futures_util::stream::StreamExt as _;
-use crate::bindings::{pocket_field_controller_new, pocket_field_controller_init, pocket_group_controller_init, pocket_group_controller_new};
+use crate::bindings::{pocket_field_controller_init, pocket_field_controller_new, pocket_group_controller_data_import, pocket_group_controller_data_import_legacy, pocket_group_controller_init, pocket_group_controller_new};
 
 impl RestController {
     pub async fn upload(&self, mut payload: Multipart) -> HttpResponse {
         let mut session_id = String::new();
+        let mut file_legacy: String = String::new();
         let mut file: String = String::new();
 
         while let Some(item) = payload.next().await {
@@ -32,6 +37,23 @@ impl RestController {
                         Ok(bytes) => {
                             if let Ok(data) = from_utf8(bytes.to_vec().as_slice()) {
                                 session_id = data.to_string();
+                            }
+                        }
+                        Err(err) => {
+                            return HttpResponseHelper::internal_server_error()
+                                .error(err.to_string())
+                                .build();
+                        }
+                    }
+                }
+            }
+
+            if field.name().unwrap_or("") == "file_legacy" {
+                if let Ok(tmp) = field.bytes(3).await {
+                    match tmp {
+                        Ok(bytes) => {
+                            if let Ok(data) = from_utf8(bytes.to_vec().as_slice()) {
+                                file_legacy = data.to_string();
                             }
                         }
                         Err(err) => {
@@ -63,9 +85,41 @@ impl RestController {
 
         let mut session = get_session!(session_id, "Session not found");
 
+        let mut full_path_file = match self.data.dir_path.clone().as_path().to_str() {
+            None => return HttpResponseHelper::not_acceptable()
+                .session_id(session.session_id)
+                .error("data_dir_path not found")
+                .build(),
+            Some(data_dir_path) => data_dir_path.to_string()
+        };
+        full_path_file.push(MAIN_SEPARATOR);
+        full_path_file.push_str(&Ulid::new().to_string());
+
+
+        writeln!(File::create(full_path_file)?, "{file}")?;
+
         unsafe {
-            pocket_group_controller_data_import(self_, full_path_file_import);
+            if let Ok(c_full_path_file_import) = CString::new(full_path_file.clone()) {
+
+                if file_legacy == "1" {
+                    if !pocket_group_controller_data_import_legacy(session.pocket, c_full_path_file_import.as_ptr()) {
+                        return HttpResponseHelper::not_acceptable()
+                            .session_id(session.session_id)
+                            .error("Unable import data")
+                            .build()
+                    }
+                } else {
+                    if !pocket_group_controller_data_import(session.pocket, c_full_path_file_import.as_ptr()) {
+                        return HttpResponseHelper::not_acceptable()
+                            .session_id(session.session_id)
+                            .error("Unable import data")
+                            .build()
+                    }
+                }
+            }
         }
+
+        let _ = delete_file(&full_path_file);
 
         let group_controller = get_group_controller!(session);
 
@@ -76,7 +130,7 @@ impl RestController {
         HttpResponseHelper::ok()
             .path("/home")
             .title("")
-            .session_id(session_id)
+            .session_id(session.session_id)
             .groups(get_list_group(
                 group_controller,
                 field_controller,

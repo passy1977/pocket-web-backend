@@ -7,7 +7,9 @@ use crate::services::data::Data;
 use actix_web::web::Json;
 use actix_web::HttpResponse;
 use std::ffi::CString;
+use std::path::Path;
 use std::sync::Arc;
+use std::{fs, io::{Error, ErrorKind}};
 
 pub struct RestController {
     pub(super) data: Data
@@ -136,6 +138,17 @@ pub fn get_list_field(field_controller: *const pocket_field_controller_t, group_
     Ok(ret)
 }
 
+pub fn delete_file(file: &String) -> Result<(), Error> {
+    let path = Path::new(file);
+
+    if path.exists() && path.is_file() {
+        fs::remove_file(path)?;
+    } else {
+        return Err(Error::new(ErrorKind::NotFound, "Impossible remove configuration file"));
+    }
+
+    Ok(())
+}
 
 impl RestController {
     
