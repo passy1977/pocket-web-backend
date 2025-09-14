@@ -113,3 +113,27 @@ where T: PartialEq + Eq + Hash + Clone
 
     set_a == set_b
 }
+
+// pub fn hex_to_bytes(hex_str: &str) -> Result<Vec<u8>, String> {
+//     if hex_str.len() % 2 != 0 {
+//         return Err("Hex string has an odd length".to_string());
+//     }
+
+//     let mut bytes = Vec::with_capacity(hex_str.len() / 2);
+    
+//     for chunk in hex_str.as_bytes().chunks(2) {
+//         let num = u8::from_str_radix(std::str::from_utf8(chunk).map_err(|_| "Invalid UTF-8 sequence")?, 16)
+//             .map_err(|_| "Failed to parse hex digit")?;
+//         bytes.push(num);
+//     }
+
+//     Ok(bytes)
+// }
+
+// pub fn bytes_to_hex(bytes: &[u8]) -> String {
+//     let hex_str = bytes.iter()
+//         .map(|byte| format!("{:02x}", byte))
+//         .collect::<String>();
+    
+//     hex_str
+// }

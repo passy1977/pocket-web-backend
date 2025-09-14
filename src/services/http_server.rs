@@ -1,5 +1,5 @@
 
-use crate::{models::data_transport::DataTransport, rest::rest_controller::RestController, services::http_response_helper::HttpResponseHelper};
+use crate::{models::data_transport::DataTransport, rest::rest_controller::RestController};
 use actix_multipart::Multipart;
 use actix_web::{web, Responder};
 
@@ -53,13 +53,13 @@ pub async fn logout(data_transport: web::Json<DataTransport>) -> impl Responder 
 }
 
 pub async fn upload(multipart: Multipart) -> impl Responder {
-
-    match RestController::share().upload(multipart).await {
-        Ok(response) => response,
-        Err(e) => HttpResponseHelper::internal_server_error()
-            .error(e.to_string())
-            .build()
-    }
+    RestController::share().upload(multipart).await
+    // match RestController::share().upload(multipart).await {
+    //     Ok(response) => response,
+    //     Err(e) => HttpResponseHelper::internal_server_error()
+    //         .error(e.to_string())
+    //         .build()
+    // }
 }
 
 pub mod server {
@@ -91,7 +91,7 @@ pub mod server {
                 .route("/v5/pocket/debug", web::post().to(debug))
                 .route("/v5/pocket/change_passwd", web::put().to(change_passwd))
                 .route("/v5/pocket/export_data", web::put().to(export_data))
-                .route("/v5/pocket/import_data", web::post().to(import_data))
+                .route("/v5/pocket/import_data", web::put().to(import_data))
                 .route("/v5/pocket/logout", web::put().to(logout))
                 .route("/v5/pocket/upload", web::post().to(upload))
                 .service(fs::Files::new("/", "./statics").index_file("index.html"))
