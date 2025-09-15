@@ -96,13 +96,20 @@ impl RestController {
         full_path_file.push_str(&Ulid::new().to_string());
 
 
-        writeln!(File::create(full_path_file)?, "{file}")?;
+
+        if writeln!(File::create(full_path_file.clone()).unwrap(), "{file}").is_err() {
+            return HttpResponseHelper::not_acceptable()
+                .session_id(session.session_id)
+                .error("Impossible write on {full_path_file}")
+                .build()
+        }
 
         unsafe {
             if let Ok(c_full_path_file_import) = CString::new(full_path_file.clone()) {
 
                 if file_legacy == "1" {
                     if !pocket_group_controller_data_import_legacy(session.pocket, c_full_path_file_import.as_ptr()) {
+                        let _ = delete_file(&full_path_file);
                         return HttpResponseHelper::not_acceptable()
                             .session_id(session.session_id)
                             .error("Unable import data")
@@ -110,6 +117,7 @@ impl RestController {
                     }
                 } else {
                     if !pocket_group_controller_data_import(session.pocket, c_full_path_file_import.as_ptr()) {
+                        let _ = delete_file(&full_path_file);
                         return HttpResponseHelper::not_acceptable()
                             .session_id(session.session_id)
                             .error("Unable import data")
