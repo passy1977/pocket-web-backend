@@ -153,6 +153,7 @@ impl Data {
         Ok(())
     }
 
+    #[allow(dead_code)]
     pub fn remove_config_json(&self, email: &String) -> Result<(), Error> {
                 let email = sha512_encrypt(email);
 

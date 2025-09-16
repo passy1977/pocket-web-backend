@@ -1,4 +1,4 @@
-use crate::bindings::{pocket_logout, pocket_stat_t_OK, pocket_user_t};
+use crate::bindings::{pocket_logout, pocket_stat_t_OK};
 use crate::get_session;
 use crate::models::data_transport::DataTransport;
 use crate::rest::rest_controller::RestController;
@@ -25,17 +25,17 @@ impl RestController {
             };
 
             unsafe {
-                if pocket_logout(session.pocket) == pocket_stat_t_OK {
+                if pocket_logout(session.pocket, maintain_config) == pocket_stat_t_OK {
 
-                    let user = (*((*session.pocket).user as *const pocket_user_t)).to_user();
+                    // let user = (*((*session.pocket).user as *const pocket_user_t)).to_user();
 
-                    if !maintain_config {
-                        if let Err(error) = self.data.remove_config_json(&user.email) {
-                            session.update_timestamp_last_update();
-                            data_transport.error = Some(error.to_string());
-                            return self.home(data_transport)
-                        }
-                    }
+                    // if !maintain_config {
+                    //     if let Err(error) = self.data.remove_config_json(&user.email) {
+                    //         session.update_timestamp_last_update();
+                    //         data_transport.error = Some(error.to_string());
+                    //         return self.home(data_transport)
+                    //     }
+                    // }
                     
                     Sessions::share().remove(&session.session_id, true);
 

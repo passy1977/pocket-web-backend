@@ -204,7 +204,7 @@ catch(const runtime_error& e)
     return static_cast<pocket_stat_t>(static_cast<session*>(self->session)->get_status());
 }
 
-pocket_stat_t pocket_logout(const pocket_t *self) try
+pocket_stat_t pocket_logout(const pocket_t *self, bool maintain_config) try
 {
     auto session = static_cast<class session*>(self->session);
     const auto user = convert(static_cast<pocket_user_t*>(self->user));
@@ -216,7 +216,15 @@ pocket_stat_t pocket_logout(const pocket_t *self) try
 #ifdef SYNCHRONIZER_CONNECT_TIMEOUT
     session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
 #endif
-    return session->soft_logout(user) ? OK : static_cast<pocket_stat_t>(session->get_status());
+    if(maintain_config) 
+    {
+        return session->invalidate(user) ? OK : static_cast<pocket_stat_t>(session->get_status());
+    } 
+    else
+    {
+        return session->logout(user) ? OK : static_cast<pocket_stat_t>(session->get_status());
+    }
+    
 }
 catch(const runtime_error& e)
 {
@@ -262,7 +270,7 @@ pocket_stat_t pocket_change_passwd(pocket_t* self, const char* full_path_file, c
             return ERROR;
         }
 
-        return pocket_logout(self);
+        return pocket_logout(self, true);
     }
     else
     {

@@ -5,6 +5,7 @@ use crate::bindings::{free, pocket_aes_decrypt, pocket_aes_encrypt, pocket_sha51
 
 pub(crate) type Result<T, E = &'static str> = std::result::Result<T, E>;
 
+#[allow(dead_code)]
 #[derive(Debug, PartialEq, Eq)]
 pub(crate)  enum Error {
     Undefine,

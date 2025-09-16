@@ -577,7 +577,7 @@ unsafe extern "C" {
     ) -> pocket_stat_t;
 }
 unsafe extern "C" {
-    pub fn pocket_logout(self_: *const pocket_t) -> pocket_stat_t;
+    pub fn pocket_logout(self_: *const pocket_t, maintain_config: bool) -> pocket_stat_t;
 }
 unsafe extern "C" {
     pub fn pocket_change_passwd(

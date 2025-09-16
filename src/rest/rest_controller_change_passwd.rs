@@ -81,7 +81,7 @@ impl RestController {
 
                     if status == pocket_stat_t_OK {
                         unsafe {
-                            if pocket_logout(session.pocket) == pocket_stat_t_OK {
+                            if pocket_logout(session.pocket, true) == pocket_stat_t_OK {
 
                                 if delete_file(&full_path_file).is_err() {
                                     eprintln!("Impossible delete config file")
