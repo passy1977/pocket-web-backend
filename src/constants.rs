@@ -2,7 +2,7 @@ use std::fmt;
 use std::fmt::{Display, Formatter};
 use crate::bindings;
 use crate::bindings::pocket_stat_t;
-use crate::constants::Stats::{Busy, CacheNotFound, DbFieldError, DbGenericError, DbGroupError, DbGroupFieldError, DeviceIdNotMatch, DeviceNotFound, Error, JsonParsingError, LocalDeviceIdNotMatch, MapIdError, NoNetwork, PasswdError, Ready, SecretEmpty, SecretNotMatch, TimestampLastNotParsable, TimestampLastUpdateNotMatch, UserNotFound, WrongSizeToken};
+use crate::constants::Stats::*;
 
 pub(crate) mod conf {
     pub const IP: &str = "127.0.0.1";

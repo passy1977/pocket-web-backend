@@ -604,6 +604,13 @@ unsafe extern "C" {
     ) -> bool;
 }
 unsafe extern "C" {
+    pub fn pocket_send_data_with_timeouts(
+        self_: *mut pocket_t,
+        timeout: ::std::os::raw::c_long,
+        connect_timeout: ::std::os::raw::c_long,
+    ) -> pocket_stat_t;
+}
+unsafe extern "C" {
     pub fn pocket_send_data(self_: *mut pocket_t) -> pocket_stat_t;
 }
 unsafe extern "C" {
@@ -614,13 +621,13 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn pocket_group_controller_data_import(
-        self_: *const pocket_t,
+        self_: *mut pocket_t,
         full_path_file_import: *const ::std::os::raw::c_char,
     ) -> bool;
 }
 unsafe extern "C" {
     pub fn pocket_group_controller_data_import_legacy(
-        self_: *const pocket_t,
+        self_: *mut pocket_t,
         full_path_file_import: *const ::std::os::raw::c_char,
     ) -> bool;
 }

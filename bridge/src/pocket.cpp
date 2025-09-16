@@ -350,20 +350,15 @@ catch(const runtime_error& e)
     return false;
 }
 
-pocket_stat_t pocket_send_data(pocket_t* self)  try
+pocket_stat_t pocket_send_data_with_timeouts(pocket_t* self, long timeout, long connect_timeout) try
 {
     if (!self || self->user == nullptr) return ERROR;
 
     auto session = static_cast<class session*>(self->session);
     const auto logged_user = convert(static_cast<pocket_user_t*>(self->user));
 
-#ifdef SYNCHRONIZER_TIMEOUT
-    session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
-#endif
-
-#ifdef SYNCHRONIZER_CONNECT_TIMEOUT
-    session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
-#endif
+    session->set_synchronizer_timeout(timeout);
+    session->set_synchronizer_connect_timeout(connect_timeout);
     if(auto&& user = session->send_data(logged_user); user.has_value())
     {
         pocket_user_free(static_cast<pocket_user_t*>(self->user));
@@ -371,6 +366,20 @@ pocket_stat_t pocket_send_data(pocket_t* self)  try
     }
 
     return static_cast<pocket_stat_t>(session->get_status());
+}
+catch(const runtime_error& e)
+{
+    error(APP_TAG, e.what());
+    return ERROR;
+}
+
+pocket_stat_t pocket_send_data(pocket_t* self) try 
+{
+#if defined(SYNCHRONIZER_TIMEOUT) && defined(SYNCHRONIZER_CONNECT_TIMEOUT) 
+    return pocket_send_data_with_timeouts(self, SYNCHRONIZER_TIMEOUT, SYNCHRONIZER_CONNECT_TIMEOUT);
+#else
+    return pocket_send_data_with_timeouts(self, 0, 0);
+#endif
 }
 catch(const runtime_error& e)
 {
@@ -404,7 +413,7 @@ catch(const runtime_error& e)
     return false;
 }
 
-bool pocket_group_controller_data_import(const pocket_t* self, const char* full_path_file_import) try
+bool pocket_group_controller_data_import(pocket_t* self, const char* full_path_file_import) try
 {
     if (!full_path_file_import) return false;
 
@@ -414,15 +423,22 @@ bool pocket_group_controller_data_import(const pocket_t* self, const char* full_
     auto session = static_cast<class session*>(self->session);
     const auto user = convert(static_cast<pocket_user_t*>(self->user));
 
-#ifdef SYNCHRONIZER_TIMEOUT
-    session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
-#endif
-
-#ifdef SYNCHRONIZER_CONNECT_TIMEOUT
-    session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
-#endif
-
-    return session->import_data_legacy(user, full_path_file_import, POCKET_ENABLE_AES);
+    if (session->import_data(user, full_path_file_import, POCKET_ENABLE_AES)) 
+    {
+        auto rc = pocket_send_data_with_timeouts(self, 0, 0);
+        if(rc == OK || rc == READY) 
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
 }
 catch(const runtime_error& e)
 {
@@ -430,7 +446,7 @@ catch(const runtime_error& e)
     return false;
 }
 
-bool pocket_group_controller_data_import_legacy(const pocket_t* self, const char* full_path_file_import) try
+bool pocket_group_controller_data_import_legacy(pocket_t* self, const char* full_path_file_import) try
 {
     if (!full_path_file_import) return false;
 
@@ -439,15 +455,22 @@ bool pocket_group_controller_data_import_legacy(const pocket_t* self, const char
     auto session = static_cast<class session*>(self->session);
     const auto user = convert(static_cast<pocket_user_t*>(self->user));
 
-#ifdef SYNCHRONIZER_TIMEOUT
-    session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
-#endif
-
-#ifdef SYNCHRONIZER_CONNECT_TIMEOUT
-    session->set_synchronizer_connect_timeout(SYNCHRONIZER_CONNECT_TIMEOUT);
-#endif
-
-    return session->import_data_legacy(user, full_path_file_import, POCKET_ENABLE_AES);
+    if (session->import_data_legacy(user, full_path_file_import, POCKET_ENABLE_AES)) 
+    {
+        auto rc = pocket_send_data_with_timeouts(self, 0, 0);
+        if(rc == OK || rc == READY) 
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
 }
 catch(const runtime_error& e)
 {

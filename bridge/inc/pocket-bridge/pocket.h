@@ -47,10 +47,11 @@ pocket_stat_t pocket_logout(const pocket_t *self);
 pocket_stat_t pocket_change_passwd(pocket_t* self, const char* full_path_file, const char* config_json, const char* new_passwd);
 bool pocket_copy_group(pocket_t* self, int64_t group_id_src, int64_t group_id_dst, bool move);
 bool pocket_copy_field(pocket_t* self, int64_t field_id_src, int64_t group_id_dst, bool move);
+pocket_stat_t pocket_send_data_with_timeouts(pocket_t* self, long timeout, long connect_timeout);
 pocket_stat_t pocket_send_data(pocket_t* self);
 bool pocket_group_controller_data_export(const pocket_t* self, const char* full_path_file_export);
-bool pocket_group_controller_data_import(const pocket_t* self, const char* full_path_file_import);
-bool pocket_group_controller_data_import_legacy(const pocket_t* self, const char* full_path_file_import);
+bool pocket_group_controller_data_import(pocket_t* self, const char* full_path_file_import);
+bool pocket_group_controller_data_import_legacy(pocket_t* self, const char* full_path_file_import);
 
 
 const char* pocket_aes_decrypt(const pocket_t* self, const char encrypted[]);
