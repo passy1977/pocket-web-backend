@@ -31,14 +31,24 @@ pub fn home(&self, data_transport: Json<DataTransport>) -> HttpResponse {
     Sessions::share().add(session.clone());
 
     session.update_timestamp_last_update();
-    HttpResponseHelper::ok()
-        .path("/home")
-        .title("")
-        .session_id(session.session_id)
-        .error(data_transport.error.clone().unwrap())
-        .groups(get_list_group(group_controller, field_controller, group_id, &search))
-        .fields(get_list_field(field_controller, group_id, &search))
-        .build()
+    if let Some(error) = data_transport.error.clone() {
+        HttpResponseHelper::ok()
+            .path("/home")
+            .title("")
+            .session_id(session.session_id)
+            .error(error)
+            .groups(get_list_group(group_controller, field_controller, group_id, &search))
+            .fields(get_list_field(field_controller, group_id, &search))
+            .build()
+    } else {
+        HttpResponseHelper::ok()
+            .path("/home")
+            .title("")
+            .session_id(session.session_id)
+            .groups(get_list_group(group_controller, field_controller, group_id, &search))
+            .fields(get_list_field(field_controller, group_id, &search))
+            .build()
+    }
 }
 
 }

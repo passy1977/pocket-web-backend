@@ -22,6 +22,7 @@ impl RestController {
                 .build()
         };
 
+        maintain_config.pop();
 
         let maintain_config = if maintain_config == "true" {
             true
@@ -32,31 +33,22 @@ impl RestController {
             return self.home(data_transport)
         };
 
-        unsafe {
-            if pocket_logout(session.pocket, maintain_config) == pocket_stat_t_OK {
 
-                // let user = (*((*session.pocket).user as *const pocket_user_t)).to_user();
+        let check = unsafe {
+            pocket_logout(session.pocket, maintain_config) == pocket_stat_t_OK
+        };
 
-                // if !maintain_config {
-                //     if let Err(error) = self.data.remove_config_json(&user.email) {
-                //         session.update_timestamp_last_update();
-                //         data_transport.error = Some(error.to_string());
-                //         return self.home(data_transport)
-                //     }
-                // }
-                
-                Sessions::share().remove(&session.session_id, true);
-
-                return HttpResponseHelper::ok()
-                .path("/login")
-                .data("logout")
-                .session_id(session.session_id).build();
-
-            } else {
-                data_transport.error = Some("Unable perform logout".to_string());
-                return self.home(data_transport)
-            }
+        if !check && !maintain_config {                
+            data_transport.error = Some("Unable perform logout".to_string());
+            return self.home(data_transport)
         }
+
+        Sessions::share().remove(&session.session_id, true);
+
+        return HttpResponseHelper::ok()
+            .path("/login")
+            .data("logout")
+            .session_id(session.session_id).build();
 
 
     }
