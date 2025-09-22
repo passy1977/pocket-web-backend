@@ -6,7 +6,9 @@ fn main() {
     let dst = Config::new("bridge")
         .define("POCKET_MAX_BUFFER_RESPONSE_SIZE", "10485760")
         .define("POCKET_ENABLE_LOG", "1")
+        .define("CMAKE_VERBOSE_MAKEFILE", "ON")  // Show actual compilation commands
         // .define("POCKET_ENABLE_AES", "1")
+        .very_verbose(true)  // Enable very verbose output to see all CMake/make commands
         .build();
     println!("cargo:rustc-link-search=native={}", dst.display());
     println!("{}", env::var("OUT_DIR").unwrap());
