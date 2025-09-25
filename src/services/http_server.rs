@@ -40,10 +40,6 @@ pub async fn change_passwd(data_transport: web::Json<DataTransport>) -> impl Res
     RestController::share().change_passwd(data_transport)
 }
 
-pub async fn export_data(data_transport: web::Json<DataTransport>) -> impl Responder {
-    RestController::share().export_data(data_transport)
-}
-
 pub async fn import_data(data_transport: web::Json<DataTransport>) -> impl Responder {
     RestController::share().import_data(data_transport)
 }
@@ -64,7 +60,7 @@ pub async fn upload(multipart: Multipart) -> impl Responder {
 
 pub mod server {
     use crate::services::http_server::upload;
-    use super::{debug, field_detail, group_detail, hello, login, home, registration, data, change_passwd, export_data, import_data, logout};
+    use super::{debug, field_detail, group_detail, hello, login, home, registration, data, change_passwd, import_data, logout};
     use actix_cors::Cors;
     use actix_files as fs;
     use actix_web::{web, App, HttpServer};
@@ -90,7 +86,6 @@ pub mod server {
                 .route("/v5/pocket/group_detail", web::put().to(group_detail))
                 .route("/v5/pocket/debug", web::post().to(debug))
                 .route("/v5/pocket/change_passwd", web::put().to(change_passwd))
-                .route("/v5/pocket/export_data", web::put().to(export_data))
                 .route("/v5/pocket/import_data", web::put().to(import_data))
                 .route("/v5/pocket/logout", web::put().to(logout))
                 .route("/v5/pocket/upload", web::post().to(upload))
