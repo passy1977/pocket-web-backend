@@ -137,8 +137,8 @@ pocket_field_t* convert(const field::ptr& field)
    field->server_group_field_id,
    field->title.c_str(),
    field->value.c_str(),
-   field->synchronized,
    field->is_hidden,
+   field->synchronized,
    field->deleted,
    field->timestamp_creation
   );
