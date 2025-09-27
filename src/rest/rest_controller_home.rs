@@ -39,6 +39,7 @@ pub fn home(&self, data_transport: Json<DataTransport>) -> HttpResponse {
             .error(error)
             .groups(get_list_group(group_controller, field_controller, group_id, &search))
             .fields(get_list_field(field_controller, group_id, &search))
+            .data(search)
             .build()
     } else {
         HttpResponseHelper::ok()
@@ -47,6 +48,7 @@ pub fn home(&self, data_transport: Json<DataTransport>) -> HttpResponse {
             .session_id(session.session_id)
             .groups(get_list_group(group_controller, field_controller, group_id, &search))
             .fields(get_list_field(field_controller, group_id, &search))
+            .data(search)
             .build()
     }
 }

@@ -2,7 +2,7 @@ use crate::bindings::{pocket_field_controller_del, pocket_field_controller_init,
 use crate::models::field::Field;
 use crate::models::group::Group;
 use crate::models::data_transport::DataTransport;
-use crate::rest::rest_controller::RestController;
+use crate::rest::rest_controller::{split_group_id_and_search, RestController};
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;
 use crate::{get_field_controller, get_group_controller, get_group_field_controller, get_session};
@@ -241,6 +241,7 @@ fn field_handler(field_controller: *mut pocket_field_controller_t, data_transpor
     true
 }
 
+
 impl RestController {
 
     pub fn data(&self, mut data_transport: Json<DataTransport>) -> HttpResponse {
@@ -276,10 +277,17 @@ impl RestController {
             if !are_sets_equal(&original_groups, &data_transport.groups.clone().unwrap()) {
                 let tmp = data_transport.groups.clone().unwrap();
                 let Group{id, group_id, .. } = tmp.get(0).unwrap();
-                data_transport.data = Some(format!("{group_id}|{id}").to_string());
+
+                let mut _id = "".to_string();
+                let (_, search) = match split_group_id_and_search(&data_transport, &mut _id) {
+                    Ok((id_group, search)) => (id_group, search),
+                    Err(e) => return HttpResponseHelper::internal_server_error()
+                        .error(e)
+                        .build()
+                };
+
+                data_transport.data = Some(format!("{group_id}|{search}|{id}").to_string());
             }
-
-
         }
 
         if data_transport.group_fields.is_some() {
@@ -293,7 +301,7 @@ impl RestController {
         unsafe  {
             let rc = pocket_send_data(session.pocket);
             if rc != pocket_stat_t_OK && rc != pocket_stat_t_READY {
-                println!("Impossible to send data rc:{}({rc})", Stats::to_string(rc));
+                eprintln!("Impossible to send data rc:{}({rc})", Stats::to_string(rc));
             }
         }
 
@@ -302,7 +310,6 @@ impl RestController {
                 .error(err.unwrap())
                 .build()
         }
-
 
         session.update_timestamp_last_update();
         self.home(data_transport)
