@@ -15,14 +15,36 @@ fn main() {
     // Set CMake build type based on Rust profile
     if is_release {
         config.define("CMAKE_BUILD_TYPE", "Release");
-        // Release-specific optimizations
-        config.define("CMAKE_CXX_FLAGS_RELEASE", "-O3 -DNDEBUG");
-        config.define("CMAKE_C_FLAGS_RELEASE", "-O3 -DNDEBUG");
+        
+        // Aggressive optimization flags for maximum speed
+        config.define("CMAKE_CXX_FLAGS_RELEASE", "-O3 -DNDEBUG -march=native -mtune=native -flto -ffast-math -funroll-loops");
+        config.define("CMAKE_C_FLAGS_RELEASE", "-O3 -DNDEBUG -march=native -mtune=native -flto -ffast-math -funroll-loops");
+        
+        // Linker optimization flags
+        config.define("CMAKE_EXE_LINKER_FLAGS_RELEASE", "-flto -Wl,-O2 -Wl,--strip-all");
+        config.define("CMAKE_SHARED_LINKER_FLAGS_RELEASE", "-flto -Wl,-O2 -Wl,--strip-all");
+        
+        // Disable all logging and debugging features
+        config.define("POCKET_ENABLE_LOG", "OFF");
+        config.define("POCKET_DISABLE_LOCK", "ON");  // Disable locking for better performance if safe
+        config.define("POCKET_ENABLE_TEST", "OFF");
+        
+        // Disable verbose output in release
+        config.very_verbose(false);
+        
     } else {
         config.define("CMAKE_BUILD_TYPE", "Debug");
-        // Debug-specific flags
-        config.define("CMAKE_CXX_FLAGS_DEBUG", "-g -O0 -DDEBUG");
-        config.define("CMAKE_C_FLAGS_DEBUG", "-g -O0 -DDEBUG");
+        
+        // Debug-specific flags with full debugging info
+        config.define("CMAKE_CXX_FLAGS_DEBUG", "-g3 -O0 -DDEBUG -Wall -Wextra -fsanitize=address -fno-omit-frame-pointer");
+        config.define("CMAKE_C_FLAGS_DEBUG", "-g3 -O0 -DDEBUG -Wall -Wextra -fsanitize=address -fno-omit-frame-pointer");
+        config.define("CMAKE_EXE_LINKER_FLAGS_DEBUG", "-fsanitize=address");
+        
+        // Enable all logging and debugging features
+        config.define("POCKET_ENABLE_LOG", "ON");
+        config.define("POCKET_DISABLE_LOCK", "OFF");
+        config.define("POCKET_ENABLE_TEST", "ON");
+        
         // Enable verbose output only in debug mode
         config.define("CMAKE_VERBOSE_MAKEFILE", "ON");
         config.very_verbose(true);
@@ -30,8 +52,7 @@ fn main() {
 
     let dst = config
         .define("POCKET_MAX_BUFFER_RESPONSE_SIZE", "10485760")
-        .define("POCKET_ENABLE_LOG", if is_release { "0" } else { "1" }) // Disable logs in release
-        // .define("POCKET_ENABLE_AES", "1")
+        .define("POCKET_FORCE_TIMESTAMP_LAST_UPDATE", "0")
         .build();
 
     println!("cargo:rustc-link-search=native={}", dst.display());
