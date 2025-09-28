@@ -1,4 +1,4 @@
-use crate::bindings::{pocket_logout, pocket_stat_t_OK};
+use crate::bindings::{pocket_logout, pocket_stat_t_OK, pocket_user_t};
 use crate::get_session;
 use crate::models::data_transport::DataTransport;
 use crate::rest::rest_controller::{split_group_id_and_search, RestController};
@@ -11,7 +11,7 @@ use actix_web::HttpResponse;
 impl RestController {
 
     pub fn logout(&self, mut data_transport: Json<DataTransport>) -> HttpResponse {
-        let  session = get_session!(data_transport.session_id, "Session not found");
+        let mut session = get_session!(data_transport.session_id, "Session not found");
 
 
         let mut maintain_config = "".to_string();
@@ -41,6 +41,20 @@ impl RestController {
         if !check && !maintain_config {                
             data_transport.error = Some("Unable perform logout".to_string());
             return self.home(data_transport)
+        }
+
+
+
+        if !maintain_config {
+            unsafe {
+                let user = (*((*session.pocket).user as *const pocket_user_t)).to_user();
+
+                if let Err(error) = self.data.remove_config_json(&user.email) {
+                    session.update_timestamp_last_update();
+                    data_transport.error = Some(error.to_string());
+                    return self.home(data_transport)
+                }
+            }
         }
 
         Sessions::share().remove(&session.session_id, true);
