@@ -26,7 +26,7 @@ fn main() {
         
         // Disable all logging and debugging features
         config.define("POCKET_ENABLE_LOG", "OFF");
-        config.define("POCKET_DISABLE_LOCK", "ON");  // Disable locking for better performance if safe
+        config.define("POCKET_DISABLE_LOCK", "ON");
         config.define("POCKET_ENABLE_TEST", "OFF");
         
         // Disable verbose output in release
@@ -35,10 +35,9 @@ fn main() {
     } else {
         config.define("CMAKE_BUILD_TYPE", "Debug");
         
-        // Debug-specific flags with full debugging info
-        config.define("CMAKE_CXX_FLAGS_DEBUG", "-g3 -O0 -DDEBUG -Wall -Wextra -fsanitize=address -fno-omit-frame-pointer");
-        config.define("CMAKE_C_FLAGS_DEBUG", "-g3 -O0 -DDEBUG -Wall -Wextra -fsanitize=address -fno-omit-frame-pointer");
-        config.define("CMAKE_EXE_LINKER_FLAGS_DEBUG", "-fsanitize=address");
+        // Debug-specific flags WITHOUT AddressSanitizer
+        config.define("CMAKE_CXX_FLAGS_DEBUG", "-g3 -O0 -DDEBUG -Wall -Wextra -fno-omit-frame-pointer");
+        config.define("CMAKE_C_FLAGS_DEBUG", "-g3 -O0 -DDEBUG -Wall -Wextra -fno-omit-frame-pointer");
         
         // Enable all logging and debugging features
         config.define("POCKET_ENABLE_LOG", "ON");
