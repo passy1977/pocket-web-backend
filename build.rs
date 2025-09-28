@@ -3,13 +3,37 @@ use std::path::PathBuf;
 use cmake::Config;
 
 fn main() {
-    let dst = Config::new("bridge")
+    // Detect build profile
+    let profile = env::var("PROFILE").unwrap_or_else(|_| "debug".to_string());
+    let is_release = profile == "release";
+    
+    println!("cargo:warning=Building with profile: {} (CMake build type: {})", 
+             profile, if is_release { "Release" } else { "Debug" });
+
+    let mut config = Config::new("bridge");
+    
+    // Set CMake build type based on Rust profile
+    if is_release {
+        config.define("CMAKE_BUILD_TYPE", "Release");
+        // Release-specific optimizations
+        config.define("CMAKE_CXX_FLAGS_RELEASE", "-O3 -DNDEBUG");
+        config.define("CMAKE_C_FLAGS_RELEASE", "-O3 -DNDEBUG");
+    } else {
+        config.define("CMAKE_BUILD_TYPE", "Debug");
+        // Debug-specific flags
+        config.define("CMAKE_CXX_FLAGS_DEBUG", "-g -O0 -DDEBUG");
+        config.define("CMAKE_C_FLAGS_DEBUG", "-g -O0 -DDEBUG");
+        // Enable verbose output only in debug mode
+        config.define("CMAKE_VERBOSE_MAKEFILE", "ON");
+        config.very_verbose(true);
+    }
+
+    let dst = config
         .define("POCKET_MAX_BUFFER_RESPONSE_SIZE", "10485760")
-        .define("POCKET_ENABLE_LOG", "1")
-        .define("CMAKE_VERBOSE_MAKEFILE", "ON")  // Show actual compilation commands
+        .define("POCKET_ENABLE_LOG", if is_release { "0" } else { "1" }) // Disable logs in release
         // .define("POCKET_ENABLE_AES", "1")
-        .very_verbose(true)  // Enable very verbose output to see all CMake/make commands
         .build();
+
     println!("cargo:rustc-link-search=native={}", dst.display());
     println!("{}", env::var("OUT_DIR").unwrap());
     println!("cargo:rustc-link-search={}/build", env::var("OUT_DIR").unwrap());
