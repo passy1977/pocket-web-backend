@@ -41,8 +41,8 @@ fn main() {
         
         // Enable all logging and debugging features
         config.define("POCKET_ENABLE_LOG", "ON");
-        config.define("POCKET_DISABLE_LOCK", "OFF");
-        config.define("POCKET_ENABLE_TEST", "ON");
+        config.define("POCKET_DISABLE_LOCK", "ON");
+        config.define("POCKET_ENABLE_TEST", "OFF");
         
         // Enable verbose output only in debug mode
         config.define("CMAKE_VERBOSE_MAKEFILE", "ON");
