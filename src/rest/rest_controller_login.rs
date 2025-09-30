@@ -30,7 +30,13 @@ pub fn login(&self, data_transport: Json<DataTransport>) -> HttpResponse {
         }
     };
 
-    let session = match Sessions::share().get(&*data_transport.session_id) {
+    if Sessions::share().check(&email) {
+        return HttpResponseHelper::forbidden()
+            .error("Account already logged in")
+            .build()
+    }
+
+    let mut session = match Sessions::share().get(&*data_transport.session_id) {
         None => return HttpResponseHelper::forbidden()
             .error("Session not found")
             .build(),
@@ -71,6 +77,10 @@ pub fn login(&self, data_transport: Json<DataTransport>) -> HttpResponse {
                     .data(Stats::from(rc).to_string())
                     .build()
             }
+
+            session.email = Some(email.clone());
+            Sessions::share().remove(&session.session_id, false);
+            Sessions::share().add(session.clone());
         }
     } else {
         return HttpResponseHelper::ok()
