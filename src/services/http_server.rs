@@ -48,18 +48,16 @@ pub async fn logout(data_transport: web::Json<DataTransport>) -> impl Responder 
     RestController::share().logout(data_transport)
 }
 
+pub async fn heartbeat(session_id: web::Path<String>) -> impl Responder {
+    RestController::share().heartbeat(session_id)
+}
+
 pub async fn upload(multipart: Multipart) -> impl Responder {
     RestController::share().upload(multipart).await
-    // match RestController::share().upload(multipart).await {
-    //     Ok(response) => response,
-    //     Err(e) => HttpResponseHelper::internal_server_error()
-    //         .error(e.to_string())
-    //         .build()
-    // }
 }
 
 pub mod server {
-    use crate::services::http_server::upload;
+    use crate::services::http_server::{heartbeat, upload};
     use super::{debug, field_detail, group_detail, hello, login, home, registration, data, change_passwd, import_data, logout};
     use actix_cors::Cors;
     use actix_files as fs;
@@ -89,6 +87,7 @@ pub mod server {
                 .route("/v5/pocket/import_data", web::put().to(import_data))
                 .route("/v5/pocket/logout", web::put().to(logout))
                 .route("/v5/pocket/upload", web::post().to(upload))
+                .route("/v5/pocket/heartbeat/{session_id}", web::get().to(heartbeat))
                 .service(fs::Files::new("/", "./statics").index_file("index.html"))
             })
             .bind((ip, port))?

@@ -26,6 +26,8 @@ pub struct Session {
 
     pub field_controller: *mut pocket_field_controller_t,
 
+    pub email: Option<String>,
+
     pub timestamp_last_update: u64
 }
 
@@ -40,6 +42,7 @@ impl Session {
             group_controller: null_mut(),
             group_field_controller: null_mut(),
             field_controller: null_mut(),
+            email: None,
             timestamp_last_update: match SystemTime::now().duration_since(UNIX_EPOCH) {
                 Ok(duration) => duration.as_secs(), 
                 Err(_) => 0
@@ -119,4 +122,17 @@ impl Sessions {
             sessions.remove(session_id);    
         }
     }
+
+    pub fn check(&self, email: &String) -> bool {
+        let sessions = self.sessions.lock().unwrap();
+        for (_, session) in sessions.iter() {
+            if let Some(session_email) = &session.email {
+                if session_email == email {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
 }

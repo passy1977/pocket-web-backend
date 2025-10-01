@@ -10,3 +10,4 @@ mod rest_controller_macro;
 pub(crate) mod rest_controller_change_passwd;
 pub(crate) mod rest_controller_import_data;
 pub(crate) mod rest_controller_logout;
+pub(crate) mod rest_controller_heartbeat;
