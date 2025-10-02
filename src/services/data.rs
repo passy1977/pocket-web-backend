@@ -26,7 +26,10 @@ pub struct Data {
     #[serde(skip_serializing, skip_deserializing)]
     pub(super) update : bool,
 
-    pub max_threads: usize
+    pub max_threads: usize,
+
+    /// Session expiration time in seconds
+    pub session_expiration_time: u32
 }
 
 
@@ -69,7 +72,8 @@ impl Data {
             ip: IP.to_string(),
             port: PORT,
             update: false,
-            max_threads: MAX_BLOCKING_THREADS
+            max_threads: MAX_BLOCKING_THREADS,
+            session_expiration_time: SESSION_EXPIRATION_TIME
         };
         
         if let Err(e) = ret.load() {
@@ -102,6 +106,7 @@ impl Data {
         self.port = data.port;
         self.update = false;
         self.max_threads = data.max_threads;
+        self.session_expiration_time = data.session_expiration_time;
 
         Ok(())
     }
@@ -170,6 +175,17 @@ impl Data {
         }
             
         Ok(())
+    }
+
+    /// Get session expiration time in seconds
+    pub fn get_session_expiration_time(&self) -> u32 {
+        self.session_expiration_time
+    }
+
+    /// Set session expiration time in seconds
+    pub fn set_session_expiration_time(&mut self, time: u32) {
+        self.session_expiration_time = time;
+        self.update = true;
     }
 
 }
