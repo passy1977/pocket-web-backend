@@ -3,4 +3,4 @@ pub(crate) mod cli;
 pub(crate) mod session;
 pub(crate) mod http_server;
 pub(crate) mod http_response_helper;
-pub(crate) mod recurring_timer;
+pub(crate) mod session_timer;

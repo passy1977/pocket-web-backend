@@ -1,4 +1,6 @@
 use crate::bindings::{pocket_field_controller_free, pocket_field_controller_t, pocket_free, pocket_group_controller_free, pocket_group_controller_t, pocket_group_field_controller_free, pocket_group_field_controller_t, pocket_new, pocket_t};
+use crate::services::data::Data;
+use crate::services::session_timer::SessionTimer;
 use std::collections::HashMap;
 use std::ptr::null_mut;
 use std::sync::{Arc, Mutex};
@@ -28,11 +30,23 @@ pub struct Session {
 
     pub email: Option<String>,
 
-    pub timestamp_last_update: u64
+    pub timestamp_last_update: u64    
 }
 
+unsafe impl Send for pocket_t {}
+unsafe impl Sync for pocket_t {}
+unsafe impl Send for pocket_group_controller_t {}
+unsafe impl Sync for pocket_group_controller_t {}
+unsafe impl Send for pocket_group_field_controller_t {}
+unsafe impl Sync for pocket_group_field_controller_t {}
+unsafe impl Send for pocket_field_controller_t {}
+unsafe impl Sync for pocket_field_controller_t {}
+unsafe impl Send for Session {}
+unsafe impl Sync for Session {}
 unsafe impl Send for Sessions {}
 unsafe impl Sync for Sessions {}
+
+static DEFAULT_TIMESTAMP_LAST_UPDATE : u32 = 5 * 60 * 1_000; // 5 minutes in seconds
 
 impl Session {
     pub fn new() -> Session {
@@ -61,14 +75,27 @@ impl Session {
 
 pub struct Sessions {
     sessions: Mutex<HashMap<String, Session>>, // Using a HashMap to store sessions by session_id
+    #[allow(dead_code)]
+    timer: Option<SessionTimer>,
+    #[allow(dead_code)]
+    session_expiration_time: u32 // in seconds
 }
 
 
 
 impl Sessions {
     fn new() -> Self {
-        Sessions {
+
+        Self {
             sessions: Mutex::new(HashMap::new()),
+            timer: None,
+            session_expiration_time: match Data::init() {
+                Ok(data) =>  data.session_expiration_time,
+                Err(e) => {
+                    eprintln!("Error loading data: {e}");
+                    DEFAULT_TIMESTAMP_LAST_UPDATE 
+                }
+            }
         }
     }
 
@@ -123,7 +150,7 @@ impl Sessions {
         }
     }
 
-    pub fn check(&self, email: &String) -> bool {
+    pub fn check_if_already_logged(&self, email: &String) -> bool {
         let sessions = self.sessions.lock().unwrap();
         for (_, session) in sessions.iter() {
             if let Some(session_email) = &session.email {
@@ -135,4 +162,27 @@ impl Sessions {
         false
     }
 
+
+    pub fn invalidate(&self, timestamp_last_update: u64) {
+        let sessions = self.sessions.lock().unwrap();
+        for (session_id, session) in sessions.iter() {
+            if timestamp_last_update > session.timestamp_last_update + self.session_expiration_time as u64 {
+                println!("Invalidating session: {}", session_id);
+                self.remove(session_id, true);
+                
+            }
+        }
+    }
+
+    pub fn start_validator(&mut self)  {
+        if self.timer.is_none() {
+            self.timer = Some(SessionTimer::new());
+        }        
+    }
+
+    pub fn stop_validator(&mut self)  {
+        if let Some(timer) = &mut self.timer {
+            timer.stop();
+        }
+    }
 }

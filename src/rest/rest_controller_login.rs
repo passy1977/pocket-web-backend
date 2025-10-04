@@ -30,7 +30,7 @@ pub fn login(&self, data_transport: Json<DataTransport>) -> HttpResponse {
         }
     };
 
-    if Sessions::share().check(&email) {
+    if Sessions::share().check_if_already_logged(&email) {
         return HttpResponseHelper::forbidden()
             .error("Account already logged in")
             .build()

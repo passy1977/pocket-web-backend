@@ -8,12 +8,7 @@ impl RestController {
 
     pub fn hello(&self, session_id: Path<String>) -> HttpResponse {
 
-        let mut session_id_handler = "".to_string();
-        if !session_id.is_empty() {
-            session_id_handler = session_id.clone();
-        }
-
-        let session_id = match Sessions::share().get(session_id_handler.as_str()) {
+        let session_id = match Sessions::share().get(session_id.as_str()) {
             None => {
                 let session = Session::new();
                 let session_id = session.session_id.clone();

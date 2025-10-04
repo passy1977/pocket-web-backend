@@ -177,15 +177,4 @@ impl Data {
         Ok(())
     }
 
-    /// Get session expiration time in seconds
-    pub fn get_session_expiration_time(&self) -> u32 {
-        self.session_expiration_time
-    }
-
-    /// Set session expiration time in seconds
-    pub fn set_session_expiration_time(&mut self, time: u32) {
-        self.session_expiration_time = time;
-        self.update = true;
-    }
-
 }
