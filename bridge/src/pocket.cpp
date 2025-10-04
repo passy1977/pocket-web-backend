@@ -56,8 +56,6 @@ pocket_t* pocket_new(void)
 
     memset(pocket, 0, sizeof(pocket_t));
 
-    pocket->last_status = READY;
-
     return pocket;
 }
 
@@ -192,8 +190,6 @@ pocket_stat_t pocket_login(pocket_t* self, const char* email, const char* passwd
             self->user = nullptr;
         }
         self->user = convert(user);
-
-        self->last_status = OK;
         return OK;
     }
     else
