@@ -635,6 +635,9 @@ unsafe extern "C" {
     pub fn pocket_is_no_network(self_: *const pocket_t) -> bool;
 }
 unsafe extern "C" {
+    pub fn pocket_validate_session(self_: *const pocket_t) -> bool;
+}
+unsafe extern "C" {
     pub fn pocket_aes_decrypt(
         self_: *const pocket_t,
         encrypted: *const ::std::os::raw::c_char,
