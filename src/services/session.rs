@@ -161,15 +161,14 @@ impl Sessions {
         false
     }
 
-    pub fn invalidate(&self, seconds_elapsed: u32) {
+    pub fn invalidate(&self, current_timestamp: u64) {
         let mut sessions = self.sessions.lock().unwrap();
         let mut sessions_to_remove = Vec::new();
         
-        for (session_id, session) in sessions.iter() {
+        for (session_id, session) in sessions.iter_mut() {
+            println!("session_id:{session_id} current_timestamp:{current_timestamp} session.timestamp_last_update + self.session_expiration_time:{}", session.timestamp_last_update + self.session_expiration_time as u64);
 
-            println!("session.timestamp_last_update + seconds_elapsed:{} session.timestamp_last_update + self.session_expiration_time:{}", session.timestamp_last_update + seconds_elapsed as u64, session.timestamp_last_update + self.session_expiration_time as u64);
-
-            if session.timestamp_last_update + seconds_elapsed as u64 > session.timestamp_last_update + self.session_expiration_time as u64 {
+            if current_timestamp > session.timestamp_last_update + self.session_expiration_time as u64 {
                 println!("Invalidating session: {}", session_id);
                     
                 unsafe {
@@ -194,6 +193,7 @@ impl Sessions {
             }
         }
         
+
         for session_id in sessions_to_remove {
             sessions.remove(&session_id);
         }

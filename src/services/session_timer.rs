@@ -23,7 +23,6 @@ impl SessionTimer {
                 
                 let mut enable_loop = true;
 
-                let mut count = 0u32;
                 loop {
                     if let Ok(stop_signal) = rx.try_recv() {
                         enable_loop = !stop_signal;
@@ -31,11 +30,16 @@ impl SessionTimer {
                     if !enable_loop {
                         break;
                     }
-                    Sessions::share().invalidate(count);
+
+                    let current_timestamp = std::time::SystemTime::now()
+                        .duration_since(std::time::UNIX_EPOCH)
+                        .unwrap()
+                        .as_secs();
+
+                    Sessions::share().invalidate(current_timestamp);
 
                     thread::sleep(std::time::Duration::from_millis(LOOP_SLEEP));
 
-                    count += 1;
                 }
             });
 
