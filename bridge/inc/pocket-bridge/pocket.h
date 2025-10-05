@@ -52,7 +52,7 @@ pocket_stat_t pocket_send_data(pocket_t* self);
 bool pocket_group_controller_data_export(const pocket_t* self, const char* full_path_file_export);
 bool pocket_group_controller_data_import(pocket_t* self, const char* full_path_file_import);
 bool pocket_group_controller_data_import_legacy(pocket_t* self, const char* full_path_file_import);
-
+bool pocket_is_no_network(const pocket_t* self);
 
 const char* pocket_aes_decrypt(const pocket_t* self, const char encrypted[]);
 const char* pocket_aes_encrypt(const pocket_t* self, const char plain[]);

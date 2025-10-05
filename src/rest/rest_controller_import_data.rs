@@ -9,7 +9,7 @@ use actix_web::{HttpResponse};
 use ulid::Ulid;
 use crate::services::session::Sessions;
 use futures_util::stream::StreamExt as _;
-use crate::bindings::{pocket_field_controller_init, pocket_field_controller_new, pocket_group_controller_data_import, pocket_group_controller_data_import_legacy, pocket_group_controller_init, pocket_group_controller_new};
+use crate::bindings::{pocket_field_controller_init, pocket_field_controller_new, pocket_group_controller_data_import, pocket_group_controller_data_import_legacy, pocket_group_controller_init, pocket_group_controller_new, pocket_is_no_network};
 
 impl RestController {
     pub async fn upload(&self, mut payload: Multipart) -> HttpResponse {
@@ -120,6 +120,12 @@ impl RestController {
                             .build()
                     }
                 }
+            }
+
+            if pocket_is_no_network(session.pocket) {
+                Sessions::share().start_validator();
+            } else {
+                Sessions::share().stop_validator();
             }
         }
 

@@ -2,7 +2,7 @@ use std::ffi::CString;
 use std::str::FromStr;
 use actix_web::HttpResponse;
 use actix_web::web::Json;
-use crate::bindings::{pocket_initialize, pocket_login};
+use crate::bindings::{pocket_initialize, pocket_is_no_network, pocket_login};
 use crate::constants::Stats;
 use crate::models::data_transport::DataTransport;
 use crate::rest::rest_controller::RestController;
@@ -81,6 +81,12 @@ pub fn login(&self, data_transport: Json<DataTransport>) -> HttpResponse {
             session.email = Some(email.clone());
             Sessions::share().remove(&session.session_id, false);
             Sessions::share().add(session.clone());
+                        
+            if pocket_is_no_network(session.pocket) {
+                Sessions::share().start_validator();
+            } else {
+                Sessions::share().stop_validator();
+            }
         }
     } else {
         return HttpResponseHelper::ok()

@@ -1,4 +1,4 @@
-use crate::bindings::{pocket_field_controller_del, pocket_field_controller_init, pocket_field_controller_new, pocket_field_controller_persist, pocket_field_controller_t, pocket_group_controller_del, pocket_group_controller_init, pocket_group_controller_new, pocket_group_controller_persist, pocket_send_data, pocket_group_controller_t, pocket_group_field_controller_del, pocket_group_field_controller_init, pocket_group_field_controller_new, pocket_group_field_controller_persist, pocket_group_field_controller_t, pocket_stat_t_OK, pocket_stat_t_READY};
+use crate::bindings::{pocket_field_controller_del, pocket_field_controller_init, pocket_field_controller_new, pocket_field_controller_persist, pocket_field_controller_t, pocket_group_controller_del, pocket_group_controller_init, pocket_group_controller_new, pocket_group_controller_persist, pocket_group_controller_t, pocket_group_field_controller_del, pocket_group_field_controller_init, pocket_group_field_controller_new, pocket_group_field_controller_persist, pocket_group_field_controller_t, pocket_is_no_network, pocket_send_data, pocket_stat_t_OK, pocket_stat_t_READY};
 use crate::models::field::Field;
 use crate::models::group::Group;
 use crate::models::data_transport::DataTransport;
@@ -302,6 +302,11 @@ impl RestController {
             let rc = pocket_send_data(session.pocket);
             if rc != pocket_stat_t_OK && rc != pocket_stat_t_READY {
                 eprintln!("Impossible to send data rc:{}({rc})", Stats::to_string(rc));
+            }
+            if pocket_is_no_network(session.pocket) {
+                Sessions::share().start_validator();
+            } else {
+                Sessions::share().stop_validator();
             }
         }
 

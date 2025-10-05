@@ -8,6 +8,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use ulid::Ulid;
 
 
+static DEFAULT_TIMESTAMP_LAST_UPDATE : u32 = 5 * 60; // 5 minutes in seconds
  
 impl pocket_t {
     pub fn is_valid(&self) -> bool {
@@ -46,8 +47,6 @@ unsafe impl Sync for Session {}
 unsafe impl Send for Sessions {}
 unsafe impl Sync for Sessions {}
 
-static DEFAULT_TIMESTAMP_LAST_UPDATE : u32 = 5 * 60 * 1_000; // 5 minutes in seconds
-
 impl Session {
     pub fn new() -> Session {
         Self {
@@ -76,7 +75,7 @@ impl Session {
 pub struct Sessions {
     sessions: Mutex<HashMap<String, Session>>, // Using a HashMap to store sessions by session_id
     #[allow(dead_code)]
-    timer: Option<SessionTimer>,
+    timer: Mutex<Option<SessionTimer>>,
     #[allow(dead_code)]
     session_expiration_time: u32 // in seconds
 }
@@ -88,7 +87,7 @@ impl Sessions {
 
         Self {
             sessions: Mutex::new(HashMap::new()),
-            timer: None,
+            timer: Mutex::new(None),
             session_expiration_time: match Data::init() {
                 Ok(data) =>  data.session_expiration_time,
                 Err(e) => {
@@ -162,27 +161,55 @@ impl Sessions {
         false
     }
 
-
-    pub fn invalidate(&self, timestamp_last_update: u64) {
-        let sessions = self.sessions.lock().unwrap();
+    pub fn invalidate(&self, seconds_elapsed: u32) {
+        let mut sessions = self.sessions.lock().unwrap();
+        let mut sessions_to_remove = Vec::new();
+        
         for (session_id, session) in sessions.iter() {
-            if timestamp_last_update > session.timestamp_last_update + self.session_expiration_time as u64 {
+
+            println!("session.timestamp_last_update + seconds_elapsed:{} session.timestamp_last_update + self.session_expiration_time:{}", session.timestamp_last_update + seconds_elapsed as u64, session.timestamp_last_update + self.session_expiration_time as u64);
+
+            if session.timestamp_last_update + seconds_elapsed as u64 > session.timestamp_last_update + self.session_expiration_time as u64 {
                 println!("Invalidating session: {}", session_id);
-                self.remove(session_id, true);
+                    
+                unsafe {
+                    if !session.pocket.is_null() {
+                        pocket_free(session.pocket);
+                    }
+
+                    if !session.group_controller.is_null() {
+                        pocket_group_controller_free(session.group_controller);
+                    }
+                                        
+                    if !session.group_field_controller.is_null() {
+                        pocket_group_field_controller_free(session.group_field_controller);
+                    }
+                    
+                    if !session.field_controller.is_null() {
+                        pocket_field_controller_free(session.field_controller);
+                    }
+                }
                 
+                sessions_to_remove.push(session_id.clone());
             }
+        }
+        
+        for session_id in sessions_to_remove {
+            sessions.remove(&session_id);
         }
     }
 
-    pub fn start_validator(&mut self)  {
-        if self.timer.is_none() {
-            self.timer = Some(SessionTimer::new());
+    pub fn start_validator(&self)  {
+        let mut timer = self.timer.lock().unwrap();
+        if timer.is_none() {
+            *timer = Some(SessionTimer::new());
         }        
     }
 
-    pub fn stop_validator(&mut self)  {
-        if let Some(timer) = &mut self.timer {
-            timer.stop();
+    pub fn stop_validator(&self)  {
+        let mut timer = self.timer.lock().unwrap();
+        if let Some(ref mut t) = *timer {
+            t.stop();
         }
     }
 }

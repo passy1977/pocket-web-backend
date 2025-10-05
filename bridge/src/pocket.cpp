@@ -485,6 +485,15 @@ catch(const runtime_error& e)
     return false;
 }
 
+bool pocket_is_no_network(const pocket_t* self)
+{
+    if (self == nullptr)
+    {
+        return false;
+    }
+    return static_cast<class session*>(self->session)->is_no_network();
+}
+
 const char* pocket_aes_decrypt(const pocket_t* self, const char encrypted[])
 {
     if (self == nullptr || encrypted == nullptr || self->aes == nullptr)
