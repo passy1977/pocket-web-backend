@@ -303,11 +303,6 @@ impl RestController {
             if rc != pocket_stat_t_OK && rc != pocket_stat_t_READY {
                 eprintln!("Impossible to send data rc:{}({rc})", Stats::to_string(rc));
             }
-            if pocket_is_no_network(session.pocket) {
-                Sessions::share().start_validator();
-            } else {
-                Sessions::share().stop_validator();
-            }
         }
 
         if err.is_some() {
@@ -316,6 +311,9 @@ impl RestController {
                 .build()
         }
 
+        unsafe {
+            session.remote_session_handling = !pocket_is_no_network(session.pocket);
+        }
         perform_timestamp_last_update!(session);
         self.home(data_transport)
 

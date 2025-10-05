@@ -31,7 +31,9 @@ pub struct Session {
 
     pub email: Option<String>,
 
-    pub timestamp_last_update: u64    
+    pub timestamp_last_update: u64,
+
+    pub remote_session_handling: bool
 }
 
 unsafe impl Send for pocket_t {}
@@ -59,7 +61,8 @@ impl Session {
             timestamp_last_update: match SystemTime::now().duration_since(UNIX_EPOCH) {
                 Ok(duration) => duration.as_secs(), 
                 Err(_) => 0
-            }
+            },
+            remote_session_handling: true
         }
     }
     
@@ -166,7 +169,10 @@ impl Sessions {
         let mut sessions_to_remove = Vec::new();
         
         for (session_id, session) in sessions.iter_mut() {
-            println!("session_id:{session_id} current_timestamp:{current_timestamp} session.timestamp_last_update + self.session_expiration_time:{}", session.timestamp_last_update + self.session_expiration_time as u64);
+
+            if session.remote_session_handling {
+                continue;
+            }
 
             if current_timestamp > session.timestamp_last_update + self.session_expiration_time as u64 {
                 println!("Invalidating session: {}", session_id);
@@ -193,8 +199,8 @@ impl Sessions {
             }
         }
         
-
         for session_id in sessions_to_remove {
+            println!("Session expired for session_id:{session_id}");
             sessions.remove(&session_id);
         }
     }
@@ -206,6 +212,7 @@ impl Sessions {
         }        
     }
 
+    #[allow(dead_code)]
     pub fn stop_validator(&self)  {
         let mut timer = self.timer.lock().unwrap();
         if let Some(ref mut t) = *timer {

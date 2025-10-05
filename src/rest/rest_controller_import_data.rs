@@ -122,11 +122,7 @@ impl RestController {
                 }
             }
 
-            if pocket_is_no_network(session.pocket) {
-                Sessions::share().start_validator();
-            } else {
-                Sessions::share().stop_validator();
-            }
+            session.remote_session_handling = !pocket_is_no_network(session.pocket);
         }
 
         let _ = delete_file(&full_path_file);

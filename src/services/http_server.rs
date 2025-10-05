@@ -57,7 +57,7 @@ pub async fn upload(multipart: Multipart) -> impl Responder {
 }
 
 pub mod server {
-    use crate::services::http_server::{heartbeat, upload};
+    use crate::services::{http_server::{heartbeat, upload}, session::Sessions};
     use super::{debug, field_detail, group_detail, hello, login, home, registration, data, change_passwd, import_data, logout};
     use actix_cors::Cors;
     use actix_files as fs;
@@ -71,6 +71,8 @@ pub mod server {
 
         println!("Starting server at http://{ip}:{port}");
         
+        Sessions::share().start_validator();
+
         HttpServer::new(|| {
             App::new()
                 .wrap(Logger::default())
@@ -94,6 +96,7 @@ pub mod server {
             .workers(max_threads)
             .run()
             .await
+            
     }
 }
 

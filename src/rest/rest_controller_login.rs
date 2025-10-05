@@ -80,14 +80,12 @@ pub fn login(&self, data_transport: Json<DataTransport>) -> HttpResponse {
             }
 
             session.email = Some(email.clone());
+            session.remote_session_handling = !pocket_is_no_network(session.pocket);
+
             Sessions::share().remove(&session.session_id, false);
             Sessions::share().add(session.clone());
                         
-            if pocket_is_no_network(session.pocket) {
-                Sessions::share().start_validator();
-            } else {
-                Sessions::share().stop_validator();
-            }
+
         }
     } else {
         return HttpResponseHelper::ok()
