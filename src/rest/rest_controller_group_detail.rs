@@ -4,7 +4,7 @@ use crate::models::data_transport::DataTransport;
 use crate::rest::rest_controller::{get_list_group_field, split_group_id_and_search, RestController};
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;
-use crate::{get_group_controller, get_group_field_controller, get_session};
+use crate::{get_group_controller, get_group_field_controller, get_session, perform_timestamp_last_update};
 use actix_web::web::Json;
 use actix_web::HttpResponse;
 
@@ -49,7 +49,7 @@ impl RestController {
 
                     let empty_search = "".to_string();
 
-                    session.update_timestamp_last_update();
+                    perform_timestamp_last_update!(session);
                     return HttpResponseHelper::ok()
                         .path("/group-detail")
                         .title("New group".to_string())
@@ -86,7 +86,7 @@ impl RestController {
         groups.push(group);
         let groups = Ok(groups);
 
-        session.update_timestamp_last_update();
+        perform_timestamp_last_update!(session);
         HttpResponseHelper::ok()
             .path("/group-detail")
             .title(title)

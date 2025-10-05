@@ -1,5 +1,5 @@
 use std::{self, io::Write, ffi::CString, path::MAIN_SEPARATOR, str::from_utf8, fs::File};
-use crate::{get_field_controller, get_group_controller, get_session};
+use crate::{get_field_controller, get_group_controller, get_session, perform_timestamp_last_update};
 use crate::models::data_transport::DataTransport;
 use crate::rest::rest_controller::{delete_file, get_list_field, get_list_group, RestController};
 use crate::services::http_response_helper::HttpResponseHelper;
@@ -136,7 +136,7 @@ impl RestController {
         let field_controller = get_field_controller!(session);
 
         let search = String::new();
-        session.update_timestamp_last_update();
+        perform_timestamp_last_update!(session);
         HttpResponseHelper::ok()
             .path("/home")
             .title("")
@@ -156,7 +156,7 @@ impl RestController {
 
         if let Some(data) = &data_transport.data {
             if data.is_empty() {
-                session.update_timestamp_last_update();
+                perform_timestamp_last_update!(session);
                 HttpResponseHelper::ok()
                     .path("/import-data")
                     .title("Import data")

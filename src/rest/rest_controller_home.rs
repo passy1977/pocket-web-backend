@@ -3,7 +3,7 @@ use crate::models::data_transport::DataTransport;
 use crate::rest::rest_controller::*;
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;
-use crate::{get_field_controller, get_group_controller, get_session};
+use crate::{get_field_controller, get_group_controller, get_session, perform_timestamp_last_update};
 use actix_web::web::Json;
 use actix_web::HttpResponse;
 
@@ -26,11 +26,8 @@ pub fn home(&self, data_transport: Json<DataTransport>) -> HttpResponse {
     let field_controller = get_field_controller!(session);
 
 
-    Sessions::share().remove(&session.session_id, false);
-
-    Sessions::share().add(session.clone());
-
-    session.update_timestamp_last_update();
+    perform_timestamp_last_update!(session);
+    
     if let Some(error) = data_transport.error.clone() {
         HttpResponseHelper::ok()
             .path("/home")

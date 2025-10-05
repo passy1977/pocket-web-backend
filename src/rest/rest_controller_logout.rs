@@ -1,5 +1,5 @@
 use crate::bindings::{pocket_logout, pocket_stat_t_OK, pocket_user_t};
-use crate::get_session;
+use crate::{get_session, perform_timestamp_last_update};
 use crate::models::data_transport::DataTransport;
 use crate::rest::rest_controller::{split_group_id_and_search, RestController};
 use crate::services::http_response_helper::HttpResponseHelper;
@@ -50,7 +50,7 @@ impl RestController {
                 let user = (*((*session.pocket).user as *const pocket_user_t)).to_user();
 
                 if let Err(error) = self.data.remove_config_json(&user.email) {
-                    session.update_timestamp_last_update();
+                    perform_timestamp_last_update!(session);
                     data_transport.error = Some(error.to_string());
                     return self.home(data_transport)
                 }

@@ -5,7 +5,7 @@ use crate::models::data_transport::DataTransport;
 use crate::rest::rest_controller::{split_group_id_and_search, RestController};
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;
-use crate::{get_field_controller, get_group_controller, get_group_field_controller, get_session};
+use crate::{get_field_controller, get_group_controller, get_group_field_controller, get_session, perform_timestamp_last_update};
 use actix_web::web::Json;
 use actix_web::HttpResponse;
 use crate::constants::Stats;
@@ -316,7 +316,7 @@ impl RestController {
                 .build()
         }
 
-        session.update_timestamp_last_update();
+        perform_timestamp_last_update!(session);
         self.home(data_transport)
 
     }

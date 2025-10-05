@@ -74,3 +74,14 @@ macro_rules! get_field_controller {
         field_controller
     }};
 }
+
+#[macro_export]
+macro_rules! perform_timestamp_last_update {
+    ($session:ident) => {
+        $session.update_timestamp_last_update();
+
+        Sessions::share().remove(&$session.session_id, false);
+
+        Sessions::share().add($session.clone());
+    };
+}

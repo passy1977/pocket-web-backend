@@ -5,7 +5,7 @@ use crate::models::field::{Field, Fields};
 use crate::rest::rest_controller::{split_group_id_and_search, RestController};
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;
-use crate::{get_field_controller, get_session};
+use crate::{get_field_controller, get_session, perform_timestamp_last_update};
 use actix_web::web::Json;
 use actix_web::HttpResponse;
 
@@ -49,7 +49,7 @@ impl RestController {
 
                     let empty_search = "".to_string();
 
-                    session.update_timestamp_last_update();
+                    perform_timestamp_last_update!(session);
                     return HttpResponseHelper::ok()
                         .path("/field-detail")
                         .title("New field".to_string())
@@ -85,7 +85,7 @@ impl RestController {
         fields.push(field);
         let fields: crate::utils::Result<Fields> = Ok(fields);
 
-        session.update_timestamp_last_update();
+        perform_timestamp_last_update!(session);
         HttpResponseHelper::ok()
             .path("/field-detail")
             .title(title)

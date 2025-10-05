@@ -5,6 +5,7 @@ use actix_web::web::Json;
 use crate::bindings::{pocket_initialize, pocket_is_no_network, pocket_login};
 use crate::constants::Stats;
 use crate::models::data_transport::DataTransport;
+use crate::perform_timestamp_last_update;
 use crate::rest::rest_controller::RestController;
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;
@@ -97,6 +98,7 @@ pub fn login(&self, data_transport: Json<DataTransport>) -> HttpResponse {
             .build();
     }
     
+    perform_timestamp_last_update!(session);
     HttpResponseHelper::ok()
         .path("/home")
         .title("Home")

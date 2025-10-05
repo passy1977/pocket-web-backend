@@ -6,31 +6,19 @@ use crate::models::data_transport::DataTransport;
 use crate::rest::rest_controller::{delete_file, RestController};
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;
-use crate::get_session;
+use crate::{get_session, perform_timestamp_last_update};
 use crate::utils::aes_decrypt;
 use actix_web::web::Json;
 use actix_web::HttpResponse;
 
 impl RestController {
 
-    // fn delete_file(&self, file: &String) -> Result<(), Error> {
-    //     let path = Path::new(file);
-
-    //     if path.exists() && path.is_file() {
-    //         fs::remove_file(path)?;
-    //     } else {
-    //         return Err(Error::new(ErrorKind::NotFound, "Impossible remove configuration file"));
-    //     }
-
-    //     Ok(())
-    // }
-
     pub fn change_passwd(&self, data_transport: Json<DataTransport>) -> HttpResponse {
         let mut session = get_session!(data_transport.session_id, "Session not found");
 
         if let Some(data) = &data_transport.data {
             if data.is_empty() {
-                session.update_timestamp_last_update();
+                perform_timestamp_last_update!(session);
                 HttpResponseHelper::ok()
                     .path("/change-passwd")
                     .title("Change password")
