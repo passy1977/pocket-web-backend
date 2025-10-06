@@ -494,7 +494,7 @@ bool pocket_is_no_network(const pocket_t* self)
     return static_cast<class session*>(self->session)->is_no_network();
 }
 
-bool pocket_validate_session(const pocket_t* self)
+bool pocket_heartbeat(const pocket_t* self)
 {
     if (self == nullptr)
     {
@@ -507,10 +507,13 @@ bool pocket_validate_session(const pocket_t* self)
         return false;
     }
 
-    //TODO: check if session is still valid on server side
+    const auto user = convert(static_cast<pocket_user_t*>(self->user));
+    if(!user)
+    {
+        return false;
+    }
 
-
-    return true;
+    return session->heartbeat(user);
 }
 
 const char* pocket_aes_decrypt(const pocket_t* self, const char encrypted[])

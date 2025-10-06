@@ -1,3 +1,4 @@
+use crate::bindings::pocket_heartbeat;
 use crate::rest::rest_controller::RestController;
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;
@@ -21,12 +22,24 @@ impl RestController {
             
             Some(session) => {
                 if session.remote_session_handling {
-                    HttpResponseHelper::ok()
+
+                    if unsafe { pocket_heartbeat(session.pocket) } {
+                        HttpResponseHelper::ok()
                         .path("")
                         .title("")
                         .session_id(session.session_id)
                         .data("remote_session_handling")
                         .build()
+                    } else {
+                        eprintln!("Heartbeat remote session expired for session_id: {}", &*session_id);
+                        Sessions::share().remove(&*session_id, true);
+                        HttpResponseHelper::ok()
+                            .session_id(&*session_id)
+                            .data("expired")
+                            .error(std::format!("Remote session expired for session_id: {}", &*session_id))
+                            .build()
+                    }
+                    
                 } else {
                     HttpResponseHelper::ok()
                         .path("")
