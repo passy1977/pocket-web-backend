@@ -31,5 +31,5 @@ async fn main() -> std::io::Result<()> {
     
 
 
-    server::start(data.ip.clone(), data.port, data.max_threads).await
+    server::start(data.address.clone(), data.port, data.max_threads).await
 }

@@ -5,8 +5,8 @@ use crate::services::data::Data;
 
 #[derive(Parser)]
 pub struct Cli {
-    /// Host ip
-    pub ip: Option<String>,
+    /// Host address
+    pub address: Option<String>,
 
     /// Connection port
     pub port: Option<u16>,
@@ -20,10 +20,10 @@ impl Cli {
     pub fn update(data: &mut Data) {
         let cli = Cli::parse();
 
-        if let Some(ip) = cli.ip.as_ref() {
-            if let Ok(_)  = Ipv4Addr::from_str(ip.as_str()) {
-                if data.ip != *ip {
-                    data.ip = ip.clone();
+        if let Some(address) = cli.address.as_ref() {
+            if let Ok(_)  = Ipv4Addr::from_str(address.as_str()) {
+                if data.address != *address {
+                    data.address = address.clone();
                     data.update = true;
                 }    
             }

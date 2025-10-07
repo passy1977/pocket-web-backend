@@ -65,18 +65,27 @@ pub mod server {
     use std::io;
     use actix_web::middleware::Logger;
 
-    pub async fn start(ip: String, port: u16, max_threads: usize) -> io::Result<()> {
+    pub async fn start(address: String, port: u16, max_threads: usize) -> io::Result<()> {
 
         env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
-        println!("Starting server at http://{ip}:{port}");
+        println!("Starting server at http://{address}:{port}");
         
         Sessions::share().start_validator();
 
-        HttpServer::new(|| {
+        let origin = format!("http://{}:{}", address, port);
+        HttpServer::new(move || {
+            let cors = Cors::default()
+                .allowed_origin(&origin)
+                .allowed_origin("http://localhost:8080") // Per sviluppo frontend
+                .allowed_origin("http://127.0.0.1:8080") // Per sviluppo frontend
+                .allowed_methods(vec!["GET", "POST", "PUT"])
+                .allowed_headers(vec!["Content-Type", "Authorization", "Accept"])
+                .max_age(3600);
+
             App::new()
                 .wrap(Logger::default())
-                .wrap(Cors::permissive())
+                .wrap(cors)
                 .route("/v5/pocket/hello/{session_id}", web::get().to(hello))
                 .route("/v5/pocket/login", web::post().to(login))
                 .route("/v5/pocket/registration", web::post().to(registration))
@@ -92,7 +101,7 @@ pub mod server {
                 .route("/v5/pocket/heartbeat/{session_id}", web::get().to(heartbeat))
                 .service(fs::Files::new("/", "./statics").index_file("index.html"))
             })
-            .bind((ip, port))?
+            .bind((address, port))?
             .workers(max_threads)
             .run()
             .await

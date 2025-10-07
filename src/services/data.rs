@@ -17,8 +17,8 @@ pub struct Data {
     #[serde(skip_serializing, skip_deserializing)]
     pub dir_path: PathBuf,
 
-    /// IP address on which the server listens
-    pub ip: String,
+    /// Address on which the server listens
+    pub address: String,
 
     /// Connection port
     pub port: u16,
@@ -69,7 +69,7 @@ impl Data {
         let mut ret = Self {
             file_data_path,
             dir_path,
-            ip: IP.to_string(),
+            address: IP.to_string(),
             port: PORT,
             update: false,
             max_threads: MAX_BLOCKING_THREADS,
@@ -102,7 +102,7 @@ impl Data {
 
         let data : Data = serde_json::from_str(&data)?;
 
-        self.ip = data.ip;
+        self.address = data.address;
         self.port = data.port;
         self.update = false;
         self.max_threads = data.max_threads;
