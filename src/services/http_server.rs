@@ -28,6 +28,8 @@ pub async fn group_detail(data_transport: web::Json<DataTransport>) -> impl Resp
     RestController::share().group_detail(data_transport)
 }
 
+// Funzione debug disponibile solo in modalità debug/development
+#[cfg(debug_assertions)]
 pub async fn debug(data_transport: web::Json<DataTransport>) -> impl Responder {
     RestController::share().debug(data_transport)
 }
@@ -58,7 +60,12 @@ pub async fn upload(multipart: Multipart) -> impl Responder {
 
 pub mod server {
     use crate::services::{http_server::{heartbeat, upload}, session::Sessions};
-    use super::{debug, field_detail, group_detail, hello, login, home, registration, data, change_passwd, import_data, logout};
+    
+    //Available only in dev mode
+    #[cfg(debug_assertions)]
+    use super::debug;
+    
+    use super::{field_detail, group_detail, hello, login, home, registration, data, change_passwd, import_data, logout};
     use actix_cors::Cors;
     use actix_files as fs;
     use actix_web::{web, App, HttpServer};
@@ -77,13 +84,13 @@ pub mod server {
         HttpServer::new(move || {
             let cors = Cors::default()
                 .allowed_origin(&origin)
-                .allowed_origin("http://localhost:8080") // Per sviluppo frontend
-                .allowed_origin("http://127.0.0.1:8080") // Per sviluppo frontend
+                .allowed_origin("http://localhost:8080") 
+                .allowed_origin("http://127.0.0.1:8080") 
                 .allowed_methods(vec!["GET", "POST", "PUT"])
                 .allowed_headers(vec!["Content-Type", "Authorization", "Accept"])
                 .max_age(3600);
 
-            App::new()
+            let app = App::new()
                 .wrap(Logger::default())
                 .wrap(cors)
                 .route("/v5/pocket/hello/{session_id}", web::get().to(hello))
@@ -92,9 +99,13 @@ pub mod server {
                 .route("/v5/pocket/home", web::put().to(home))
                 .route("/v5/pocket/data", web::post().to(data))
                 .route("/v5/pocket/field_detail", web::put().to(field_detail))
-                .route("/v5/pocket/group_detail", web::put().to(group_detail))
-                .route("/v5/pocket/debug", web::post().to(debug))
-                .route("/v5/pocket/change_passwd", web::put().to(change_passwd))
+                .route("/v5/pocket/group_detail", web::put().to(group_detail));
+
+            // Endpoint debug available only in dev mode
+            #[cfg(debug_assertions)]
+            let app = app.route("/v5/pocket/debug", web::post().to(debug));
+
+            app.route("/v5/pocket/change_passwd", web::put().to(change_passwd))
                 .route("/v5/pocket/import_data", web::put().to(import_data))
                 .route("/v5/pocket/logout", web::put().to(logout))
                 .route("/v5/pocket/upload", web::post().to(upload))
