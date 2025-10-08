@@ -19,6 +19,7 @@ mod bindings;
 mod services;
 mod utils;
 mod rest;
+mod rate_limiter;
 
 //https://medium.com/@AlexanderObregon/building-restful-apis-with-rust-and-warp-70a6159fd804
 

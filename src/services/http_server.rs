@@ -1,19 +1,19 @@
 
 use crate::{models::data_transport::DataTransport, rest::rest_controller::RestController};
 use actix_multipart::Multipart;
-use actix_web::{web, Responder};
+use actix_web::{web, Responder, HttpRequest};
 
 
 pub async fn hello(session_id: web::Path<String>) -> impl Responder {
     RestController::share().hello(session_id)
 }
 
-pub async fn login(data_transport: web::Json<DataTransport>) -> impl Responder {
-    RestController::share().login(data_transport)
+pub async fn login(req: HttpRequest, data_transport: web::Json<DataTransport>) -> impl Responder {
+    RestController::share().login(req, data_transport)
 }
 
-pub async fn registration(data_transport: web::Json<DataTransport>) -> impl Responder {
-    RestController::share().registration(data_transport)
+pub async fn registration(req: HttpRequest, data_transport: web::Json<DataTransport>) -> impl Responder {
+    RestController::share().registration(req, data_transport)
 }
 
 pub async fn home(data_transport: web::Json<DataTransport>) -> impl Responder {
@@ -38,8 +38,8 @@ pub async fn data(data_transport: web::Json<DataTransport>) -> impl Responder {
     RestController::share().data(data_transport)
 }
 
-pub async fn change_passwd(data_transport: web::Json<DataTransport>) -> impl Responder {
-    RestController::share().change_passwd(data_transport)
+pub async fn change_passwd(req: HttpRequest, data_transport: web::Json<DataTransport>) -> impl Responder {
+    RestController::share().change_passwd(req, data_transport)
 }
 
 pub async fn import_data(data_transport: web::Json<DataTransport>) -> impl Responder {
@@ -50,8 +50,8 @@ pub async fn logout(data_transport: web::Json<DataTransport>) -> impl Responder 
     RestController::share().logout(data_transport)
 }
 
-pub async fn heartbeat(session_id: web::Path<String>) -> impl Responder {
-    RestController::share().heartbeat(session_id)
+pub async fn heartbeat(req: HttpRequest, session_id: web::Path<String>) -> impl Responder {
+    RestController::share().heartbeat(req, session_id)
 }
 
 pub async fn upload(multipart: Multipart) -> impl Responder {

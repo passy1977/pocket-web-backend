@@ -1,6 +1,6 @@
 use std::ffi::CString;
 use std::str::FromStr;
-use actix_web::HttpResponse;
+use actix_web::{HttpResponse, HttpRequest};
 use actix_web::web::Json;
 use crate::bindings::{pocket_initialize, pocket_is_no_network, pocket_login};
 use crate::constants::Stats;
@@ -9,10 +9,16 @@ use crate::perform_timestamp_last_update;
 use crate::rest::rest_controller::RestController;
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;
+use crate::rate_limiter::check_rate_limit_or_reject;
 
 impl RestController {
     
-pub fn login(&self, data_transport: Json<DataTransport>) -> HttpResponse {
+pub fn login(&self, req: HttpRequest, data_transport: Json<DataTransport>) -> HttpResponse {
+
+    // Verifica rate limiting per l'endpoint di login
+    if let Some(response) = check_rate_limit_or_reject(&req, "/v5/pocket/login", Some(data_transport.session_id.as_str())) {
+        return response;
+    }
 
     let (email, passwd) = match &data_transport.data {
         None => return HttpResponseHelper::forbidden()

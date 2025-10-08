@@ -1,13 +1,19 @@
 use std::{ffi::CString, str::FromStr};
 
-use actix_web::{web::Json, HttpResponse};
+use actix_web::{web::Json, HttpResponse, HttpRequest};
 
 use crate::{bindings::pocket_initialize, models::data_transport::DataTransport, rest::rest_controller::RestController, services::session::Sessions, utils::aes_encrypt};
 use crate::services::http_response_helper::HttpResponseHelper;
+use crate::rate_limiter::check_rate_limit_or_reject;
 
 impl RestController {
 
-        pub fn registration(&self, data_transport: Json<DataTransport>) -> HttpResponse {
+        pub fn registration(&self, req: HttpRequest, data_transport: Json<DataTransport>) -> HttpResponse {
+
+        // Verifica rate limiting per l'endpoint di registration
+        if let Some(response) = check_rate_limit_or_reject(&req, "/v5/pocket/registration", Some(data_transport.session_id.as_str())) {
+            return response;
+        }
 
         let (config_json, email , passwd, password_confirmation) = match &data_transport.data {
             None => return HttpResponseHelper::forbidden()

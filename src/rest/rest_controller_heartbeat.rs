@@ -3,11 +3,18 @@ use crate::perform_timestamp_last_update;
 use crate::rest::rest_controller::RestController;
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;
-use actix_web::HttpResponse;
+use actix_web::{HttpResponse, HttpRequest};
 use actix_web::web::Path;
+use crate::rate_limiter::check_rate_limit_or_reject;
 
 impl RestController {
-    pub fn heartbeat(&self, session_id: Path<String>) -> HttpResponse {
+    pub fn heartbeat(&self, req: HttpRequest, session_id: Path<String>) -> HttpResponse {
+        
+        // Verifica rate limiting per l'endpoint di heartbeat
+        if let Some(response) = check_rate_limit_or_reject(&req, "/v5/pocket/heartbeat", Some(&session_id)) {
+            return response;
+        }
+        
         match Sessions::share().get(&session_id) {
             None => 
             {

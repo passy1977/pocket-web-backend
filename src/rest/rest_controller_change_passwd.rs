@@ -8,12 +8,18 @@ use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::session::Sessions;
 use crate::{get_session, perform_timestamp_last_update};
 use crate::utils::aes_decrypt;
-use actix_web::web::Json;
-use actix_web::HttpResponse;
+use actix_web::{web::Json, HttpResponse, HttpRequest};
+use crate::rate_limiter::check_rate_limit_or_reject;
 
 impl RestController {
 
-    pub fn change_passwd(&self, data_transport: Json<DataTransport>) -> HttpResponse {
+    pub fn change_passwd(&self, req: HttpRequest, data_transport: Json<DataTransport>) -> HttpResponse {
+        
+        // Verifica rate limiting per l'endpoint di change_passwd
+        if let Some(response) = check_rate_limit_or_reject(&req, "/v5/pocket/change_passwd", Some(data_transport.session_id.as_str())) {
+            return response;
+        }
+        
         let mut session = get_session!(data_transport.session_id, "Session not found");
 
         if let Some(data) = &data_transport.data {
