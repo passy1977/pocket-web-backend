@@ -1,4 +1,5 @@
 use std::{self, io::Write, ffi::CString, path::MAIN_SEPARATOR, str::from_utf8, fs::File};
+use crate::services::secure_session::generate_secure_session_id;
 use crate::{get_field_controller, get_group_controller, get_session, perform_timestamp_last_update};
 use crate::models::data_transport::DataTransport;
 use crate::rest::rest_controller::{delete_file, get_list_field, get_list_group, RestController};
@@ -6,7 +7,6 @@ use crate::services::http_response_helper::HttpResponseHelper;
 use actix_multipart::Multipart;
 use actix_web::web::Json;
 use actix_web::{HttpResponse};
-use ulid::Ulid;
 use crate::services::session::Sessions;
 use futures_util::stream::StreamExt as _;
 use crate::bindings::{pocket_field_controller_init, pocket_field_controller_new, pocket_group_controller_data_import, pocket_group_controller_data_import_legacy, pocket_group_controller_init, pocket_group_controller_new, pocket_is_no_network};
@@ -89,7 +89,7 @@ impl RestController {
             Some(data_dir_path) => data_dir_path.to_string()
         };
         full_path_file.push(MAIN_SEPARATOR);
-        full_path_file.push_str(&Ulid::new().to_string());
+        full_path_file.push_str(&generate_secure_session_id());
 
 
 

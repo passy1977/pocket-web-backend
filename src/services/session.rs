@@ -1,11 +1,11 @@
 use crate::bindings::{pocket_field_controller_free, pocket_field_controller_t, pocket_free, pocket_group_controller_free, pocket_group_controller_t, pocket_group_field_controller_free, pocket_group_field_controller_t, pocket_new, pocket_t};
 use crate::services::data::Data;
+use crate::services::secure_session::generate_secure_session_id;
 use crate::services::session_timer::SessionTimer;
 use std::collections::HashMap;
 use std::ptr::null_mut;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
-use ulid::Ulid;
 
 
 static DEFAULT_TIMESTAMP_LAST_UPDATE : u32 = 5 * 60; // 5 minutes in seconds
@@ -52,7 +52,7 @@ unsafe impl Sync for Sessions {}
 impl Session {
     pub fn new() -> Session {
         Self {
-            session_id: Ulid::new().to_string(),
+            session_id: generate_secure_session_id(),
             pocket: unsafe { pocket_new() },
             group_controller: null_mut(),
             group_field_controller: null_mut(),
