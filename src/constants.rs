@@ -9,6 +9,12 @@ pub(crate) mod conf {
     pub const PORT :u16 = 8080;
     pub const MAX_BLOCKING_THREADS: usize = 2;
     pub const SESSION_EXPIRATION_TIME: u32 = 300; // 5 minuti in secondi
+    
+    // CORS Configuration
+    pub const CORS_MAX_AGE: usize = 3600; // 1 hour
+    pub const CORS_ALLOWED_METHODS: &[&str] = &["GET", "POST", "PUT"];
+    pub const CORS_ALLOWED_HEADERS: &[&str] = &["Content-Type", "Authorization", "Accept", "X-Requested-With"];
+    
 }
 
 pub(crate)  mod data {

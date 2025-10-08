@@ -60,13 +60,13 @@ pub async fn upload(multipart: Multipart) -> impl Responder {
 
 pub mod server {
     use crate::services::{http_server::{heartbeat, upload}, session::Sessions};
+    use crate::utils::configure_cors;
     
     //Available only in dev mode
     #[cfg(debug_assertions)]
     use super::debug;
     
     use super::{field_detail, group_detail, hello, login, home, registration, data, change_passwd, import_data, logout};
-    use actix_cors::Cors;
     use actix_files as fs;
     use actix_web::{web, App, HttpServer};
     use std::io;
@@ -82,13 +82,8 @@ pub mod server {
 
         let origin = format!("http://{}:{}", address, port);
         HttpServer::new(move || {
-            let cors = Cors::default()
-                .allowed_origin(&origin)
-                .allowed_origin("http://localhost:8080") 
-                .allowed_origin("http://127.0.0.1:8080") 
-                .allowed_methods(vec!["GET", "POST", "PUT"])
-                .allowed_headers(vec!["Content-Type", "Authorization", "Accept"])
-                .max_age(3600);
+            // Configura CORS utilizzando la funzione helper sicura
+            let cors = configure_cors(origin.clone());
 
             let app = App::new()
                 .wrap(Logger::default())

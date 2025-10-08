@@ -138,3 +138,41 @@ where T: PartialEq + Eq + Hash + Clone
     
 //     hex_str
 // }
+
+pub(crate) fn configure_cors(server_origin: String) -> actix_cors::Cors {
+    use crate::constants::conf::{CORS_MAX_AGE, CORS_ALLOWED_METHODS, CORS_ALLOWED_HEADERS};
+    use actix_cors::Cors;
+    use std::env;
+    
+    let mut cors = Cors::default()
+        .allowed_origin(&server_origin)
+        .allowed_methods(CORS_ALLOWED_METHODS.to_vec())
+        .allowed_headers(CORS_ALLOWED_HEADERS.to_vec())
+        .max_age(CORS_MAX_AGE);
+    
+    #[cfg(debug_assertions)]
+    {
+        cors = cors
+            .allowed_origin("http://localhost:8080")
+            .allowed_origin("http://127.0.0.1:8080");
+    }
+    
+    if let Ok(additional_origins) = env::var("CORS_ALLOWED_ORIGINS") {
+        for origin in additional_origins.split(',') {
+            let origin = origin.trim();
+            if !origin.is_empty() {
+                cors = cors.allowed_origin(origin);
+            }
+        }
+    }
+    
+    #[cfg(not(debug_assertions))]
+    {
+        if env::var("CORS_PERMISSIVE").is_err() {
+            // In produzione, mantieni configurazione ristretta di default
+            cors = cors.supports_credentials();
+        }
+    }
+    
+    cors
+}
