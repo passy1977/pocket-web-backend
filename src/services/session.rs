@@ -220,3 +220,175 @@ impl Sessions {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::sync::Arc;
+
+    #[test]
+    fn test_session_new() {
+        let session = Session::new();
+        
+        // Verifica che il session_id sia generato
+        assert!(!session.session_id.is_empty());
+        assert_eq!(session.session_id.len(), 64); // SHA256 hex
+        
+        // Verifica che pocket sia inizializzato
+        assert!(!session.pocket.is_null());
+        
+        // Verifica valori di default
+        assert!(session.group_controller.is_null());
+        assert!(session.group_field_controller.is_null());
+        assert!(session.field_controller.is_null());
+        assert!(session.email.is_none());
+        assert!(session.remote_session_handling);
+        
+        // Verifica timestamp
+        assert!(session.timestamp_last_update > 0);
+    }
+
+    #[test]
+    fn test_session_update_timestamp() {
+        let mut session = Session::new();
+        let initial_timestamp = session.timestamp_last_update;
+        
+        // Aspetta un attimo per garantire un timestamp diverso
+        std::thread::sleep(std::time::Duration::from_millis(10));
+        
+        session.update_timestamp_last_update();
+        
+        assert!(session.timestamp_last_update >= initial_timestamp);
+    }
+
+    #[test]
+    fn test_sessions_new() {
+        let sessions = Sessions::new();
+        
+        // Verifica che le sessioni siano inizializzate vuote
+        let sessions_map = sessions.sessions.lock().unwrap();
+        assert!(sessions_map.is_empty());
+        
+        // Verifica che il timer sia None inizialmente
+        let timer = sessions.timer.lock().unwrap();
+        assert!(timer.is_none());
+        
+        // Verifica che session_expiration_time sia un valore ragionevole
+        assert!(sessions.session_expiration_time > 0);
+    }
+
+    #[test]
+    fn test_sessions_add_session() {
+        let sessions = Sessions::new();
+        let session = Session::new();
+        let session_id = session.session_id.clone();
+        
+        sessions.add(session);
+        
+        // Verifica che la sessione sia stata aggiunta
+        let sessions_map = sessions.sessions.lock().unwrap();
+        assert!(sessions_map.contains_key(&session_id));
+        assert_eq!(sessions_map.len(), 1);
+    }
+
+    #[test]
+    fn test_sessions_get_session() {
+        let sessions = Sessions::new();
+        let session = Session::new();
+        let session_id = session.session_id.clone();
+        
+        sessions.add(session);
+        
+        // Test sessione esistente
+        let retrieved_session = sessions.get(&session_id);
+        assert!(retrieved_session.is_some());
+        assert_eq!(retrieved_session.unwrap().session_id, session_id);
+        
+        // Test sessione inesistente
+        let non_existent = sessions.get("non_existent_id");
+        assert!(non_existent.is_none());
+    }
+
+    #[test]
+    fn test_sessions_get_session_mut() {
+        let sessions = Sessions::new();
+        let mut session = Session::new();
+        session.email = Some("test@example.com".to_string());
+        let session_id = session.session_id.clone();
+        
+        sessions.add(session);
+        
+        // Test modifica sessione esistente
+        {
+            let mut sessions_map = sessions.sessions.lock().unwrap();
+            if let Some(session_ref) = sessions_map.get_mut(&session_id) {
+                session_ref.email = Some("updated@example.com".to_string());
+            }
+        }
+        
+        // Verifica che la modifica sia persistita
+        let retrieved_session = sessions.get(&session_id);
+        assert_eq!(retrieved_session.unwrap().email, Some("updated@example.com".to_string()));
+    }
+
+    #[test]
+    fn test_sessions_remove_session() {
+        let sessions = Sessions::new();
+        let session = Session::new();
+        let session_id = session.session_id.clone();
+        
+        sessions.add(session);
+        
+        // Verifica che la sessione esista
+        assert!(sessions.get(&session_id).is_some());
+        
+        // Rimuovi la sessione
+        sessions.remove(&session_id, false);
+        
+        // Verifica che la sessione sia stata rimossa
+        assert!(sessions.get(&session_id).is_none());
+    }
+
+    #[test]
+    fn test_sessions_contains() {
+        let sessions = Sessions::new();
+        let session = Session::new();
+        let session_id = session.session_id.clone();
+        
+        // Verifica che la sessione non esista inizialmente
+        assert!(sessions.get(&session_id).is_none());
+        
+        sessions.add(session);
+        
+        // Verifica che la sessione esista ora
+        assert!(sessions.get(&session_id).is_some());
+        
+        // Test con ID inesistente
+        assert!(sessions.get("non_existent_id").is_none());
+    }
+
+    #[test]
+    fn test_sessions_share() {
+        // Test del singleton
+        let sessions1 = Sessions::share();
+        let sessions2 = Sessions::share();
+        
+        // Dovrebbero essere la stessa istanza
+        assert!(Arc::ptr_eq(&sessions1, &sessions2));
+    }
+
+    #[test]
+    fn test_pocket_t_is_valid() {
+        // Test per verificare che pocket_t::is_valid funzioni
+        // Nota: questo test è limitato perché dipende dal codice C
+        // e non possiamo facilmente creare un pocket_t valido nei test
+        let pocket = pocket_t {
+            session: std::ptr::null_mut(),
+            user: std::ptr::null_mut(),
+            aes: std::ptr::null_mut(),
+        };
+        
+        // Un pocket con session null dovrebbe essere invalido
+        assert!(!pocket.is_valid());
+    }
+}

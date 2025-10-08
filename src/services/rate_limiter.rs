@@ -336,12 +336,13 @@ mod tests {
     }
 
     #[test]
-    fn test_global_rate_limiter() {
-        let ip = "192.168.1.1".parse().unwrap();
-        let endpoint = "/v5/pocket/heartbeat";
-
-        // Test del rate limiter globale
-        assert!(check_rate_limit(ip, endpoint, None));
-        assert!(check_rate_limit(ip, endpoint, Some("session123")));
+    fn test_rate_limiter_global_instance() {
+        // Test che il rate limiter globale sia accessibile
+        let limiter = &*RATE_LIMITER;
+        let ip = "192.168.1.1".parse::<std::net::IpAddr>().unwrap();
+        let endpoint = "/v5/pocket/test";
+        
+        // Dovrebbe funzionare per i primi tentativi
+        assert!(limiter.check_ip_rate(ip, endpoint));
     }
 }

@@ -176,3 +176,81 @@ pub(crate) fn configure_cors(server_origin: String) -> actix_cors::Cors {
     
     cors
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_are_sets_equal_same_elements() {
+        let a = vec![1, 2, 3, 4];
+        let b = vec![4, 3, 2, 1]; // Same elements, different order
+        assert!(are_sets_equal(&a, &b));
+    }
+
+    #[test]
+    fn test_are_sets_equal_different_elements() {
+        let a = vec![1, 2, 3];
+        let b = vec![1, 2, 4];
+        assert!(!are_sets_equal(&a, &b));
+    }
+
+    #[test]
+    fn test_are_sets_equal_empty_sets() {
+        let a: Vec<i32> = vec![];
+        let b: Vec<i32> = vec![];
+        assert!(are_sets_equal(&a, &b));
+    }
+
+    #[test]
+    fn test_are_sets_equal_duplicates() {
+        let a = vec![1, 2, 2, 3];
+        let b = vec![1, 2, 3];
+        assert!(are_sets_equal(&a, &b)); // Duplicates should be ignored
+    }
+
+    #[test]
+    fn test_are_sets_equal_strings() {
+        let a = vec!["hello", "world"];
+        let b = vec!["world", "hello"];
+        assert!(are_sets_equal(&a, &b));
+    }
+
+    #[test]
+    fn test_error_display() {
+        let error = Error::Undefine;
+        assert_eq!(format!("{}", error), "Undefine");
+
+        let error = Error::Msg("Custom error message".to_string());
+        assert_eq!(format!("{}", error), "Custom error message");
+    }
+
+    #[test]
+    fn test_error_description() {
+        use std::error::Error;
+        
+        let error = crate::utils::Error::Undefine;
+        assert_eq!(format!("{}", error), "Undefine");
+
+        let error = crate::utils::Error::Msg("Custom message".to_string());
+        assert_eq!(format!("{}", error), "Custom message");
+    }
+
+    #[test]
+    fn test_error_equality() {
+        assert_eq!(Error::Undefine, Error::Undefine);
+        assert_eq!(Error::Msg("test".to_string()), Error::Msg("test".to_string()));
+        assert_ne!(Error::Undefine, Error::Msg("test".to_string()));
+    }
+
+    // Test per configure_cors - verifica che la configurazione CORS sia valida
+    #[test]
+    fn test_configure_cors_basic() {
+        let origin = "http://localhost:3000".to_string();
+        let _cors = configure_cors(origin.clone());
+        
+        // Non possiamo testare facilmente il contenuto interno di Cors,
+        // ma possiamo verificare che la funzione non vada in panic
+        // e ritorni un oggetto Cors valido
+    }
+}

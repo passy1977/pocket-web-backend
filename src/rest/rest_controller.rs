@@ -184,3 +184,153 @@ impl RestController {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use actix_web::web::Json;
+
+    #[test]
+    fn test_split_group_id_and_search_valid_data() {
+        let data_transport = Json(DataTransport {
+            data: Some("123|search_term".to_string()),
+            ..DataTransport::default()
+        });
+        let mut other = String::new();
+
+        let result = split_group_id_and_search(&data_transport, &mut other);
+        
+        assert!(result.is_ok());
+        let (group_id, search) = result.unwrap();
+        assert_eq!(group_id, 123);
+        assert_eq!(search, "search_term");
+        assert!(other.is_empty());
+    }
+
+    #[test]
+    fn test_split_group_id_and_search_with_additional_data() {
+        let data_transport = Json(DataTransport {
+            data: Some("456|search|extra|data".to_string()),
+            ..DataTransport::default()
+        });
+        let mut other = String::new();
+
+        let result = split_group_id_and_search(&data_transport, &mut other);
+        
+        assert!(result.is_ok());
+        let (group_id, search) = result.unwrap();
+        assert_eq!(group_id, 456);
+        assert_eq!(search, "search");
+        assert_eq!(other, "extra|data|");
+    }
+
+    #[test]
+    fn test_split_group_id_and_search_no_data() {
+        let data_transport = Json(DataTransport {
+            data: None,
+            ..DataTransport::default()
+        });
+        let mut other = String::new();
+
+        let result = split_group_id_and_search(&data_transport, &mut other);
+        
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "No data send");
+    }
+
+    #[test]
+    fn test_split_group_id_and_search_insufficient_parts() {
+        let data_transport = Json(DataTransport {
+            data: Some("123".to_string()), // Solo group_id, manca search
+            ..DataTransport::default()
+        });
+        let mut other = String::new();
+
+        let result = split_group_id_and_search(&data_transport, &mut other);
+        
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "group_id is mandatory");
+    }
+
+    #[test]
+    fn test_split_group_id_and_search_invalid_group_id() {
+        let data_transport = Json(DataTransport {
+            data: Some("invalid_id|search_term".to_string()),
+            ..DataTransport::default()
+        });
+        let mut other = String::new();
+
+        let result = split_group_id_and_search(&data_transport, &mut other);
+        
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "group_id parse error");
+    }
+
+    #[test]
+    fn test_split_group_id_and_search_empty_parts() {
+        let data_transport = Json(DataTransport {
+            data: Some("789|".to_string()), // Search vuoto
+            ..DataTransport::default()
+        });
+        let mut other = String::new();
+
+        let result = split_group_id_and_search(&data_transport, &mut other);
+        
+        assert!(result.is_ok());
+        let (group_id, search) = result.unwrap();
+        assert_eq!(group_id, 789);
+        assert_eq!(search, "");
+    }
+
+    #[test]
+    fn test_split_group_id_and_search_negative_id() {
+        let data_transport = Json(DataTransport {
+            data: Some("-1|search_term".to_string()),
+            ..DataTransport::default()
+        });
+        let mut other = String::new();
+
+        let result = split_group_id_and_search(&data_transport, &mut other);
+        
+        assert!(result.is_ok());
+        let (group_id, search) = result.unwrap();
+        assert_eq!(group_id, -1);
+        assert_eq!(search, "search_term");
+    }
+
+    #[test]
+    fn test_split_group_id_and_search_special_characters() {
+        let data_transport = Json(DataTransport {
+            data: Some("100|search with spaces|extra data with symbols!@#".to_string()),
+            ..DataTransport::default()
+        });
+        let mut other = String::new();
+
+        let result = split_group_id_and_search(&data_transport, &mut other);
+        
+        assert!(result.is_ok());
+        let (group_id, search) = result.unwrap();
+        assert_eq!(group_id, 100);
+        assert_eq!(search, "search with spaces");
+        assert_eq!(other, "extra data with symbols!@#|");
+    }
+
+    #[test]
+    fn test_rest_controller_creation() {
+        // Test che possiamo creare un RestController
+        // Nota: questo test è limitato perché Data::init() potrebbe fallire
+        // se non ci sono i file di configurazione appropriati
+        let data = match crate::services::data::Data::init() {
+            Ok(data) => data,
+            Err(_) => {
+                // Se non riusciamo a inizializzare Data, creiamo un mock
+                // Questo test verifica principalmente che la struttura sia definita correttamente
+                return;
+            }
+        };
+
+        let controller = RestController { data };
+        // Se arriviamo qui, la creazione è andata a buon fine
+        assert_eq!(controller.data.address.is_empty(), false);
+    }
+}
