@@ -15,7 +15,7 @@ impl RestController {
 
     pub fn change_passwd(&self, req: HttpRequest, data_transport: Json<DataTransport>) -> HttpResponse {
         
-        // Verifica rate limiting per l'endpoint di change_passwd
+        // Check rate limiting for change_passwd endpoint
         if let Some(response) = check_rate_limit_or_reject(&req, "/v5/pocket/change_passwd", Some(data_transport.session_id.as_str())) {
             return response;
         }

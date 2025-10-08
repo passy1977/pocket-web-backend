@@ -8,7 +8,7 @@ pub(crate) mod conf {
     pub const IP: &str = "127.0.0.1";
     pub const PORT :u16 = 8080;
     pub const MAX_BLOCKING_THREADS: usize = 2;
-    pub const SESSION_EXPIRATION_TIME: u32 = 300; // 5 minuti in secondi
+    pub const SESSION_EXPIRATION_TIME: u32 = 300; // 5 minutes in seconds
     
     // CORS Configuration
     pub const CORS_MAX_AGE: usize = 3600; // 1 hour

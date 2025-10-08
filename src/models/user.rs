@@ -103,7 +103,7 @@ mod tests {
 
     #[test]
     fn test_user_stat_enum_values() {
-        // Verifica che i valori dell'enum corrispondano a quelli attesi
+        // Verify that enum values match the expected ones
         assert_eq!(UserStat::UserStatNotActive as c_uint, 1);
         assert_eq!(UserStat::UserStatActive as c_uint, 0);
         assert_eq!(UserStat::UserStatDeleted as c_uint, 2);

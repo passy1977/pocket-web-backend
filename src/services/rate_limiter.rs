@@ -6,7 +6,7 @@ use tokio::time::{interval, Duration as TokioDuration};
 use actix_web::{HttpResponse, HttpRequest};
 use serde_json::json;
 
-/// Configurazione per i limiti di rate limiting
+/// Configuration for rate limiting
 #[derive(Debug, Clone)]
 pub struct RateLimit {
     pub max_requests: u32,
@@ -21,29 +21,29 @@ impl RateLimit {
         }
     }
     
-    // Limiti predefiniti per diversi endpoint
+    // Default limits for different endpoints
     pub fn login_limit() -> Self {
-        Self::new(5, 300) // 5 tentativi ogni 5 minuti
+        Self::new(5, 300) // 5 attempts every 5 minutes
     }
     
     pub fn registration_limit() -> Self {
-        Self::new(3, 3600) // 3 registrazioni ogni ora
+        Self::new(3, 3600) // 3 registrations every hour
     }
     
     pub fn password_change_limit() -> Self {
-        Self::new(3, 3600) // 3 cambi password ogni ora
+        Self::new(3, 3600) // 3 password changes every hour
     }
     
     pub fn api_limit() -> Self {
-        Self::new(1000, 3600) // 1000 richieste API ogni ora
+        Self::new(1000, 3600) // 1000 API requests every hour
     }
     
     pub fn heartbeat_limit() -> Self {
-        Self::new(12, 60) // 12 heartbeat ogni minuto
+        Self::new(12, 60) // 12 heartbeats every minute
     }
 }
 
-/// Entry per tracciare le richieste di un client
+/// Entry to track client requests
 #[derive(Debug, Clone)]
 struct RequestEntry {
     count: u32,
@@ -62,7 +62,7 @@ impl RequestEntry {
         if let Ok(elapsed) = self.window_start.elapsed() {
             elapsed.as_secs() >= window_seconds
         } else {
-            true // Se non riusciamo a calcolare, consideriamo scaduto
+            true // If we can't calculate, consider it expired
         }
     }
     
@@ -76,13 +76,13 @@ impl RequestEntry {
     }
 }
 
-/// Rate limiter principale
+/// Main rate limiter
 pub struct RateLimiter {
-    // Traccia richieste per IP
+    // Track requests by IP
     ip_requests: Arc<Mutex<HashMap<IpAddr, HashMap<String, RequestEntry>>>>,
-    // Traccia richieste per session ID
+    // Track requests by session ID
     session_requests: Arc<Mutex<HashMap<String, HashMap<String, RequestEntry>>>>,
-    // Configurazioni per endpoint
+    // Configurations for endpoints
     endpoint_limits: HashMap<String, RateLimit>,
 }
 
@@ -90,13 +90,13 @@ impl RateLimiter {
     pub fn new() -> Self {
         let mut endpoint_limits = HashMap::new();
         
-        // Configura limiti per endpoint specifici
+        // Configure limits for specific endpoints
         endpoint_limits.insert("/v5/pocket/login".to_string(), RateLimit::login_limit());
         endpoint_limits.insert("/v5/pocket/registration".to_string(), RateLimit::registration_limit());
         endpoint_limits.insert("/v5/pocket/change_passwd".to_string(), RateLimit::password_change_limit());
         endpoint_limits.insert("/v5/pocket/heartbeat".to_string(), RateLimit::heartbeat_limit());
         
-        // Limite generico per tutti gli altri endpoint API
+        // Generic limit for all other API endpoints
         endpoint_limits.insert("_default_api".to_string(), RateLimit::api_limit());
         
         let rate_limiter = Self {
@@ -105,13 +105,13 @@ impl RateLimiter {
             endpoint_limits,
         };
         
-        // Avvia il cleanup automatico
+        // Start automatic cleanup
         rate_limiter.start_cleanup_task();
         
         rate_limiter
     }
     
-    /// Verifica se una richiesta da un IP può essere processata
+    /// Verify if a request from an IP can be processed
     pub fn check_ip_rate(&self, ip: IpAddr, endpoint: &str) -> bool {
         let limit = self.get_endpoint_limit(endpoint);
         let endpoint_key = format!("{}_{}", endpoint, "ip");
@@ -122,7 +122,7 @@ impl RateLimiter {
         self.check_rate_internal(ip_map, &endpoint_key, &limit)
     }
     
-    /// Verifica se una richiesta da una session può essere processata
+    /// Verify if a request from a session can be processed
     pub fn check_session_rate(&self, session_id: &str, endpoint: &str) -> bool {
         let limit = self.get_endpoint_limit(endpoint);
         let endpoint_key = format!("{}_{}", endpoint, "session");
@@ -162,7 +162,7 @@ impl RateLimiter {
         self.endpoint_limits
             .get(endpoint)
             .or_else(|| {
-                // Se l'endpoint inizia con /v5/pocket/, usa il limite API di default
+                // If the endpoint starts with /v5/pocket/, use the default API limit
                 if endpoint.starts_with("/v5/pocket/") {
                     self.endpoint_limits.get("_default_api")
                 } else {
@@ -170,19 +170,19 @@ impl RateLimiter {
                 }
             })
             .cloned()
-            .unwrap_or_else(|| RateLimit::new(100, 3600)) // Fallback molto restrittivo
+            .unwrap_or_else(|| RateLimit::new(100, 3600)) // Very restrictive fallback
     }
     
-    /// Avvia un task in background per pulire le entry scadute
+    /// Start a background task to clean expired entries
     fn start_cleanup_task(&self) {
-        // Solo in modalità non-test avvia il task di cleanup
+        // Only start cleanup task in non-test mode
         #[cfg(not(test))]
         {
             let ip_requests = self.ip_requests.clone();
             let session_requests = self.session_requests.clone();
             
             tokio::spawn(async move {
-                let mut cleanup_interval = interval(TokioDuration::from_secs(300)); // Ogni 5 minuti
+                let mut cleanup_interval = interval(TokioDuration::from_secs(300)); // Every 5 minutes
                 
                 loop {
                     cleanup_interval.tick().await;
@@ -191,7 +191,7 @@ impl RateLimiter {
                     {
                         let mut ip_map = ip_requests.lock().unwrap();
                         ip_map.retain(|_, endpoint_map| {
-                            endpoint_map.retain(|_, entry| !entry.is_expired(3600)); // Rimuovi entry più vecchie di 1 ora
+                            endpoint_map.retain(|_, entry| !entry.is_expired(3600)); // Remove entries older than 1 hour
                             !endpoint_map.is_empty()
                         });
                     }
@@ -210,23 +210,23 @@ impl RateLimiter {
     }
 }
 
-/// Istanza globale del rate limiter
+/// Global rate limiter instance
 static RATE_LIMITER: LazyLock<RateLimiter> = LazyLock::new(|| RateLimiter::new());
 
-/// Funzione helper per verificare i rate limit e restituire una risposta di errore se necessario
+/// Helper function to check rate limits and return error response if necessary
 pub fn check_rate_limit_or_reject(
     req: &HttpRequest,
     endpoint: &str,
     session_id: Option<&str>,
 ) -> Option<HttpResponse> {
-    // Estrai IP del client
+    // Extract client IP
     let client_ip = req
         .connection_info()
         .realip_remote_addr()
         .and_then(|addr| addr.parse::<IpAddr>().ok())
         .unwrap_or_else(|| "127.0.0.1".parse().unwrap());
     
-    // Verifica rate limit per IP
+    // Check rate limit for IP
     if !RATE_LIMITER.check_ip_rate(client_ip, endpoint) {
         return Some(
             HttpResponse::TooManyRequests()
@@ -238,7 +238,7 @@ pub fn check_rate_limit_or_reject(
         );
     }
     
-    // Se c'è un session ID, verifica anche il rate limit per session
+    // If there's a session ID, also check rate limit for session
     if let Some(sid) = session_id {
         if !RATE_LIMITER.check_session_rate(sid, endpoint) {
             return Some(
@@ -252,10 +252,10 @@ pub fn check_rate_limit_or_reject(
         }
     }
     
-    None // Nessun rate limit violato
+    None // No rate limit violated
 }
 
-/// Funzione helper per verificare manualmente i rate limit
+/// Helper function to manually check rate limits
 // pub fn check_rate_limit(ip: IpAddr, endpoint: &str, session_id: Option<&str>) -> bool {
 //     let ip_ok = RATE_LIMITER.check_ip_rate(ip, endpoint);
     
@@ -320,7 +320,7 @@ mod tests {
         }
         assert!(!limiter.check_ip_rate(ip, "/v5/pocket/login"));
 
-        // Registration dovrebbe ancora funzionare
+        // Registration should still work
         assert!(limiter.check_ip_rate(ip, "/v5/pocket/registration"));
     }
 
@@ -328,21 +328,21 @@ mod tests {
     fn test_request_entry_expiration() {
         let mut entry = RequestEntry::new();
         
-        // Simula una entry vecchia
+        // Simulate an old entry
         entry.window_start = SystemTime::now() - Duration::from_secs(400);
         
-        // Dovrebbe essere scaduta (per una finestra di 300 secondi)
+        // Should be expired (for a 300 second window)
         assert!(entry.is_expired(300));
     }
 
     #[test]
     fn test_rate_limiter_global_instance() {
-        // Test che il rate limiter globale sia accessibile
+        // Test that the global rate limiter is accessible
         let limiter = &*RATE_LIMITER;
         let ip = "192.168.1.1".parse::<std::net::IpAddr>().unwrap();
         let endpoint = "/v5/pocket/test";
         
-        // Dovrebbe funzionare per i primi tentativi
+        // Should work for the first attempts
         assert!(limiter.check_ip_rate(ip, endpoint));
     }
 }

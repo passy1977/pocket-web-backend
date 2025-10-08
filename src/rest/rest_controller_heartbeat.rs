@@ -10,7 +10,7 @@ use crate::services::rate_limiter::check_rate_limit_or_reject;
 impl RestController {
     pub fn heartbeat(&self, req: HttpRequest, session_id: Path<String>) -> HttpResponse {
         
-        // Verifica rate limiting per l'endpoint di heartbeat
+        // Check rate limiting for heartbeat endpoint
         if let Some(response) = check_rate_limit_or_reject(&req, "/v5/pocket/heartbeat", Some(&session_id)) {
             return response;
         }

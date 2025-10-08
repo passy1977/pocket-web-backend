@@ -169,7 +169,7 @@ pub(crate) fn configure_cors(server_origin: String) -> actix_cors::Cors {
     #[cfg(not(debug_assertions))]
     {
         if env::var("CORS_PERMISSIVE").is_err() {
-            // In produzione, mantieni configurazione ristretta di default
+            // In production, maintain restricted configuration by default
             cors = cors.supports_credentials();
         }
     }
@@ -243,14 +243,14 @@ mod tests {
         assert_ne!(Error::Undefine, Error::Msg("test".to_string()));
     }
 
-    // Test per configure_cors - verifica che la configurazione CORS sia valida
+    // Test for configure_cors - verify that CORS configuration is valid
     #[test]
     fn test_configure_cors_basic() {
         let origin = "http://localhost:3000".to_string();
         let _cors = configure_cors(origin.clone());
         
-        // Non possiamo testare facilmente il contenuto interno di Cors,
-        // ma possiamo verificare che la funzione non vada in panic
-        // e ritorni un oggetto Cors valido
+        // We can't easily test the internal content of Cors,
+        // but we can verify that the function doesn't panic
+        // and returns a valid Cors object
     }
 }

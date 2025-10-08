@@ -241,7 +241,7 @@ mod tests {
     #[test]
     fn test_split_group_id_and_search_insufficient_parts() {
         let data_transport = Json(DataTransport {
-            data: Some("123".to_string()), // Solo group_id, manca search
+            data: Some("123".to_string()), // Only group_id, missing search
             ..DataTransport::default()
         });
         let mut other = String::new();
@@ -269,7 +269,7 @@ mod tests {
     #[test]
     fn test_split_group_id_and_search_empty_parts() {
         let data_transport = Json(DataTransport {
-            data: Some("789|".to_string()), // Search vuoto
+            data: Some("789|".to_string()), // Empty search
             ..DataTransport::default()
         });
         let mut other = String::new();
@@ -317,20 +317,20 @@ mod tests {
 
     #[test]
     fn test_rest_controller_creation() {
-        // Test che possiamo creare un RestController
-        // Nota: questo test è limitato perché Data::init() potrebbe fallire
-        // se non ci sono i file di configurazione appropriati
+        // Test that we can create a RestController
+        // Note: this test is limited because Data::init() might fail
+        // if there are no appropriate configuration files
         let data = match crate::services::data::Data::init() {
             Ok(data) => data,
             Err(_) => {
-                // Se non riusciamo a inizializzare Data, creiamo un mock
-                // Questo test verifica principalmente che la struttura sia definita correttamente
+                // If we can't initialize Data, create a mock
+                // This test mainly verifies that the structure is defined correctly
                 return;
             }
         };
 
         let controller = RestController { data };
-        // Se arriviamo qui, la creazione è andata a buon fine
+        // If we get here, creation was successful
         assert_eq!(controller.data.address.is_empty(), false);
     }
 }
