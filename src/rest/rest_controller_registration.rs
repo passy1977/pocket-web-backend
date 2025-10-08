@@ -4,7 +4,7 @@ use actix_web::{web::Json, HttpResponse, HttpRequest};
 
 use crate::{bindings::pocket_initialize, models::data_transport::DataTransport, rest::rest_controller::RestController, services::session::Sessions, utils::aes_encrypt};
 use crate::services::http_response_helper::HttpResponseHelper;
-use crate::rate_limiter::check_rate_limit_or_reject;
+use crate::services::rate_limiter::check_rate_limit_or_reject;
 
 impl RestController {
 

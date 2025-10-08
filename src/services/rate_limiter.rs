@@ -256,16 +256,16 @@ pub fn check_rate_limit_or_reject(
 }
 
 /// Funzione helper per verificare manualmente i rate limit
-pub fn check_rate_limit(ip: IpAddr, endpoint: &str, session_id: Option<&str>) -> bool {
-    let ip_ok = RATE_LIMITER.check_ip_rate(ip, endpoint);
+// pub fn check_rate_limit(ip: IpAddr, endpoint: &str, session_id: Option<&str>) -> bool {
+//     let ip_ok = RATE_LIMITER.check_ip_rate(ip, endpoint);
     
-    if let Some(session) = session_id {
-        let session_ok = RATE_LIMITER.check_session_rate(session, endpoint);
-        ip_ok && session_ok
-    } else {
-        ip_ok
-    }
-}
+//     if let Some(session) = session_id {
+//         let session_ok = RATE_LIMITER.check_session_rate(session, endpoint);
+//         ip_ok && session_ok
+//     } else {
+//         ip_ok
+//     }
+// }
 
 #[cfg(test)]
 mod tests {

@@ -9,7 +9,7 @@ use crate::services::session::Sessions;
 use crate::{get_session, perform_timestamp_last_update};
 use crate::utils::aes_decrypt;
 use actix_web::{web::Json, HttpResponse, HttpRequest};
-use crate::rate_limiter::check_rate_limit_or_reject;
+use crate::services::rate_limiter::check_rate_limit_or_reject;
 
 impl RestController {
 
