@@ -265,7 +265,6 @@ src/
 │   ├── rate_limiter.rs
 │   ├── secure_session.rs
 │   └── session.rs
-└── error_handling/      # Error handling utilities
 ```
 
 ### Key Components
@@ -394,13 +393,7 @@ log::info!("Rate limiter stats: {} active IPs, {} active sessions", ip_count, se
 ## 🚧 Future Enhancements
 
 ### Planned Features
-- [ ] Redis integration for distributed rate limiting
-- [ ] Prometheus metrics export
-- [ ] Configuration file support
-- [ ] Database persistence layer
 - [ ] JWT token support
-- [ ] OAuth2 integration
-- [ ] API versioning system
 - [ ] Comprehensive logging system
 
 ### Scalability Improvements
@@ -443,8 +436,7 @@ For support, please:
 
 ## 🔗 Related Projects
 
-- [pocket-lib](./bridge/pocket-lib/) - Core C++ library
-- [pocket-bridge](./bridge/) - C++ bridge components
+- [pocket-lib](https://github.com/passy1977/pocket-lib) - Core C++ library
 
 ---
 
