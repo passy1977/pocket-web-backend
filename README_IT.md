@@ -76,6 +76,65 @@ Il generatore sicuro combina multiple fonti di entropia:
 
 ## 🛠️ Installazione
 
+### Dipendenze di Sistema (Debian 12)
+
+Prima di compilare il progetto, installa i pacchetti di sistema richiesti:
+
+```bash
+# Aggiorna l'elenco dei pacchetti
+sudo apt update
+
+# Installa gli strumenti di build essenziali
+sudo apt install -y build-essential git
+
+# Installa la toolchain Rust (se non già installata)
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source ~/.cargo/env
+
+# Installa CMake e pkg-config (richiesti per la compilazione del bridge C++)
+sudo apt install -y cmake pkg-config
+
+# Installa le librerie di sviluppo OpenSSL
+sudo apt install -y libssl-dev
+
+# Installa le librerie di sviluppo SQLite3
+sudo apt install -y libsqlite3-dev
+
+# Installa librerie di sviluppo aggiuntive (opzionali ma consigliate)
+sudo apt install -y libc6-dev
+```
+
+#### Dettagli Pacchetti
+
+| Pacchetto | Scopo | Richiesto da |
+|-----------|-------|--------------|
+| `build-essential` | Compilatore GCC/G++, make e strumenti di build base | Compilazione bridge C++ |
+| `cmake` | Generatore di sistema di build | Build CMake di pocket-lib |
+| `pkg-config` | Strumento di configurazione pacchetti | Rilevamento librerie in CMake |
+| `libssl-dev` | Header e librerie di sviluppo OpenSSL | Operazioni crittografiche |
+| `libsqlite3-dev` | Header e librerie di sviluppo SQLite3 | Operazioni database |
+| `libc6-dev` | File di sviluppo libreria C standard | Compilazione generale C/C++ |
+| `git` | Sistema di controllo versione | Gestione codice sorgente |
+
+#### Verifica
+
+Puoi verificare le installazioni con:
+
+```bash
+# Controlla versioni compilatori
+gcc --version
+g++ --version
+cmake --version
+
+# Controlla librerie
+pkg-config --modversion openssl
+pkg-config --modversion sqlite3
+
+# Controlla installazione Rust
+rustc --version
+cargo --version
+```
+
 ### Clona il Repository
 ```bash
 git clone https://github.com/passy1977/pocket-web-backend.git

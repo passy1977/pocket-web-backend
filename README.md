@@ -76,6 +76,65 @@ The secure generator combines multiple entropy sources:
 
 ## 🛠️ Installation
 
+### System Dependencies (Debian 12)
+
+Before building the project, install the required system packages:
+
+```bash
+# Update package list
+sudo apt update
+
+# Install essential build tools
+sudo apt install -y build-essential git
+
+# Install Rust toolchain (if not already installed)
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source ~/.cargo/env
+
+# Install CMake and pkg-config (required for C++ bridge compilation)
+sudo apt install -y cmake pkg-config
+
+# Install OpenSSL development libraries
+sudo apt install -y libssl-dev
+
+# Install SQLite3 development libraries  
+sudo apt install -y libsqlite3-dev
+
+# Install additional development libraries (optional but recommended)
+sudo apt install -y libc6-dev
+```
+
+#### Package Details
+
+| Package | Purpose | Required By |
+|---------|---------|-------------|
+| `build-essential` | GCC/G++ compiler, make, and basic build tools | C++ bridge compilation |
+| `cmake` | Build system generator | pocket-lib CMake build |
+| `pkg-config` | Package configuration tool | Library detection in CMake |
+| `libssl-dev` | OpenSSL development headers and libraries | Cryptographic operations |
+| `libsqlite3-dev` | SQLite3 development headers and libraries | Database operations |
+| `libc6-dev` | Standard C library development files | General C/C++ compilation |
+| `git` | Version control system | Source code management |
+
+#### Verification
+
+You can verify the installations with:
+
+```bash
+# Check compiler versions
+gcc --version
+g++ --version
+cmake --version
+
+# Check libraries
+pkg-config --modversion openssl
+pkg-config --modversion sqlite3
+
+# Check Rust installation
+rustc --version
+cargo --version
+```
+
 ### Clone the Repository
 ```bash
 git clone https://github.com/passy1977/pocket-web-backend.git
