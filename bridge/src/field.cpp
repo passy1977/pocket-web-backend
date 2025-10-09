@@ -18,6 +18,7 @@
 ***************************************************************************/
 
 #include "pocket-bridge/field.h"
+#include "pocket-bridge/pocket.h"
 
 #include "pocket-pods/field.hpp"
 using pocket::pods::field;
@@ -77,10 +78,10 @@ pocket_field_t* pocket_field_new_with_params(
  field->group_field_id = group_field_id;
  field->server_group_field_id = server_group_field_id;
 
- field->title = strdup(title);
+ field->title = pocket_strdup(title);
  if (field->title == nullptr) return nullptr;
 
- field->value = strdup(value);
+ field->value = pocket_strdup(value);
  if (field->value == nullptr)
  {
   pocket_field_free(field);

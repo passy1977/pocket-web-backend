@@ -654,6 +654,9 @@ unsafe extern "C" {
         str_: *const ::std::os::raw::c_char,
     ) -> *const ::std::os::raw::c_char;
 }
+unsafe extern "C" {
+    pub fn pocket_strdup(str_: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct pocket_field_controller_t {

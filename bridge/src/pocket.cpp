@@ -568,3 +568,12 @@ const char* pocket_sha512_encrypt(const char str[])
     memcpy(ret, enc.c_str(), enc.length());
     return ret;
 }
+
+char *pocket_strdup(const char *str)
+{
+    if (str == nullptr) return nullptr;
+    size_t len = strlen(str);
+    char* ret = new(nothrow) char[len + 1];
+    if (ret == nullptr) return nullptr;
+    return ret;
+}

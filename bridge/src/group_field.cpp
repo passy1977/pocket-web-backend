@@ -18,15 +18,13 @@
 ***************************************************************************/
 
 #include "pocket-bridge/group_field.h"
+#include "pocket-bridge/pocket.h"
 
 #include "pocket-pods/group-field.hpp"
 using pocket::pods::group_field;
 
 #include <new>
 #include <cstring>
-
-
-
 using namespace std;
 
 pocket_group_field_t* pocket_group_field_new() {
@@ -34,6 +32,7 @@ pocket_group_field_t* pocket_group_field_new() {
         .new_insertion = false,
         .id = 0,
         .server_id = 0,
+        .user_id = 0,
         .group_id = 0,
         .server_group_id = 0,
         .title = nullptr,
@@ -68,7 +67,7 @@ pocket_group_field_t* pocket_group_field_new_with_params(int64_t id,
     group_field->group_id = group_id;
     group_field->server_group_id = server_group_id;
     
-    group_field->title = strdup(title);
+    group_field->title = pocket_strdup(title);
     if (!group_field->title)
     {
         delete group_field;

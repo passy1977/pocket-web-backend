@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "pocket-bridge/group.h"
+#include "pocket-bridge/pocket.h"
 
 #include "pocket-pods/group.hpp"
 using pocket::pods::group;
@@ -71,10 +72,10 @@ pocket_group_t* pocket_group_new_with_params(int64_t id,
     group->group_id = group_id;
     group->server_group_id = server_group_id;
 
-    group->title = strdup(title);
+    group->title = pocket_strdup(title);
     if(icon)
     {
-        group->icon = strdup(icon);
+        group->icon = pocket_strdup(icon);
     }
     else
     {
@@ -82,7 +83,7 @@ pocket_group_t* pocket_group_new_with_params(int64_t id,
     }
     if(note)
     {
-        group->note = strdup(note);
+        group->note = pocket_strdup(note);
     }
     else
     {

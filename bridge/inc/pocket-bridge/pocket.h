@@ -59,6 +59,8 @@ const char* pocket_aes_decrypt(const pocket_t* self, const char encrypted[]);
 const char* pocket_aes_encrypt(const pocket_t* self, const char plain[]);
 const char* pocket_sha512_encrypt(const char str[]);
 
+char *pocket_strdup(const char *str);
+
 #ifdef __cplusplus
 }
 #endif

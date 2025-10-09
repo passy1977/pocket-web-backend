@@ -18,6 +18,7 @@
 ***************************************************************************/
 
 #include "pocket-bridge/user.h"
+#include "pocket-bridge/pocket.h"
 
 #include "pocket-pods/user.hpp"
 using pocket::pods::user;
@@ -52,9 +53,9 @@ pocket_user_t* pocket_user_init_with_params(int64_t id,
     if (!user) return nullptr;
 
     user->id = id;
-    user->email = strdup(email);
-    user->name = strdup(name);
-    user->passwd = strdup(passwd);
+    user->email = pocket_strdup(email);
+    user->name = pocket_strdup(name);
+    user->passwd = pocket_strdup(passwd);
 
     if (user->email == nullptr || user->name == nullptr || user->passwd == nullptr)
     {
