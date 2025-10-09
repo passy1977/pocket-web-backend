@@ -28,6 +28,17 @@ impl RestController {
             }
             
             Some(mut session) => {
+                if !session.is_valid() {
+                    #[cfg(debug_assertions)]
+                    eprintln!("Heartbeat invalid session for session_id: {}", &*session_id);
+                    Sessions::share().remove(&*session_id, true);
+                    return HttpResponseHelper::ok()
+                        .session_id(&*session_id)
+                        .data("expired")
+                        .error(std::format!("Invalid session for session_id: {}", &*session_id))
+                        .build();
+                }
+
                 if session.remote_session_handling {
                     if unsafe { pocket_heartbeat(session.pocket) } {
                         HttpResponseHelper::ok()

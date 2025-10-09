@@ -487,7 +487,7 @@ catch(const runtime_error& e)
 
 bool pocket_is_no_network(const pocket_t* self)
 {
-    if (self == nullptr)
+    if (self == nullptr || self->session == nullptr || self->user == nullptr)
     {
         return false;
     }
@@ -496,7 +496,7 @@ bool pocket_is_no_network(const pocket_t* self)
 
 bool pocket_heartbeat(const pocket_t* self)
 {
-    if (self == nullptr)
+    if (self == nullptr || self->session == nullptr || self->user == nullptr)
     {
         return false;
     }
