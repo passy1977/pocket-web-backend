@@ -82,12 +82,9 @@ pub mod server {
 
         let origin = format!("http://{}:{}", address, port);
         HttpServer::new(move || {
-            // Configura CORS utilizzando la funzione helper sicura
-            let cors = configure_cors(origin.clone());
-
             let app = App::new()
                 .wrap(Logger::default())
-                .wrap(cors)
+                .wrap(configure_cors(origin.clone()))
                 .route("/v5/pocket/hello/{session_id}", web::get().to(hello))
                 .route("/v5/pocket/login", web::post().to(login))
                 .route("/v5/pocket/registration", web::post().to(registration))

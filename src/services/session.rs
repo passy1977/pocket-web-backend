@@ -175,6 +175,7 @@ impl Sessions {
             }
 
             if current_timestamp > session.timestamp_last_update + self.session_expiration_time as u64 {
+                #[cfg(debug_assertions)]
                 println!("Invalidating session: {}", session_id);
                     
                 unsafe {
@@ -200,6 +201,7 @@ impl Sessions {
         }
         
         for session_id in sessions_to_remove {
+            #[cfg(debug_assertions)]
             println!("Session expired for session_id:{session_id}");
             sessions.remove(&session_id);
         }

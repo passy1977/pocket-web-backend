@@ -18,6 +18,7 @@ impl RestController {
         match Sessions::share().get(&session_id) {
             None => 
             {
+                #[cfg(debug_assertions)]
                 eprintln!("Heartbeat session expired for session_id: {}", &*session_id);
                 HttpResponseHelper::ok()
                     .session_id(&*session_id)
@@ -36,6 +37,7 @@ impl RestController {
                         .build()
                     } else {
                         if unsafe { !pocket_is_no_network(session.pocket) } {
+                            #[cfg(debug_assertions)]
                             eprintln!("Heartbeat remote session expired for session_id: {}", &*session_id);
                             Sessions::share().remove(&*session_id, true);
                             HttpResponseHelper::ok()
