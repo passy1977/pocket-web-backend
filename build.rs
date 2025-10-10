@@ -28,6 +28,7 @@ fn main() {
         config.define("POCKET_ENABLE_LOG", "OFF");
         config.define("POCKET_DISABLE_LOCK", "ON");
         config.define("POCKET_ENABLE_TEST", "OFF");
+        config.define("POCKET_ENABLE_AES", "ON");
         
         // Disable verbose output in release
         config.very_verbose(false);
@@ -43,7 +44,8 @@ fn main() {
         config.define("POCKET_ENABLE_LOG", "ON");
         config.define("POCKET_DISABLE_LOCK", "ON");
         config.define("POCKET_ENABLE_TEST", "OFF");
-        
+        config.define("POCKET_ENABLE_AES", "OFF");
+
         // Enable verbose output only in debug mode
         config.define("CMAKE_VERBOSE_MAKEFILE", "ON");
         config.very_verbose(true);
