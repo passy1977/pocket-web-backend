@@ -28,7 +28,7 @@ impl RestController {
             };
 
             if field.name().unwrap_or("") == "session_id" {
-                if let Ok(tmp) = field.bytes(30).await {
+                if let Ok(tmp) = field.bytes(70).await {
                     match tmp {
                         Ok(bytes) => {
                             if let Ok(data) = from_utf8(bytes.to_vec().as_slice()) {
