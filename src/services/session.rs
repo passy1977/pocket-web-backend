@@ -12,7 +12,7 @@ static DEFAULT_TIMESTAMP_LAST_UPDATE : u32 = 5 * 60; // 5 minutes in seconds
  
 impl pocket_t {
     pub fn is_valid(&self) -> bool {
-        !self.session.is_null() && !self.user.is_null() && !self.aes.is_null()
+        !self.session.is_null()
     }
 }
 
@@ -74,7 +74,7 @@ impl Session {
     }
     
     pub fn is_valid(&self) -> bool {
-        !self.pocket.is_null() && unsafe { (*self.pocket).is_valid() }
+        !self.pocket.is_null() && unsafe { (*self.pocket).is_valid() && !(*self.pocket).user.is_null() && !(*self.pocket).aes.is_null()}
     }
 
 }
@@ -174,7 +174,7 @@ impl Sessions {
         
         for (session_id, session) in sessions.iter_mut() {
 
-            if session.remote_session_handling || !session.is_valid() {
+            if session.remote_session_handling {
                 continue;
             }
 
