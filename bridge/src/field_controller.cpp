@@ -103,9 +103,14 @@ pocket_field_t** pocket_field_controller_get_list(const pocket_field_controller_
     }
     return ret;
 }
-catch(const runtime_error& e)
+catch(const exception& e)
 {
     error(APP_TAG, e.what());
+    return nullptr;
+}
+catch(...)
+{
+    error(APP_TAG, "Unknown exception in pocket_field_controller_get_list");
     return nullptr;
 }
 
@@ -167,9 +172,14 @@ pocket_stat_t pocket_field_controller_persist(const pocket_field_controller_t* s
     }
     return READY;
 }
-catch(const runtime_error& e)
+catch(const exception& e)
 {
     error(APP_TAG, e.what());
+    return ERROR;
+}
+catch(...)
+{
+    error(APP_TAG, "Unknown exception in pocket_field_controller_persist");
     return ERROR;
 }
 
@@ -183,9 +193,14 @@ pocket_stat_t pocket_field_controller_del(const pocket_field_controller_t* self,
 
     return READY;
 }
-catch(const runtime_error& e)
+catch(const exception& e)
 {
     error(APP_TAG, e.what());
+    return ERROR;
+}
+catch(...)
+{
+    error(APP_TAG, "Unknown exception in pocket_field_controller_del");
     return ERROR;
 }
 
@@ -202,9 +217,14 @@ pocket_field_t* pocket_field_controller_get(const pocket_field_controller_t* sel
     }
     return nullptr;
 }
-catch(const runtime_error& e)
+catch(const exception& e)
 {
     error(APP_TAG, e.what());
+    return nullptr;
+}
+catch(...)
+{
+    error(APP_TAG, "Unknown exception in pocket_field_controller_get");
     return nullptr;
 }
 
@@ -216,8 +236,13 @@ int32_t pocket_field_controller_count_child(const pocket_field_controller_t* sel
 
     return view_field->get_list(group->id).size();
 }
-catch(const runtime_error& e)
+catch(const exception& e)
 {
     error(APP_TAG, e.what());
+    return 0;
+}
+catch(...)
+{
+    error(APP_TAG, "Unknown exception in pocket_field_controller_count_child");
     return 0;
 }

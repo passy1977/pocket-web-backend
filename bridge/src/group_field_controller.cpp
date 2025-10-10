@@ -136,9 +136,14 @@ pocket_stat_t pocket_group_field_controller_del(const pocket_group_field_control
     return READY;
 
 }
-catch(const runtime_error& e)
+catch(const exception& e)
 {
     error(APP_TAG, e.what());
+    return ERROR;
+}
+catch(...)
+{
+    error(APP_TAG, "Unknown exception in pocket_group_field_controller_del");
     return ERROR;
 }
 
@@ -182,8 +187,13 @@ pocket_stat_t pocket_group_field_controller_persist(const pocket_group_field_con
 
     return READY;
 }
-catch(const runtime_error& e)
+catch(const exception& e)
 {
     error(APP_TAG, e.what());
+    return ERROR;
+}
+catch(...)
+{
+    error(APP_TAG, "Unknown exception in pocket_group_field_controller_persist");
     return ERROR;
 }

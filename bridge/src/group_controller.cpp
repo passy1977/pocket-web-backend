@@ -112,10 +112,15 @@ pocket_group_t** pocket_group_controller_get_list(const pocket_group_controller_
     }
     return ret;
 }
-catch(const runtime_error& e)
+catch(const exception& e)
 {
     error(APP_TAG, e.what());
     return nullptr;    
+}
+catch(...)
+{
+    error(APP_TAG, "Unknown exception in pocket_group_controller_get_list");
+    return nullptr;
 }
 
 void pocket_group_controller_free_list(pocket_group_t** list, int count)
@@ -139,9 +144,14 @@ int32_t pocket_group_controller_count_child(const pocket_group_controller_t* sel
 
     return static_cast<uint32_t>(view_group->get_list(group->id).size());
 }
-catch(const runtime_error& e)
+catch(const exception& e)
 {
     error(APP_TAG, e.what());
+    return 0;
+}
+catch(...)
+{
+    error(APP_TAG, "Unknown exception in pocket_group_controller_count_child");
     return 0;
 }
 
@@ -161,9 +171,14 @@ pocket_stat_t pocket_group_controller_del(const pocket_group_controller_t* self,
 
     return READY;
 }
-catch(const runtime_error& e)
+catch(const exception& e)
 {
     error(APP_TAG, e.what());
+    return ERROR;
+}
+catch(...)
+{
+    error(APP_TAG, "Unknown exception in pocket_group_controller_del");
     return ERROR;
 }
 
@@ -222,9 +237,14 @@ pocket_stat_t pocket_group_controller_persist(const pocket_group_controller_t* s
 
     return READY;
 }
-catch(const runtime_error& e)
+catch(const exception& e)
 {
     error(APP_TAG, e.what());
+    return ERROR;
+}
+catch(...)
+{
+    error(APP_TAG, "Unknown exception in pocket_group_controller_persist");
     return ERROR;
 }
 
@@ -242,8 +262,13 @@ pocket_group_t* pocket_group_controller_get(const pocket_group_controller_t* sel
     
     return nullptr;
 }
-catch(const runtime_error& e)
+catch(const exception& e)
 {
     error(APP_TAG, e.what());
+    return nullptr;
+}
+catch(...)
+{
+    error(APP_TAG, "Unknown exception in pocket_group_controller_get");
     return nullptr;
 }
