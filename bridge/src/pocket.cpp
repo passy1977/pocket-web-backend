@@ -575,7 +575,7 @@ char *pocket_strdup(const char *str)
      size_t len = strlen(str);
      char* ret = new(nothrow) char[len + 1];
      if (ret == nullptr) return nullptr;
-     memset(ret, '\0', len + 1);
      memcpy(ret, str, len);
+     ret[len] = '\0';
      return ret;
 }
