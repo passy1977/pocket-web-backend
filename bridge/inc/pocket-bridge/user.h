@@ -41,7 +41,7 @@ typedef struct {
     char* name;
     char* passwd;
     user_stat_t status;
-    int64_t timestamp_last_update;
+    uint64_t timestamp_last_update;
 } pocket_user_t;
 
 pocket_user_t* pocket_user_init(void);
@@ -49,7 +49,7 @@ pocket_user_t* pocket_user_init_with_params(int64_t id,
                                             const char *email,
                                             const char *name,
                                             const char *passwd,
-                                            int64_t timestamp_last_update,
+                                            uint64_t timestamp_last_update,
                                             user_stat_t status);
 
 void pocket_user_free(pocket_user_t *user);

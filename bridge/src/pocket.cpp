@@ -513,7 +513,10 @@ bool pocket_heartbeat(const pocket_t* self)
         return false;
     }
 
-    return session->heartbeat(user);
+    uint64_t timestamp_last_update = 0;
+    auto ret = session->heartbeat(user, timestamp_last_update);
+
+    return ret;
 }
 
 const char* pocket_aes_decrypt(const pocket_t* self, const char encrypted[])

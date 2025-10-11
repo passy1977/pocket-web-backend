@@ -47,7 +47,7 @@ pocket_user_t* pocket_user_init_with_params(int64_t id,
                                         const char *email,
                                         const char *name,
                                         const char *passwd,
-                                        int64_t timestamp_last_update,
+                                        uint64_t timestamp_last_update,
                                         user_stat_t status) {
     auto user = new(nothrow) pocket_user_t;
     if (!user) return nullptr;
