@@ -156,11 +156,12 @@ impl Sessions {
         }
     }
 
-    pub fn check_if_already_logged(&self, email: &String) -> bool {
+    pub fn check_if_already_logged(&self, email: &String, ref_session: &mut Option<Session>) -> bool {
         let sessions = self.sessions.lock().unwrap();
         for (_, session) in sessions.iter() {
             if let Some(session_email) = &session.email {
                 if session_email == email {
+                    *ref_session = Some(session.clone());
                     return true;
                 }
             }
