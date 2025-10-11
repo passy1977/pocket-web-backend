@@ -9,7 +9,7 @@ use crate::perform_timestamp_last_update;
 use crate::rest::rest_controller::RestController;
 use crate::services::http_response_helper::HttpResponseHelper;
 use crate::services::rate_limiter::check_rate_limit_or_reject;
-use crate::services::session::Sessions;
+use crate::services::session::{Session, Sessions};
 
 
 impl RestController {
@@ -38,10 +38,11 @@ pub fn login(&self, req: HttpRequest, data_transport: Json<DataTransport>) -> Ht
         }
     };
 
-    if Sessions::share().check_if_already_logged(&email) {
-        return HttpResponseHelper::forbidden()
-            .error("Account already logged in")
-            .build()
+    let mut session_ref = Option::<Session>::None;
+    if Sessions::share().check_if_already_logged(&email, &mut session_ref ) {
+        if let Some(session) = session_ref  {
+            Sessions::share().remove(&session.session_id, true);
+        }
     }
 
     let mut session = match Sessions::share().get(&*data_transport.session_id) {
