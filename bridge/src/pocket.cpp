@@ -494,9 +494,9 @@ bool pocket_is_no_network(const pocket_t* self)
     return static_cast<class session*>(self->session)->is_no_network();
 }
 
-bool pocket_heartbeat(const pocket_t* self, uint64_t* timestamp_last_update)
+bool pocket_heartbeat(const pocket_t* self)
 {
-    if (self == nullptr || self->session == nullptr || self->user == nullptr || timestamp_last_update == nullptr)
+    if (self == nullptr || self->session == nullptr || self->user == nullptr)
     {
         return false;
     }
@@ -513,7 +513,7 @@ bool pocket_heartbeat(const pocket_t* self, uint64_t* timestamp_last_update)
         return false;
     }
 
-    return session->heartbeat(user, *timestamp_last_update);
+    return session->heartbeat(user);
 }
 
 const char* pocket_aes_decrypt(const pocket_t* self, const char encrypted[])

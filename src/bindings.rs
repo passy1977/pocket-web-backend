@@ -635,7 +635,7 @@ unsafe extern "C" {
     pub fn pocket_is_no_network(self_: *const pocket_t) -> bool;
 }
 unsafe extern "C" {
-    pub fn pocket_heartbeat(self_: *const pocket_t, timestamp_last_update: *mut u64) -> bool;
+    pub fn pocket_heartbeat(self_: *const pocket_t) -> bool;
 }
 unsafe extern "C" {
     pub fn pocket_aes_decrypt(

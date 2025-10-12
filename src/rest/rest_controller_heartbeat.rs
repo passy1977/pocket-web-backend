@@ -40,7 +40,7 @@ impl RestController {
                 }
 
                 if session.remote_session_handling {
-                    if unsafe { pocket_heartbeat(session.pocket, &mut session.timestamp_last_update) } {
+                    if unsafe { pocket_heartbeat(session.pocket) } {
                         HttpResponseHelper::ok()
                         .path("")
                         .title("")
