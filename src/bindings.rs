@@ -635,7 +635,7 @@ unsafe extern "C" {
     pub fn pocket_is_no_network(self_: *const pocket_t) -> bool;
 }
 unsafe extern "C" {
-    pub fn pocket_heartbeat(self_: *const pocket_t) -> bool;
+    pub fn pocket_heartbeat(self_: *const pocket_t, timestamp_last_update: *mut u64) -> bool;
 }
 unsafe extern "C" {
     pub fn pocket_aes_decrypt(
@@ -995,7 +995,7 @@ pub struct pocket_user_t {
     pub name: *mut ::std::os::raw::c_char,
     pub passwd: *mut ::std::os::raw::c_char,
     pub status: user_stat_t,
-    pub timestamp_last_update: i64,
+    pub timestamp_last_update: u64,
 }
 #[allow(clippy::unnecessary_operation, clippy::identity_op)]
 const _: () = {
@@ -1021,7 +1021,7 @@ unsafe extern "C" {
         email: *const ::std::os::raw::c_char,
         name: *const ::std::os::raw::c_char,
         passwd: *const ::std::os::raw::c_char,
-        timestamp_last_update: i64,
+        timestamp_last_update: u64,
         status: user_stat_t,
     ) -> *mut pocket_user_t;
 }

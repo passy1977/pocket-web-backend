@@ -67,6 +67,10 @@ impl Session {
     }
     
     pub fn update_timestamp_last_update(&mut self)  {
+        if self.remote_session_handling {
+            return;
+        }
+
         self.timestamp_last_update = match SystemTime::now().duration_since(UNIX_EPOCH) {
             Ok(duration) => duration.as_secs(),
             Err(_) => 0

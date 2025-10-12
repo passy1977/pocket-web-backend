@@ -78,7 +78,7 @@ pub struct User {
     pub name: String,
     pub passwd: String,
     pub status: UserStat,
-    pub timestamp_last_update: i64,
+    pub timestamp_last_update: u64,
 }
 
 #[cfg(test)]
