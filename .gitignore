@@ -4,3 +4,8 @@
 *.pem
 
 pocket-web-backend
+
+bridge/build/
+
+cmake-build-debug/
+cmake-build-release/
