@@ -78,7 +78,7 @@ impl Session {
     }
     
     pub fn is_valid(&self) -> bool {
-        !self.pocket.is_null() && unsafe { (*self.pocket).is_valid() && !(*self.pocket).user.is_null() && !(*self.pocket).aes.is_null()}
+        unsafe { !self.pocket.is_null() && !(*self.pocket).user.is_null() && !(*self.pocket).aes.is_null()}
     }
 
 }
@@ -179,14 +179,11 @@ impl Sessions {
         
         for (session_id, session) in sessions.iter_mut() {
 
-            if session.remote_session_handling {
+            if session.remote_session_handling && session.is_valid(){
                 continue;
             }
 
-            if current_timestamp > session.timestamp_last_update + self.session_expiration_time as u64 {
-                #[cfg(debug_assertions)]
-                println!("Invalidating session: {}", session_id);
-                    
+            if current_timestamp > session.timestamp_last_update + self.session_expiration_time as u64 {                    
                 unsafe {
                     if !session.pocket.is_null() {
                         pocket_free(session.pocket);
@@ -205,13 +202,13 @@ impl Sessions {
                     }
                 }
                 
-                sessions_to_remove.push(session_id.clone());
+                sessions_to_remove.push((session.email.clone(), session_id.clone(), session.timestamp_last_update));
             }
         }
         
-        for session_id in sessions_to_remove {
+        for (email, session_id, timestamp_last_update) in sessions_to_remove {
             #[cfg(debug_assertions)]
-            println!("Session expired for session_id:{session_id}");
+            println!("Session expired for {}@{session_id} start at:{timestamp_last_update} current:{current_timestamp} expiration_time:{}", email.unwrap_or("no_logged".to_string()), self.session_expiration_time);
             sessions.remove(&session_id);
         }
     }
