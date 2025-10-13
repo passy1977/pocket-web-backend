@@ -41,6 +41,7 @@ pub fn login(&self, req: HttpRequest, data_transport: Json<DataTransport>) -> Ht
     let mut session_ref = Option::<Session>::None;
     if Sessions::share().check_if_already_logged(&email, &mut session_ref ) {
         if let Some(session) = session_ref  {
+            #[cfg(debug_assertions)]
             println!("User already logged in, removing old session_id {}", session.session_id);
             Sessions::share().remove(&session.session_id, true);
         }
