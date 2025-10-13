@@ -227,7 +227,6 @@ mod tests {
 
     #[test]
     fn test_error_description() {
-        use std::error::Error;
         
         let error = crate::utils::Error::Undefine;
         assert_eq!(format!("{}", error), "Undefine");

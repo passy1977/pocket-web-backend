@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::net::IpAddr;
 use std::sync::{Arc, Mutex, LazyLock};
 use std::time::SystemTime;
+#[allow(unused_imports)]
 use tokio::time::{interval, Duration as TokioDuration};
 use actix_web::{HttpResponse, HttpRequest};
 use serde_json::json;

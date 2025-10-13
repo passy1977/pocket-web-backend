@@ -44,7 +44,7 @@ fn main() {
         config.define("POCKET_ENABLE_LOG", "ON");
         config.define("POCKET_DISABLE_LOCK", "ON");
         config.define("POCKET_ENABLE_TEST", "OFF");
-        config.define("POCKET_ENABLE_AES", "OFF");
+        config.define("POCKET_ENABLE_AES", "ON");
 
         // Enable verbose output only in debug mode
         config.define("CMAKE_VERBOSE_MAKEFILE", "ON");

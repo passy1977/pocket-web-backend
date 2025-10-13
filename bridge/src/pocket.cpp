@@ -241,13 +241,9 @@ pocket_stat_t pocket_change_passwd(pocket_t* self, const char* full_path_file, c
 
     auto session = static_cast<class session*>(self->session);
 
-#ifdef SYNCHRONIZER_TIMEOUT
-    session->set_synchronizer_timeout(SYNCHRONIZER_TIMEOUT);
-#endif
 
-#ifdef SYNCHRONIZER_CONNECT_TIMEOUT
+    session->set_synchronizer_timeout(0);
     session->set_synchronizer_connect_timeout(0);
-#endif
     if( auto&& user_opt = session->change_passwd(convert(static_cast<pocket_user_t*>(self->user)), full_path_file, new_passwd, POCKET_ENABLE_AES); user_opt.has_value())
     {
         self->user = convert(user_opt);
