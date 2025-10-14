@@ -246,26 +246,26 @@ pocket_stat_t pocket_change_passwd(pocket_t* self, const char* full_path_file, c
     session->set_synchronizer_connect_timeout(0);
     if( auto&& user_opt = session->change_passwd(convert(static_cast<pocket_user_t*>(self->user)), full_path_file, new_passwd, POCKET_ENABLE_AES); user_opt.has_value())
     {
-        self->user = convert(user_opt);
+//        self->user = convert(user_opt);
+//
+//        if(self->aes)
+//        {
+//            delete static_cast<class aes*>(self->aes);
+//            self->aes = nullptr;
+//        }
+//        self->aes = new(nothrow) class aes(DEVICE_AES_CBC_IV, new_passwd);
+//        if(self->aes == nullptr)
+//        {
+//            if(self->session)
+//            {
+//                delete static_cast<class session*>(self->session);
+//                self->session = nullptr;
+//            }
+//            error(APP_TAG, "Impossible alloc aes");
+//            return ERROR;
+//        }
 
-        if(self->aes)
-        {
-            delete static_cast<class aes*>(self->aes);
-            self->aes = nullptr;
-        }
-        self->aes = new(nothrow) class aes(DEVICE_AES_CBC_IV, new_passwd);
-        if(self->aes == nullptr)
-        {
-            if(self->session)
-            {
-                delete static_cast<class session*>(self->session);
-                self->session = nullptr;
-            }
-            error(APP_TAG, "Impossible alloc aes");
-            return ERROR;
-        }
-
-        return pocket_logout(self, true);
+        return OK;
     }
     else
     {

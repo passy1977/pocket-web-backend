@@ -71,6 +71,9 @@ pub fn login(&self, req: HttpRequest, data_transport: Json<DataTransport>) -> Ht
                                     true,
                                     CString::from_str(&passwd).unwrap().as_ptr()
             ) || !(*session.pocket).is_valid() {
+
+                    Sessions::share().remove(&session.session_id, true);
+
                     return HttpResponseHelper::not_acceptable()
                         .session_id(session.session_id)
                         .error("Wrong password or server not available")
