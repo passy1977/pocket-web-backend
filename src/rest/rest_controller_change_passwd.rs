@@ -1,6 +1,6 @@
 use std::ffi::CString;
 use std::path::MAIN_SEPARATOR;
-use crate::bindings::{pocket_change_passwd, pocket_logout, pocket_stat_t_OK, pocket_user_t};
+use crate::bindings::{pocket_change_passwd, pocket_stat_t_OK, pocket_user_t};
 use crate::constants::data::EXPORT_DATA_CHANGE_PASSWD;
 use crate::models::data_transport::DataTransport;
 use crate::rest::rest_controller::{delete_file, RestController};
@@ -74,52 +74,38 @@ impl RestController {
                     ) };
 
                     if status == pocket_stat_t_OK {
-                        unsafe {
-                            if pocket_logout(session.pocket, true) == pocket_stat_t_OK {
 
-                                if delete_file(&full_path_file).is_err() {
-                                    eprintln!("Impossible delete config file")
-                                }
-
-                                Sessions::share().remove(&session.session_id, true);
-
-                                return HttpResponseHelper::ok()
-                                .path("/login")
-                                .data("logout")
-                                .session_id(session.session_id).build();
-                            } else {
-                        
-                                if delete_file(&full_path_file).is_err() {
-                                    eprintln!("Impossible delete config file")
-                                }
-
-                                return HttpResponseHelper::internal_server_error()
-                                .session_id(session.session_id)
-                                .error("Something's wrong server internal error, changing passwd failed")
-                                .build()
-                            }
-                            
-                        }
-                    } else {
-                        
                         if delete_file(&full_path_file).is_err() {
-                            eprintln!("Impossible delete config file")
+                            eprintln!("Impossible delete export file")
+                        }
+
+                        Sessions::share().remove(&session.session_id, true);
+
+                        return HttpResponseHelper::ok()
+                        .path("/login")
+                        .data("logout")
+                        .session_id(session.session_id).build();
+
+                    } else {
+
+                        if delete_file(&full_path_file).is_err() {
+                            eprintln!("Impossible delete export file")
                         }
 
                         return HttpResponseHelper::internal_server_error()
                         .session_id(session.session_id)
-                        .error("Something's wrong in data config parsing, changing passwd failed")
+                        .error("Something's wrong in data parsing, changing passwd failed")
                         .build()
                     }
 
                 } else {
                     if delete_file(&full_path_file).is_err() {
-                        eprintln!("Impossible delete config file")
+                        eprintln!("Impossible delete export file")
                     }
-                
+
                     return HttpResponseHelper::not_acceptable()
                         .session_id(session.session_id)
-                        .error("config_json cannot be load")
+                        .error("config_json export be load")
                         .build()
                 };
             }

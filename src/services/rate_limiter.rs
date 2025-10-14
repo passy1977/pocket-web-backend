@@ -40,7 +40,7 @@ impl RateLimit {
     }
     
     pub fn heartbeat_limit() -> Self {
-        Self::new(12, 60) // 12 heartbeats every minute
+        Self::new(20, 60) // 12 heartbeats every minute
     }
 }
 
