@@ -2,7 +2,14 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/bridge/build/_deps/nlohmann_json-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/bridge/build/_deps/tinyxml2-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/bridge/cmake-build-debug/_deps/nlohmann_json-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/bridge/cmake-build-debug/_deps/tinyxml2-src" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/bridge/pocket-lib" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/bridge/pocket-lib/build/_deps/googletest-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/bridge/pocket-lib/build/_deps/nlohmann_json-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/bridge/pocket-lib/build/_deps/tinyxml2-src" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/bridge/pocket-lib/thread-pool" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/statics" vcs="Git" />
   </component>
