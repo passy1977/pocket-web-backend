@@ -14,15 +14,16 @@ fn main() {
     
     // Set CMake build type based on Rust profile
     if is_release {
-        config.define("CMAKE_BUILD_TYPE", "Release");
+        // Use RelWithDebInfo instead of Release to preserve symbols
+        config.define("CMAKE_BUILD_TYPE", "RelWithDebInfo");
         
-        // Aggressive optimization flags for maximum speed
-        config.define("CMAKE_CXX_FLAGS_RELEASE", "-O3 -DNDEBUG -march=native -mtune=native -flto -ffast-math -funroll-loops");
-        config.define("CMAKE_C_FLAGS_RELEASE", "-O3 -DNDEBUG -march=native -mtune=native -flto -ffast-math -funroll-loops");
+        // RelWithDebInfo flags with symbol preservation
+        config.define("CMAKE_CXX_FLAGS_RELWITHDEBINFO", "-O2 -g -DNDEBUG -fPIC -fno-eliminate-unused-debug-types");
+        config.define("CMAKE_C_FLAGS_RELWITHDEBINFO", "-O2 -g -DNDEBUG -fPIC -fno-eliminate-unused-debug-types");
         
-        // Linker optimization flags
-        config.define("CMAKE_EXE_LINKER_FLAGS_RELEASE", "-flto -Wl,-O2 -Wl,--strip-all");
-        config.define("CMAKE_SHARED_LINKER_FLAGS_RELEASE", "-flto -Wl,-O2 -Wl,--strip-all");
+        // Safe linker flags
+        config.define("CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO", "-Wl,--no-gc-sections");
+        config.define("CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO", "-Wl,--no-gc-sections");
         
         // Disable all logging and debugging features
         config.define("POCKET_ENABLE_LOG", "OFF");
@@ -60,6 +61,14 @@ fn main() {
     println!("{}", env::var("OUT_DIR").unwrap());
     println!("cargo:rustc-link-search={}/build", env::var("OUT_DIR").unwrap());
     println!("cargo:rustc-link-search=native={}/build/pocket-lib/", dst.display());
+    
+    // Explicit library search paths for release mode
+    if is_release {
+        println!("cargo:rustc-link-search=native={}/lib", dst.display());
+        println!("cargo:rustc-link-search=native={}/build", dst.display());
+        println!("cargo:rustc-link-search=native={}/build/pocket-lib", dst.display());
+    }
+    
     println!("cargo:rustc-link-lib=static=pocketbridge");
     println!("cargo:rustc-link-lib=static=pocket");
     println!("cargo:rustc-link-lib=stdc++");

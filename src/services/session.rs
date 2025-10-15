@@ -206,9 +206,10 @@ impl Sessions {
             }
         }
         
-        for (email, session_id, timestamp_last_update) in sessions_to_remove {
+        
+        for (_email, session_id, _timestamp_last_update) in sessions_to_remove {
             #[cfg(debug_assertions)]
-            println!("Session expired for {}@{session_id} start at:{timestamp_last_update} current:{current_timestamp} expiration_time:{}", email.unwrap_or("no_logged".to_string()), self.session_expiration_time);
+            println!("Session expired for {}@{session_id} start at:{_timestamp_last_update} current:{current_timestamp} expiration_time:{}", _email.unwrap_or("no_logged".to_string()), self.session_expiration_time);
             sessions.remove(&session_id);
         }
     }

@@ -23,3 +23,11 @@ tokio = { version = "1", features = ["time", "rt"] }
 [build-dependencies]
 cmake = "0.1.54"
 bindgen = "0.72.0"
+
+[profile.release]
+# Preserve symbols and avoid aggressive optimizations that break C++ linking
+strip = false
+lto = false
+panic = "unwind"
+codegen-units = 1
+debug = true  # Keep debug symbols for release builds

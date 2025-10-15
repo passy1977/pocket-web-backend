@@ -166,6 +166,7 @@ impl RestController {
         INSTANCE.clone()
     }
 
+    #[allow(dead_code)]
     pub fn debug(&self, data_transport: Json<DataTransport>) -> HttpResponse {
 
         let data = match &data_transport.data {
