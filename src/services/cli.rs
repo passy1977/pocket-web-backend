@@ -4,6 +4,8 @@ use clap::Parser;
 use crate::services::data::Data;
 
 #[derive(Parser)]
+#[command(name = "pocket-web-backend")]
+#[command(about = "A secure, high-performance web backend built with Rust and Actix Web")]
 pub struct Cli {
     /// Host address
     pub address: Option<String>,
@@ -11,8 +13,10 @@ pub struct Cli {
     /// Connection port
     pub port: Option<u16>,
 
+    /// Maximum number of threads
     pub max_threads: Option<usize>,
 
+    /// Session expiration time in seconds
     pub session_expiration_time: Option<u32>
 }
 

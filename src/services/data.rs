@@ -59,13 +59,6 @@ impl Data {
         
         let file_data_path = dir_path.join(DATA_FILE);
         
-        if !file_data_path.exists() {
-            match fs::File::create(&file_data_path) {
-                Ok(_) => (),
-                Err(_e) => return Err("Error in creation file: {e}"),
-            }
-        }
-
         let mut ret = Self {
             file_data_path,
             dir_path,
@@ -76,9 +69,15 @@ impl Data {
             session_expiration_time: SESSION_EXPIRATION_TIME
         };
         
-        if let Err(e) = ret.load() {
+        // Try to load existing configuration
+        if ret.file_data_path.exists() {
+            if let Err(e) = ret.load() {
+                ret.update = true;
+                eprintln!("Error loading data: {e}");
+            }
+        } else {
+            // File doesn't exist, mark for creation with default values
             ret.update = true;
-            eprintln!("Error loading data: {e}");
         }
 
         Cli::update(&mut ret);
@@ -93,6 +92,10 @@ impl Data {
     }
     
     pub fn load(&mut self) -> Result<(), io::Error> {
+        // Check if file exists
+        if !self.file_data_path.exists() {
+            return Err(io::Error::new(io::ErrorKind::NotFound, "Configuration file does not exist"));
+        }
 
         let mut file = File::open(self.file_data_path.as_path())?;
 
@@ -100,7 +103,13 @@ impl Data {
 
         file.read_to_string(&mut data)?;
 
-        let data : Data = serde_json::from_str(&data)?;
+        // Check if file is empty
+        if data.trim().is_empty() {
+            return Err(io::Error::new(io::ErrorKind::InvalidData, "Configuration file is empty"));
+        }
+
+        let data : Data = serde_json::from_str(&data)
+            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, format!("Invalid JSON format: {}", e)))?;
 
         self.address = data.address;
         self.port = data.port;
