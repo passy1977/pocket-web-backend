@@ -1,44 +1,54 @@
 #!/bin/bash
 
-# Script di test per verificare la configurazione automatica del BACKEND_URL
-# Supporta automaticamente Docker e Podman
+# Test script to verify automatic BACKEND_URL configuration
+# Automatically supports Docker and Podman
 
-# Funzione per rilevare il runtime container disponibile
+# Function to detect available container runtime
 detect_container_runtime() {
+    # Check common paths for podman
     if command -v podman >/dev/null 2>&1; then
         echo "podman"
+    elif [ -x "/usr/bin/podman" ]; then
+        echo "/usr/bin/podman"
+    elif [ -x "/usr/local/bin/podman" ]; then
+        echo "/usr/local/bin/podman"
+    # Check common paths for docker
     elif command -v docker >/dev/null 2>&1; then
         echo "docker"
+    elif [ -x "/usr/bin/docker" ]; then
+        echo "/usr/bin/docker"
+    elif [ -x "/usr/local/bin/docker" ]; then
+        echo "/usr/local/bin/docker"
     else
         echo "none"
     fi
 }
 
-# Rileva il runtime container
+# Detect container runtime
 CONTAINER_RUNTIME=$(detect_container_runtime)
 
 if [ "$CONTAINER_RUNTIME" = "none" ]; then
-    echo "❌ Errore: Né Docker né Podman sono installati sul sistema"
-    echo "Installa uno dei due per continuare:"
+    echo "❌ Error: Neither Docker nor Podman are installed on this system"
+    echo "Please install one of them to continue:"
     echo "  - Docker: https://docs.docker.com/get-docker/"
     echo "  - Podman: https://podman.io/getting-started/installation"
     exit 1
 fi
 
-echo "🧪 Test della configurazione automatica BACKEND_URL"
-echo "Runtime container: $CONTAINER_RUNTIME"
+echo "🧪 Testing automatic BACKEND_URL configuration"
+echo "Container runtime: $CONTAINER_RUNTIME"
 echo "================================================"
 
-# Test 1: Configurazione di default
+# Test 1: Default configuration
 echo ""
-echo "📋 Test 1: Configurazione di default (localhost:8080)"
+echo "📋 Test 1: Default configuration (localhost:8080)"
 echo "Building image..."
 $CONTAINER_RUNTIME build -t pocket-web-backend . > /dev/null 2>&1
 
 echo "Starting container in background..."
 CONTAINER_ID=$($CONTAINER_RUNTIME run -d --name pocket-test-default pocket-web-backend)
 
-# Aspetta un momento per l'avvio
+# Wait a moment for startup
 sleep 2
 
 echo "Checking constants.mjs content..."
@@ -48,16 +58,16 @@ echo "Stopping container..."
 $CONTAINER_RUNTIME stop $CONTAINER_ID > /dev/null 2>&1
 $CONTAINER_RUNTIME rm $CONTAINER_ID > /dev/null 2>&1
 
-# Test 2: Configurazione personalizzata
+# Test 2: Custom configuration
 echo ""
-echo "📋 Test 2: Configurazione personalizzata (192.168.1.100:9090)"
+echo "📋 Test 2: Custom configuration (192.168.1.100:9090)"
 CONTAINER_ID=$($CONTAINER_RUNTIME run -d \
     -e POCKET_ADDRESS=192.168.1.100 \
     -e POCKET_PORT=9090 \
     --name pocket-test-custom \
     pocket-web-backend)
 
-# Aspetta un momento per l'avvio
+# Wait a moment for startup
 sleep 2
 
 echo "Checking constants.mjs content..."
@@ -67,18 +77,18 @@ echo "Stopping container..."
 $CONTAINER_RUNTIME stop $CONTAINER_ID > /dev/null 2>&1
 $CONTAINER_RUNTIME rm $CONTAINER_ID > /dev/null 2>&1
 
-# Test 3: Test con lo script run-docker.sh
+# Test 3: Test with run-docker.sh script
 echo ""
-echo "📋 Test 3: Test con script run-docker.sh"
-echo "Questo test avvierà il container interattivamente per 10 secondi..."
-echo "Premi Ctrl+C dopo aver verificato che tutto funzioni correttamente."
+echo "📋 Test 3: Test with run-docker.sh script"
+echo "This test will start the container interactively for 10 seconds..."
+echo "Press Ctrl+C after verifying everything works correctly."
 
 timeout 10s ./run-docker.sh --address 127.0.0.1 --port 3000 || true
 
 echo ""
-echo "✅ Test completati!"
+echo "✅ Tests completed!"
 echo ""
-echo "💡 Per verificare manualmente:"
-echo "   1. Avvia: ./run-docker.sh --address TUO_IP --port TUA_PORTA"
-echo "   2. In un altro terminale: $CONTAINER_RUNTIME exec -it pocket-web-backend-instance cat /var/www/statics/js/constants.mjs"
-echo "   3. Verifica che BACKEND_URL contenga il tuo IP e porta"
+echo "💡 To verify manually:"
+echo "   1. Start: ./run-docker.sh --address YOUR_IP --port YOUR_PORT"
+echo "   2. In another terminal: $CONTAINER_RUNTIME exec -it pocket-web-backend-instance cat /var/www/statics/js/constants.mjs"
+echo "   3. Verify that BACKEND_URL contains your IP and port"
