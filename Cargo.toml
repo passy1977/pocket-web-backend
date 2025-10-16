@@ -3,6 +3,10 @@ name = "pocket-web-backend"
 version = "5.0.0"
 edition = "2024"
 
+[[bin]]
+name = "pocket-web-backend"
+path = "src/main.rs"
+
 [dependencies]
 clap = { version = "4.5.49", features = ["derive"]  }
 actix-web = "4"
