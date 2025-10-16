@@ -397,6 +397,132 @@ cargo test --release
 
 ## 🔧 Configuration
 
+### Command Line Arguments
+
+The application supports the following command line arguments:
+
+```bash
+./pocket-web-backend --help
+```
+
+Available options:
+- `--address <ADDRESS>`: Server bind address (default: 127.0.0.1)
+- `--port <PORT>`: Server port (default: 8080)
+- `--max-threads <THREADS>`: Maximum blocking threads (default: 2)
+- `--session-expiration-time <SECONDS>`: Session expiration time (default: 300)
+
+### Docker/Podman Configuration
+
+The application supports both **Docker** and **Podman** container runtimes. All scripts automatically detect which runtime is available and use it accordingly.
+
+#### Container Runtime Support
+
+| Runtime | Status | Notes |
+|---------|--------|-------|
+| Docker | ✅ Fully Supported | Traditional container runtime |
+| Podman | ✅ Fully Supported | Rootless, daemonless alternative |
+
+#### Environment Variables
+
+The Docker container supports the following environment variables:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `POCKET_ADDRESS` | Server bind address | `0.0.0.0` |
+| `POCKET_PORT` | Server port | `8080` |
+| `POCKET_MAX_THREADS` | Maximum blocking threads | `2` |
+| `POCKET_SESSION_EXPIRATION` | Session expiration (seconds) | `300` |
+
+#### Running with Docker/Podman
+
+The scripts automatically detect and use the available container runtime:
+
+1. **Build and run with auto-detection:**
+```bash
+./run-docker.sh --address 192.168.1.100 --port 9090
+```
+
+2. **Manual container commands:**
+```bash
+# Using the wrapper script (auto-detects runtime)
+./container.sh build -t pocket-web-backend .
+./container.sh run -p 8080:8080 pocket-web-backend
+
+# Or directly with your preferred runtime
+docker build -t pocket-web-backend .    # Using Docker
+podman build -t pocket-web-backend .    # Using Podman
+```
+
+3. **Using compose wrapper:**
+```bash
+./compose.sh up                 # Auto-detects docker-compose or podman-compose
+./compose.sh --profile dev up   # Run development profile
+```
+
+4. **Using the convenience script:**
+```bash
+# Copy and edit environment file
+cp .env.example .env
+
+# Run with custom settings
+./run-docker.sh --address 192.168.1.100 --port 9090 --max-threads 4
+```
+
+#### Automatic Frontend Configuration
+
+The Docker container automatically updates the frontend configuration (`statics/js/constants.mjs`) to match the server address and port. This ensures that the JavaScript frontend always connects to the correct backend URL.
+
+**How it works:**
+- On container startup, the `BACKEND_URL` constant is automatically updated
+- Original: `const BACKEND_URL = 'http://localhost:8080';`
+- Updated: `const BACKEND_URL = 'http://YOUR_ADDRESS:YOUR_PORT';`
+
+**Example:**
+```bash
+# This will update constants.mjs to use http://192.168.1.100:9090
+./run-docker.sh --address 192.168.1.100 --port 9090
+```
+
+**Testing the configuration:**
+```bash
+# Run the automated test script (auto-detects runtime)
+./test-docker-config.sh
+
+# Or manually verify in a running container
+./container.sh exec -it pocket-web-backend-instance cat /var/www/statics/js/constants.mjs
+```
+
+#### Container Runtime Scripts
+
+The project includes several wrapper scripts for convenience:
+
+| Script | Purpose |
+|--------|---------|
+| `run-docker.sh` | Main script to build and run with custom configuration |
+| `container.sh` | Universal wrapper for docker/podman commands |
+| `compose.sh` | Universal wrapper for docker-compose/podman-compose |
+| `test-docker-config.sh` | Automated testing script |
+
+#### Docker Compose / Podman Compose
+
+Use the included `docker-compose.yml` with automatic runtime detection:
+
+```bash
+# Using the wrapper script (auto-detects compose tool)
+./compose.sh up
+
+# Using the wrapper with development profile
+./compose.sh --profile dev up
+
+# Direct usage (replace with docker-compose or podman-compose as needed)
+docker-compose up                               # Docker Compose
+podman-compose up                               # Podman Compose
+docker compose up                               # Docker Compose V2
+
+# With custom environment variables
+POCKET_PORT=9090 POCKET_ADDRESS=192.168.1.100 ./compose.sh up
+```
+
 ### Rate Limiting Configuration
 ```rust
 // Modify limits in RateLimiter::new()
