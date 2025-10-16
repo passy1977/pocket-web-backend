@@ -94,6 +94,9 @@ source ~/.cargo/env
 # Install CMake and pkg-config (required for C++ bridge compilation)
 sudo apt install -y cmake pkg-config
 
+# Install Clang and libclang (required for bindgen/C++ bridge)
+sudo apt install -y clang libclang-dev llvm-dev
+
 # Install OpenSSL development libraries
 sudo apt install -y libssl-dev
 
@@ -111,6 +114,9 @@ sudo apt install -y libc6-dev
 | `build-essential` | GCC/G++ compiler, make, and basic build tools | C++ bridge compilation |
 | `cmake` | Build system generator | pocket-lib CMake build |
 | `pkg-config` | Package configuration tool | Library detection in CMake |
+| `clang` | Clang compiler and tools | bindgen for Rust-C++ bridge |
+| `libclang-dev` | Clang development libraries | bindgen C++ parsing |
+| `llvm-dev` | LLVM development tools | bindgen dependencies |
 | `libssl-dev` | OpenSSL development headers and libraries | Cryptographic operations |
 | `libsqlite3-dev` | SQLite3 development headers and libraries | Database operations |
 | `libc6-dev` | Standard C library development files | General C/C++ compilation |
@@ -125,6 +131,7 @@ You can verify the installations with:
 gcc --version
 g++ --version
 cmake --version
+clang --version
 
 # Check libraries
 pkg-config --modversion openssl
@@ -170,26 +177,47 @@ cargo run -- --help
 # Run with default settings
 cargo run
 
+# Run with custom parameters (positional arguments)
+cargo run -- [ADDRESS] [PORT] [MAX_THREADS] [SESSION_EXPIRATION_TIME]
+
+# Example with specific values
+cargo run -- 0.0.0.0 8080 16 1800
+
 # Run in release mode
 cargo run --release
+
+# Run release mode with custom parameters
+cargo run --release -- 127.0.0.1 3030 8 900
 ```
+
+### Parameters
+- **ADDRESS**: IP address to bind to (default: 0.0.0.0)
+- **PORT**: Port number to listen on (default: 3030)  
+- **MAX_THREADS**: Maximum number of worker threads (default: 8)
+- **SESSION_EXPIRATION_TIME**: Session timeout in seconds (default: 900)
 
 ### Configuration
 The application can be configured through:
-- Command line arguments
-- Environment variables
-- Configuration files (if implemented)
+- Command line arguments (positional format)
+- Environment variables (for Docker/containers)
+- Default values if no arguments provided
 
 ### Starting the Server
 ```bash
-# Development mode
+# Development mode with default settings
 cargo run
 
-# Production mode
+# Development mode with custom configuration
+cargo run -- 0.0.0.0 8080 16 1800
+
+# Production mode with default settings
 cargo run --release
+
+# Production mode with custom configuration  
+cargo run --release -- 127.0.0.1 3030 8 900
 ```
 
-The server will start on the configured address and port (default: `127.0.0.1:8080`).
+The server will start on the configured address and port (default: `0.0.0.0:3030`).
 
 ## 📡 API Endpoints
 
@@ -405,11 +433,31 @@ The application supports the following command line arguments:
 ./pocket-web-backend --help
 ```
 
-Available options:
-- `--address <ADDRESS>`: Server bind address (default: 127.0.0.1)
-- `--port <PORT>`: Server port (default: 8080)
-- `--max-threads <THREADS>`: Maximum blocking threads (default: 2)
-- `--session-expiration-time <SECONDS>`: Session expiration time (default: 300)
+Usage format:
+```
+pocket-web-backend [ADDRESS] [PORT] [MAX_THREADS] [SESSION_EXPIRATION_TIME]
+```
+
+Arguments (all optional, positional):
+- `ADDRESS`: Server bind address (default from config: 127.0.0.1)
+- `PORT`: Server port (default from config: 8080)
+- `MAX_THREADS`: Maximum blocking threads (default from config: 2)
+- `SESSION_EXPIRATION_TIME`: Session expiration time in seconds (default from config: 300)
+
+Examples:
+```bash
+# Using all arguments
+./pocket-web-backend 192.168.1.100 9090 4 600
+
+# Using only some arguments (positional order matters)
+./pocket-web-backend 0.0.0.0 8080
+
+# Using only address
+./pocket-web-backend 192.168.1.100
+
+# Using defaults (no arguments)
+./pocket-web-backend
+```
 
 ### Docker/Podman Configuration
 

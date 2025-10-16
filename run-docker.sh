@@ -1,39 +1,49 @@
 #!/bin/bash
 
-# Script di esempio per eseguire il container con configurazione personalizzata
-# Supporta automaticamente Docker e Podman
+# Example script to run the container with custom configuration
+# Automatically supports Docker and Podman
 
-# Funzione per rilevare il runtime container disponibile
+# Function to detect available container runtime
 detect_container_runtime() {
+    # Check common paths for podman
     if command -v podman >/dev/null 2>&1; then
         echo "podman"
+    elif [ -x "/usr/bin/podman" ]; then
+        echo "/usr/bin/podman"
+    elif [ -x "/usr/local/bin/podman" ]; then
+        echo "/usr/local/bin/podman"
+    # Check common paths for docker
     elif command -v docker >/dev/null 2>&1; then
         echo "docker"
+    elif [ -x "/usr/bin/docker" ]; then
+        echo "/usr/bin/docker"
+    elif [ -x "/usr/local/bin/docker" ]; then
+        echo "/usr/local/bin/docker"
     else
         echo "none"
     fi
 }
 
-# Rileva il runtime container
+# Detect container runtime
 CONTAINER_RUNTIME=$(detect_container_runtime)
 
 if [ "$CONTAINER_RUNTIME" = "none" ]; then
-    echo "❌ Errore: Né Docker né Podman sono installati sul sistema"
-    echo "Installa uno dei due per continuare:"
+    echo "❌ Error: Neither Docker nor Podman are installed on this system"
+    echo "Please install one of them to continue:"
     echo "  - Docker: https://docs.docker.com/get-docker/"
     echo "  - Podman: https://podman.io/getting-started/installation"
     exit 1
 fi
 
-echo "🐳 Usando runtime container: $CONTAINER_RUNTIME"
+echo "🐳 Using container runtime: $CONTAINER_RUNTIME"
 
-# Valori di default
+# Default values
 ADDRESS="0.0.0.0"
 PORT="8080"
 MAX_THREADS="2"
 SESSION_EXPIRATION="300"
 
-# Parsing degli argomenti
+# Argument parsing
 while [[ $# -gt 0 ]]; do
     case $1 in
         --address)
@@ -53,36 +63,55 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --help)
-            echo "Uso: $0 [opzioni]"
-            echo "Opzioni:"
-            echo "  --address ADDRESS          Indirizzo di bind (default: 0.0.0.0)"
-            echo "  --port PORT               Porta di ascolto (default: 8080)"
-            echo "  --max-threads THREADS     Numero massimo di thread (default: 2)"
-            echo "  --session-expiration SEC  Tempo scadenza sessione in secondi (default: 300)"
-            echo "  --help                    Mostra questo messaggio"
+            echo "Usage: $0 [options]"
+            echo "Options:"
+            echo "  --address ADDRESS          Bind address (default: 0.0.0.0)"
+            echo "  --port PORT               Listening port (default: 8080)"
+            echo "  --max-threads THREADS     Maximum number of threads (default: 2)"
+            echo "  --session-expiration SEC  Session expiration time in seconds (default: 300)"
+            echo "  --help                    Show this message"
             echo ""
-            echo "Runtime container rilevato: $CONTAINER_RUNTIME"
+            echo "Detected container runtime: $CONTAINER_RUNTIME"
             echo ""
-            echo "Esempi:"
+            echo "The application supports both long and short flags:"
+            echo "  -a, --address    -p, --port    -m, --max-threads    -s, --session-expiration-time"
+            echo ""
+            echo "Examples:"
             echo "  $0 --address 192.168.1.100 --port 9090"
             echo "  $0 --port 3000 --max-threads 4"
             exit 0
             ;;
         *)
-            echo "Opzione sconosciuta: $1"
-            echo "Usa --help per vedere le opzioni disponibili"
+            echo "Unknown option: $1"
+            echo "Use --help to see available options"
             exit 1
             ;;
     esac
 done
 
-echo "Avvio del container pocket-web-backend con $CONTAINER_RUNTIME:"
+echo "Starting pocket-web-backend container with $CONTAINER_RUNTIME:"
 echo "  Address: $ADDRESS"
 echo "  Port: $PORT"
 echo "  Max Threads: $MAX_THREADS"
-echo "  Session Expiration: $SESSION_EXPIRATION secondi"
+echo "  Session Expiration: $SESSION_EXPIRATION seconds"
 echo "  Backend URL (constants.mjs): http://$ADDRESS:$PORT"
 echo ""
+
+# Build image if it doesn't exist
+if ! $CONTAINER_RUNTIME image inspect pocket-web-backend >/dev/null 2>&1; then
+    echo "Building $CONTAINER_RUNTIME image..."
+    $CONTAINER_RUNTIME build -t pocket-web-backend .
+fi
+
+# Run the container
+$CONTAINER_RUNTIME run -it --rm \
+    -p ${PORT}:${PORT} \
+    -e POCKET_ADDRESS=${ADDRESS} \
+    -e POCKET_PORT=${PORT} \
+    -e POCKET_MAX_THREADS=${MAX_THREADS} \
+    -e POCKET_SESSION_EXPIRATION=${SESSION_EXPIRATION} \
+    --name pocket-web-backend-instance \
+    pocket-web-backend
 
 # Costruisci l'immagine se non esiste
 if ! $CONTAINER_RUNTIME image inspect pocket-web-backend >/dev/null 2>&1; then
