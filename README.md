@@ -461,7 +461,7 @@ Examples:
 
 ### Docker/Podman Configuration
 
-The application supports both **Docker** and **Podman** container runtimes. All scripts automatically detect which runtime is available and use it accordingly.
+The application supports both **Docker** and **Podman** container runtimes.
 
 #### Container Runtime Support
 
@@ -483,93 +483,35 @@ The Docker container supports the following environment variables:
 
 #### Running with Docker/Podman
 
-The scripts automatically detect and use the available container runtime:
-
-1. **Build and run with auto-detection:**
 ```bash
-./run-docker.sh --address 192.168.1.100 --port 9090
-```
+# Build the image with Docker
+docker build -t pocket-web-backend .
 
-2. **Manual container commands:**
-```bash
-# Using the wrapper script (auto-detects runtime)
-./container.sh build -t pocket-web-backend .
-./container.sh run -p 8080:8080 pocket-web-backend
+# Or with Podman
+podman build -t pocket-web-backend .
 
-# Or directly with your preferred runtime
-docker build -t pocket-web-backend .    # Using Docker
-podman build -t pocket-web-backend .    # Using Podman
-```
+# Run the container with custom environment variables
+docker run -it --rm \
+    -p 8080:8080 \
+    -e POCKET_ADDRESS=0.0.0.0 \
+    -e POCKET_PORT=8080 \
+    -e POCKET_MAX_THREADS=4 \
+    -e POCKET_SESSION_EXPIRATION=900 \
+    pocket-web-backend
 
-3. **Using compose wrapper:**
-```bash
-./compose.sh up                 # Auto-detects docker-compose or podman-compose
-./compose.sh --profile dev up   # Run development profile
-```
-
-4. **Using the convenience script:**
-```bash
-# Copy and edit environment file
-cp .env.example .env
-
-# Run with custom settings
-./run-docker.sh --address 192.168.1.100 --port 9090 --max-threads 4
+# Or with Podman
+podman run -it --rm \
+    -p 8080:8080 \
+    -e POCKET_ADDRESS=0.0.0.0 \
+    -e POCKET_PORT=8080 \
+    -e POCKET_MAX_THREADS=4 \
+    -e POCKET_SESSION_EXPIRATION=900 \
+    pocket-web-backend
 ```
 
 #### Automatic Frontend Configuration
 
-The Docker container automatically updates the frontend configuration (`statics/js/constants.mjs`) to match the server address and port. This ensures that the JavaScript frontend always connects to the correct backend URL.
-
-**How it works:**
-- On container startup, the `BACKEND_URL` constant is automatically updated
-- Original: `const BACKEND_URL = 'http://localhost:8080';`
-- Updated: `const BACKEND_URL = 'http://YOUR_ADDRESS:YOUR_PORT';`
-
-**Example:**
-```bash
-# This will update constants.mjs to use http://192.168.1.100:9090
-./run-docker.sh --address 192.168.1.100 --port 9090
-```
-
-**Testing the configuration:**
-```bash
-# Run the automated test script (auto-detects runtime)
-./test-docker-config.sh
-
-# Or manually verify in a running container
-./container.sh exec -it pocket-web-backend-instance cat /var/www/statics/js/constants.mjs
-```
-
-#### Container Runtime Scripts
-
-The project includes several wrapper scripts for convenience:
-
-| Script | Purpose |
-|--------|---------|
-| `run-docker.sh` | Main script to build and run with custom configuration |
-| `container.sh` | Universal wrapper for docker/podman commands |
-| `compose.sh` | Universal wrapper for docker-compose/podman-compose |
-| `test-docker-config.sh` | Automated testing script |
-
-#### Docker Compose / Podman Compose
-
-Use the included `docker-compose.yml` with automatic runtime detection:
-
-```bash
-# Using the wrapper script (auto-detects compose tool)
-./compose.sh up
-
-# Using the wrapper with development profile
-./compose.sh --profile dev up
-
-# Direct usage (replace with docker-compose or podman-compose as needed)
-docker-compose up                               # Docker Compose
-podman-compose up                               # Podman Compose
-docker compose up                               # Docker Compose V2
-
-# With custom environment variables
-POCKET_PORT=9090 POCKET_ADDRESS=192.168.1.100 ./compose.sh up
-```
+The Docker container automatically updates the frontend configuration (`statics/js/constants.mjs`) to match the server address and port specified in the environment variables.
 
 ### Rate Limiting Configuration
 ```rust
