@@ -8,7 +8,7 @@ use std::io::{self, Error, ErrorKind, Read, Write};
 use serde::{Deserialize, Serialize};
 
 pub struct Url {
-    pub scheme: String,
+    pub protocol: String,
     pub address: String,
     pub port: Option<u16>,
 }
@@ -16,7 +16,7 @@ pub struct Url {
 impl Default for Url {
     fn default() -> Self {
         Self {
-            scheme: "http".to_string(),
+            protocol: "http".to_string(),
             address: "localhost".to_string(),
             port: None,
         }
@@ -201,11 +201,11 @@ impl Data {
         let mut ret = Url::default();
 
         if self.address.starts_with("http://") {
-            ret.scheme = "http".to_string();
+            ret.protocol = "http".to_string();
         } else if self.address.starts_with("https://") {
-            ret.scheme = "https".to_string();
+            ret.protocol = "https".to_string();
         } else {
-            return Err("Invalid scheme".into());
+            return Err("Invalid protocol".into());
         }
 
         let slices = self.address.split(':').collect::<Vec<_>>();

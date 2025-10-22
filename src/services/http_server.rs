@@ -82,10 +82,10 @@ pub mod server {
 
         let origin = if let Some(port) = url.port {
             println!("Server will start at http://{}:{}", url.address, port);
-            format!("{}://{}:{}", url.scheme, url.address, port)
+            format!("{}://{}:{}", url.protocol, url.address, port)
         } else {
             println!("Server will start at http://{}", url.address);
-            format!("{}://{}", url.scheme, url.address)
+            format!("{}://{}", url.protocol, url.address)
         };
 
 
