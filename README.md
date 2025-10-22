@@ -178,23 +178,24 @@ cargo run -- --help
 cargo run
 
 # Run with custom parameters (positional arguments)
-cargo run -- [ADDRESS] [PORT] [MAX_THREADS] [SESSION_EXPIRATION_TIME]
+cargo run -- [ADDRESS] [MAX_THREADS] [SESSION_EXPIRATION_TIME]
 
 # Example with specific values
-cargo run -- 0.0.0.0 8080 16 1800
+cargo run -- http://192.168.1.100:8080 16 1800
 
 # Run in release mode
 cargo run --release
 
 # Run release mode with custom parameters
-cargo run --release -- 127.0.0.1 3030 8 900
+cargo run --release -- http://localhost:3030 8 900
 ```
 
 ### Parameters
-- **ADDRESS**: IP address to bind to (default: 0.0.0.0)
-- **PORT**: Port number to listen on (default: 3030)  
-- **MAX_THREADS**: Maximum number of worker threads (default: 8)
-- **SESSION_EXPIRATION_TIME**: Session timeout in seconds (default: 900)
+- **ADDRESS**: Full server URL including protocol and port (default: http://localhost:8080)
+  - Format: `http://HOST:PORT` or `https://HOST:PORT`
+  - Examples: `http://localhost:8080`, `http://192.168.1.100:3030`, `https://myserver.com:443`
+- **MAX_THREADS**: Maximum number of worker threads (default: 2)
+- **SESSION_EXPIRATION_TIME**: Session timeout in seconds (default: 300)
 
 ### Configuration
 The application can be configured through:
@@ -208,16 +209,16 @@ The application can be configured through:
 cargo run
 
 # Development mode with custom configuration
-cargo run -- 0.0.0.0 8080 16 1800
+cargo run -- http://0.0.0.0:8080 16 1800
 
 # Production mode with default settings
 cargo run --release
 
 # Production mode with custom configuration  
-cargo run --release -- 127.0.0.1 3030 8 900
+cargo run --release -- http://127.0.0.1:3030 8 900
 ```
 
-The server will start on the configured address and port (default: `0.0.0.0:3030`).
+The server will start on the configured address and port (default: `http://localhost:8080`).
 
 ## 📡 API Endpoints
 
@@ -435,25 +436,25 @@ The application supports the following command line arguments:
 
 Usage format:
 ```
-pocket-web-backend [ADDRESS] [PORT] [MAX_THREADS] [SESSION_EXPIRATION_TIME]
+pocket-web-backend [ADDRESS] [MAX_THREADS] [SESSION_EXPIRATION_TIME]
 ```
 
 Arguments (all optional, positional):
-- `ADDRESS`: Server bind address (default from config: 127.0.0.1)
-- `PORT`: Server port (default from config: 8080)
-- `MAX_THREADS`: Maximum blocking threads (default from config: 2)
-- `SESSION_EXPIRATION_TIME`: Session expiration time in seconds (default from config: 300)
+- `ADDRESS`: Full server URL with protocol and port (default: http://localhost:8080)
+  - Format: `http://HOST:PORT` or `https://HOST:PORT`
+- `MAX_THREADS`: Maximum blocking threads (default: 2)
+- `SESSION_EXPIRATION_TIME`: Session expiration time in seconds (default: 300)
 
 Examples:
 ```bash
 # Using all arguments
-./pocket-web-backend 192.168.1.100 9090 4 600
+./pocket-web-backend http://192.168.1.100:9090 4 600
 
 # Using only some arguments (positional order matters)
-./pocket-web-backend 0.0.0.0 8080
+./pocket-web-backend http://0.0.0.0:8080 16
 
 # Using only address
-./pocket-web-backend 192.168.1.100
+./pocket-web-backend http://192.168.1.100:3030
 
 # Using defaults (no arguments)
 ./pocket-web-backend
@@ -476,12 +477,15 @@ The Docker container supports the following environment variables:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `POCKET_ADDRESS` | Server bind address | `0.0.0.0` |
+| `POCKET_PROTOCOL` | Protocol (http or https) | `http` |
+| `POCKET_HOST` | Server bind address/hostname | `0.0.0.0` |
 | `POCKET_PORT` | Server port | `8080` |
 | `POCKET_MAX_THREADS` | Maximum blocking threads | `2` |
 | `POCKET_SESSION_EXPIRATION` | Session expiration (seconds) | `300` |
 | `CORS_ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins | None |
 | `CORS_PERMISSIVE` | Enable permissive CORS in production (not recommended) | Not set |
+
+**Note:** The container automatically builds the full server URL as `${POCKET_PROTOCOL}://${POCKET_HOST}:${POCKET_PORT}` and passes it to the application.
 
 #### Running with Docker/Podman
 
@@ -492,11 +496,37 @@ docker build -t pocket-web-backend .
 # Or with Podman
 podman build -t pocket-web-backend .
 
-# Run the container with custom environment variables
+# Run the container with default settings
 docker run -it --rm \
     -p 8080:8080 \
-    -e POCKET_ADDRESS=0.0.0.0 \
+    pocket-web-backend
+
+# Run with custom environment variables
+docker run -it --rm \
+    -p 8080:8080 \
+    -e POCKET_PROTOCOL=http \
+    -e POCKET_HOST=0.0.0.0 \
     -e POCKET_PORT=8080 \
+    -e POCKET_MAX_THREADS=4 \
+    -e POCKET_SESSION_EXPIRATION=900 \
+    pocket-web-backend
+
+# Run with different port
+docker run -it --rm \
+    -p 3030:3030 \
+    -e POCKET_PROTOCOL=http \
+    -e POCKET_HOST=0.0.0.0 \
+    -e POCKET_PORT=3030 \
+    -e POCKET_MAX_THREADS=4 \
+    -e POCKET_SESSION_EXPIRATION=900 \
+    pocket-web-backend
+
+# Run with HTTPS
+docker run -it --rm \
+    -p 443:443 \
+    -e POCKET_PROTOCOL=https \
+    -e POCKET_HOST=myserver.com \
+    -e POCKET_PORT=443 \
     -e POCKET_MAX_THREADS=4 \
     -e POCKET_SESSION_EXPIRATION=900 \
     pocket-web-backend
@@ -504,7 +534,8 @@ docker run -it --rm \
 # Run with CORS configuration for multiple origins
 docker run -it --rm \
     -p 8080:8080 \
-    -e POCKET_ADDRESS=0.0.0.0 \
+    -e POCKET_PROTOCOL=http \
+    -e POCKET_HOST=0.0.0.0 \
     -e POCKET_PORT=8080 \
     -e CORS_ALLOWED_ORIGINS="http://example.com,https://app.example.com,http://192.168.1.100:3000" \
     pocket-web-backend
@@ -512,7 +543,8 @@ docker run -it --rm \
 # Or with Podman
 podman run -it --rm \
     -p 8080:8080 \
-    -e POCKET_ADDRESS=0.0.0.0 \
+    -e POCKET_PROTOCOL=http \
+    -e POCKET_HOST=0.0.0.0 \
     -e POCKET_PORT=8080 \
     -e POCKET_MAX_THREADS=4 \
     -e POCKET_SESSION_EXPIRATION=900 \
@@ -524,7 +556,7 @@ podman run -it --rm \
 The application includes flexible CORS (Cross-Origin Resource Sharing) configuration:
 
 **Default Behavior:**
-- Server origin (based on `POCKET_ADDRESS` and `POCKET_PORT`) is always allowed
+- Server origin (built from `POCKET_PROTOCOL`, `POCKET_HOST` and `POCKET_PORT`) is always allowed
 - In **debug mode**: `http://localhost:8080` and `http://127.0.0.1:8080` are automatically allowed
 - In **production mode**: Restricted to configured origins only
 
@@ -547,7 +579,8 @@ Use the `CORS_ALLOWED_ORIGINS` environment variable to specify additional allowe
 ```bash
 docker run -it --rm \
     -p 8080:8080 \
-    -e POCKET_ADDRESS=0.0.0.0 \
+    -e POCKET_PROTOCOL=http \
+    -e POCKET_HOST=0.0.0.0 \
     -e POCKET_PORT=8080 \
     -e CORS_ALLOWED_ORIGINS="http://localhost:3000,https://myapp.com" \
     pocket-web-backend
@@ -561,7 +594,16 @@ docker run -it --rm \
 
 #### Automatic Frontend Configuration
 
-The Docker container automatically updates the frontend configuration (`statics/js/constants.mjs`) to match the server address and port specified in the environment variables.
+The Docker container automatically updates the frontend configuration (`statics/js/constants.mjs`) to match the server URL.
+
+**How it works:**
+- On container startup, the full URL is built from `POCKET_PROTOCOL`, `POCKET_HOST` and `POCKET_PORT` as `${POCKET_PROTOCOL}://${POCKET_HOST}:${POCKET_PORT}`
+- The `BACKEND_URL` constant in `constants.mjs` is automatically replaced with this URL
+- This ensures the frontend always connects to the correct backend URL
+
+**Examples:**
+- `POCKET_PROTOCOL=http`, `POCKET_HOST=192.168.1.100`, `POCKET_PORT=8080` → `http://192.168.1.100:8080`
+- `POCKET_PROTOCOL=https`, `POCKET_HOST=myserver.com`, `POCKET_PORT=443` → `https://myserver.com:443`
 
 ### Rate Limiting Configuration
 ```rust

@@ -67,15 +67,17 @@ RUN echo ciao
 RUN echo '#!/bin/bash' > /var/www/start.sh && \
     echo 'set -e' >> /var/www/start.sh && \
     echo '' >> /var/www/start.sh && \
-    echo '# Update BACKEND_URL in constants.mjs with current ADDRESS and PORT' >> /var/www/start.sh && \
-    echo 'BACKEND_URL="http://${POCKET_ADDRESS}:${POCKET_PORT}"' >> /var/www/start.sh && \
-    echo 'echo "Updating constants.mjs with BACKEND_URL: $BACKEND_URL"' >> /var/www/start.sh && \
-    echo 'sed -i "s|const BACKEND_URL = '\''[^'\'']*'\'';|const BACKEND_URL = '\''$BACKEND_URL'\'';|g" /var/www/statics/js/constants.mjs' >> /var/www/start.sh && \
+    echo '# Build full address from POCKET_PROTOCOL, POCKET_HOST and POCKET_PORT' >> /var/www/start.sh && \
+    echo 'FULL_ADDRESS="${POCKET_PROTOCOL}://${POCKET_HOST}:${POCKET_PORT}"' >> /var/www/start.sh && \
+    echo 'echo "Server will run at: ${FULL_ADDRESS}"' >> /var/www/start.sh && \
+    echo '' >> /var/www/start.sh && \
+    echo '# Update BACKEND_URL in constants.mjs' >> /var/www/start.sh && \
+    echo 'echo "Updating constants.mjs with BACKEND_URL: ${FULL_ADDRESS}"' >> /var/www/start.sh && \
+    echo 'sed -i "s|const BACKEND_URL = '\''[^'\'']*'\'';|const BACKEND_URL = '\''${FULL_ADDRESS}'\'';|g" /var/www/statics/js/constants.mjs' >> /var/www/start.sh && \
     echo '' >> /var/www/start.sh && \
     echo '# Start the application' >> /var/www/start.sh && \
     echo 'exec /var/www/pocket-web-backend \' >> /var/www/start.sh && \
-    echo '    ${POCKET_ADDRESS} \' >> /var/www/start.sh && \
-    echo '    ${POCKET_PORT} \' >> /var/www/start.sh && \
+    echo '    ${FULL_ADDRESS} \' >> /var/www/start.sh && \
     echo '    ${POCKET_MAX_THREADS} \' >> /var/www/start.sh && \
     echo '    ${POCKET_SESSION_EXPIRATION}' >> /var/www/start.sh && \
     chmod +x /var/www/start.sh
@@ -87,7 +89,8 @@ USER pocket
 WORKDIR /var/www
 
 # Set default environment variables
-ENV POCKET_ADDRESS=0.0.0.0
+ENV POCKET_PROTOCOL=http
+ENV POCKET_HOST=0.0.0.0
 ENV POCKET_PORT=8080
 ENV POCKET_MAX_THREADS=2
 ENV POCKET_SESSION_EXPIRATION=300
@@ -95,11 +98,11 @@ ENV POCKET_SESSION_EXPIRATION=300
 # Expose application port (can be overridden)
 EXPOSE ${POCKET_PORT}
 
-# Health check (using environment variable for port)
+# Health check
 # Note: HEALTHCHECK is not supported in OCI format (Podman default)
 # Uncomment the following line if using Docker format
 # HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-#     CMD curl -f http://localhost:${POCKET_PORT} || exit 1
+#     CMD curl -f http://localhost:${POCKET_PORT}/v5/pocket/heartbeat || exit 1
 
 # Start application using the startup script
 CMD ["/var/www/start.sh"] 
