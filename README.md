@@ -480,6 +480,8 @@ The Docker container supports the following environment variables:
 | `POCKET_PORT` | Server port | `8080` |
 | `POCKET_MAX_THREADS` | Maximum blocking threads | `2` |
 | `POCKET_SESSION_EXPIRATION` | Session expiration (seconds) | `300` |
+| `CORS_ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins | None |
+| `CORS_PERMISSIVE` | Enable permissive CORS in production (not recommended) | Not set |
 
 #### Running with Docker/Podman
 
@@ -499,6 +501,14 @@ docker run -it --rm \
     -e POCKET_SESSION_EXPIRATION=900 \
     pocket-web-backend
 
+# Run with CORS configuration for multiple origins
+docker run -it --rm \
+    -p 8080:8080 \
+    -e POCKET_ADDRESS=0.0.0.0 \
+    -e POCKET_PORT=8080 \
+    -e CORS_ALLOWED_ORIGINS="http://example.com,https://app.example.com,http://192.168.1.100:3000" \
+    pocket-web-backend
+
 # Or with Podman
 podman run -it --rm \
     -p 8080:8080 \
@@ -508,6 +518,46 @@ podman run -it --rm \
     -e POCKET_SESSION_EXPIRATION=900 \
     pocket-web-backend
 ```
+
+#### CORS Configuration
+
+The application includes flexible CORS (Cross-Origin Resource Sharing) configuration:
+
+**Default Behavior:**
+- Server origin (based on `POCKET_ADDRESS` and `POCKET_PORT`) is always allowed
+- In **debug mode**: `http://localhost:8080` and `http://127.0.0.1:8080` are automatically allowed
+- In **production mode**: Restricted to configured origins only
+
+**Adding Additional Origins:**
+
+Use the `CORS_ALLOWED_ORIGINS` environment variable to specify additional allowed origins. Multiple origins can be separated by commas:
+
+```bash
+# Single origin
+-e CORS_ALLOWED_ORIGINS="https://myapp.com"
+
+# Multiple origins
+-e CORS_ALLOWED_ORIGINS="http://localhost:3000,https://myapp.com,https://app.example.com"
+
+# With IP addresses
+-e CORS_ALLOWED_ORIGINS="http://192.168.1.100:3000,http://192.168.1.50:8080"
+```
+
+**Complete Example:**
+```bash
+docker run -it --rm \
+    -p 8080:8080 \
+    -e POCKET_ADDRESS=0.0.0.0 \
+    -e POCKET_PORT=8080 \
+    -e CORS_ALLOWED_ORIGINS="http://localhost:3000,https://myapp.com" \
+    pocket-web-backend
+```
+
+**Notes:**
+- Origins are automatically trimmed of whitespace
+- Empty origins are ignored
+- Each origin must include the full URL with protocol (http:// or https://)
+- CORS_ALLOWED_ORIGINS adds to existing allowed origins, doesn't replace them
 
 #### Automatic Frontend Configuration
 
