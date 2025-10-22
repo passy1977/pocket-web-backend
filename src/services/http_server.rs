@@ -76,11 +76,14 @@ pub mod server {
 
         env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
-        println!("Starting server at http://{address}:{port}");
+
         
         Sessions::share().start_validator();
 
-        let origin = format!("http://{}:{}", address, port);
+        let origin = format!("http://{address}:{port}");
+
+        println!("Starting server at {origin}");
+
         HttpServer::new(move || {
             let app = App::new()
                 .wrap(Logger::default())
