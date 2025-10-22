@@ -143,7 +143,7 @@ pub(crate) fn configure_cors(server_origin: String) -> actix_cors::Cors {
     use crate::constants::conf::{CORS_MAX_AGE, CORS_ALLOWED_METHODS, CORS_ALLOWED_HEADERS};
     use actix_cors::Cors;
     use std::env;
-    
+
     let mut cors = Cors::default()
         .allowed_origin(&server_origin)
         .allowed_methods(CORS_ALLOWED_METHODS.to_vec())
@@ -173,7 +173,7 @@ pub(crate) fn configure_cors(server_origin: String) -> actix_cors::Cors {
             cors = cors.supports_credentials();
         }
     }
-    
+
     cors
 }
 

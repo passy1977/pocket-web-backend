@@ -7,6 +7,22 @@ use std::fs::File;
 use std::io::{self, Error, ErrorKind, Read, Write};
 use serde::{Deserialize, Serialize};
 
+pub struct Url {
+    pub scheme: String,
+    pub address: String,
+    pub port: Option<u16>,
+}
+
+impl Default for Url {
+    fn default() -> Self {
+        Self {
+            scheme: "http".to_string(),
+            address: "localhost".to_string(),
+            port: None,
+        }
+    }
+}
+
 #[repr(C)]
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Data {
@@ -19,9 +35,6 @@ pub struct Data {
 
     /// Address on which the server listens
     pub address: String,
-
-    /// Connection port
-    pub port: u16,
 
     #[serde(skip_serializing, skip_deserializing)]
     pub(super) update : bool,
@@ -62,8 +75,7 @@ impl Data {
         let mut ret = Self {
             file_data_path,
             dir_path,
-            address: IP.to_string(),
-            port: PORT,
+            address: ADDRESS.to_string(),
             update: false,
             max_threads: MAX_BLOCKING_THREADS,
             session_expiration_time: SESSION_EXPIRATION_TIME
@@ -112,7 +124,6 @@ impl Data {
             .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, format!("Invalid JSON format: {}", e)))?;
 
         self.address = data.address;
-        self.port = data.port;
         self.update = false;
         self.max_threads = data.max_threads;
         self.session_expiration_time = data.session_expiration_time;
@@ -186,4 +197,32 @@ impl Data {
         Ok(())
     }
 
+    pub fn get_url(&self) -> Result<Url> {
+        let mut ret = Url::default();
+
+        if self.address.starts_with("http://") {
+            ret.scheme = "http".to_string();
+        } else if self.address.starts_with("https://") {
+            ret.scheme = "https".to_string();
+        } else {
+            return Err("Invalid scheme".into());
+        }
+
+        let slices = self.address.split(':').collect::<Vec<_>>();
+        if slices.len() == 0 || slices.len() > 3 {
+            return Err("Invalid address format".into());
+        }
+
+        ret.address = slices[1].trim_start_matches("//").to_string();
+
+        if slices.len() == 3 {
+            if let Ok(port) = slices[2].parse::<u16>() {
+                ret.port = Some(port);
+            } else {
+                return Err("Invalid port".into());
+            }
+        }
+
+        Ok(ret)
+    }
 }

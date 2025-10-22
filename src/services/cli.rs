@@ -10,9 +10,6 @@ pub struct Cli {
     /// Host address
     pub address: Option<String>,
 
-    /// Connection port
-    pub port: Option<u16>,
-
     /// Maximum number of threads
     pub max_threads: Option<usize>,
 
@@ -32,13 +29,6 @@ impl Cli {
                 }    
             }
         }
-        
-        if let Some(port) = cli.port {
-            if data.port != port {
-                data.port = port;
-                data.update = true;
-            }
-        }
 
         if let Some(max_threads) = cli.max_threads {
             if data.max_threads != max_threads {
@@ -53,6 +43,5 @@ impl Cli {
                 data.update = true;
             }
         }
-        
     }
 }

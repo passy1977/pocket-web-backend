@@ -71,16 +71,23 @@ pub mod server {
     use actix_web::{web, App, HttpServer};
     use std::io;
     use actix_web::middleware::Logger;
+    use crate::constants::conf::PORT;
+    use crate::services::data::Url;
 
-    pub async fn start(address: String, port: u16, max_threads: usize) -> io::Result<()> {
+    pub async fn start(url: Url, max_threads: usize) -> io::Result<()> {
 
         env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
-
-
         
         Sessions::share().start_validator();
 
-        let origin = format!("http://{address}:{port}");
+        let origin = if let Some(port) = url.port {
+            println!("Server will start at http://{}:{}", url.address, port);
+            format!("{}://{}:{}", url.scheme, url.address, port)
+        } else {
+            println!("Server will start at http://{}", url.address);
+            format!("{}://{}", url.scheme, url.address)
+        };
+
 
         println!("Starting server at {origin}");
 
@@ -107,7 +114,7 @@ pub mod server {
                 .route("/v5/pocket/heartbeat/{session_id}", web::get().to(heartbeat))
                 .service(fs::Files::new("/", "./statics").index_file("index.html"))
             })
-            .bind((address, port))?
+            .bind((url.address, url.port.unwrap_or(PORT)))?
             .workers(max_threads)
             .run()
             .await

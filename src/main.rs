@@ -29,8 +29,11 @@ async fn main() -> std::io::Result<()> {
         Ok(data) => data,
         Err(err) => panic!("{}", err)
     };
-    
 
+    let url = match data.get_url() {
+        Ok(url) => url,
+        Err(err) => panic!("{}", err)
+    };
 
-    server::start(data.address.clone(), data.port, data.max_threads).await
+    server::start(url, data.max_threads).await
 }
