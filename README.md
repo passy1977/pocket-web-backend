@@ -477,15 +477,18 @@ The Docker container supports the following environment variables:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `POCKET_PROTOCOL` | Protocol (http or https) | `http` |
 | `POCKET_HOST` | Server bind address/hostname | `0.0.0.0` |
 | `POCKET_PORT` | Server port | `8080` |
+| `BACKEND_URL` | Custom frontend URL (optional, overrides auto-built URL) | None |
 | `POCKET_MAX_THREADS` | Maximum blocking threads | `2` |
 | `POCKET_SESSION_EXPIRATION` | Session expiration (seconds) | `300` |
 | `CORS_ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins | None |
 | `CORS_PERMISSIVE` | Enable permissive CORS in production (not recommended) | Not set |
 
-**Note:** The container automatically builds the full server URL as `${POCKET_PROTOCOL}://${POCKET_HOST}:${POCKET_PORT}` and passes it to the application.
+**Notes:**
+- The server URL is automatically built as `http://${POCKET_HOST}:${POCKET_PORT}`
+- If `BACKEND_URL` is set, it will be used for the frontend configuration instead of the auto-built URL
+- This allows the server to bind on one address while the frontend connects to a different URL (e.g., behind a proxy/load balancer)
 
 #### Running with Docker/Podman
 
@@ -504,7 +507,6 @@ docker run -it --rm \
 # Run with custom environment variables
 docker run -it --rm \
     -p 8080:8080 \
-    -e POCKET_PROTOCOL=http \
     -e POCKET_HOST=0.0.0.0 \
     -e POCKET_PORT=8080 \
     -e POCKET_MAX_THREADS=4 \
@@ -514,36 +516,39 @@ docker run -it --rm \
 # Run with different port
 docker run -it --rm \
     -p 3030:3030 \
-    -e POCKET_PROTOCOL=http \
     -e POCKET_HOST=0.0.0.0 \
     -e POCKET_PORT=3030 \
     -e POCKET_MAX_THREADS=4 \
     -e POCKET_SESSION_EXPIRATION=900 \
     pocket-web-backend
 
-# Run with HTTPS
+# Run with HTTPS (using BACKEND_URL)
 docker run -it --rm \
-    -p 443:443 \
-    -e POCKET_PROTOCOL=https \
-    -e POCKET_HOST=myserver.com \
-    -e POCKET_PORT=443 \
-    -e POCKET_MAX_THREADS=4 \
-    -e POCKET_SESSION_EXPIRATION=900 \
+    -p 8080:8080 \
+    -e POCKET_HOST=0.0.0.0 \
+    -e POCKET_PORT=8080 \
+    -e BACKEND_URL=https://myserver.com:443 \
     pocket-web-backend
 
 # Run with CORS configuration for multiple origins
 docker run -it --rm \
     -p 8080:8080 \
-    -e POCKET_PROTOCOL=http \
     -e POCKET_HOST=0.0.0.0 \
     -e POCKET_PORT=8080 \
     -e CORS_ALLOWED_ORIGINS="http://example.com,https://app.example.com,http://192.168.1.100:3000" \
     pocket-web-backend
 
+# Run behind a proxy/load balancer with custom frontend URL
+docker run -it --rm \
+    -p 8080:8080 \
+    -e POCKET_HOST=0.0.0.0 \
+    -e POCKET_PORT=8080 \
+    -e BACKEND_URL=https://api.myserver.com \
+    pocket-web-backend
+
 # Or with Podman
 podman run -it --rm \
     -p 8080:8080 \
-    -e POCKET_PROTOCOL=http \
     -e POCKET_HOST=0.0.0.0 \
     -e POCKET_PORT=8080 \
     -e POCKET_MAX_THREADS=4 \
@@ -556,7 +561,7 @@ podman run -it --rm \
 The application includes flexible CORS (Cross-Origin Resource Sharing) configuration:
 
 **Default Behavior:**
-- Server origin (built from `POCKET_PROTOCOL`, `POCKET_HOST` and `POCKET_PORT`) is always allowed
+- Server origin (built from `POCKET_HOST` and `POCKET_PORT`) is always allowed
 - In **debug mode**: `http://localhost:8080` and `http://127.0.0.1:8080` are automatically allowed
 - In **production mode**: Restricted to configured origins only
 
@@ -579,7 +584,6 @@ Use the `CORS_ALLOWED_ORIGINS` environment variable to specify additional allowe
 ```bash
 docker run -it --rm \
     -p 8080:8080 \
-    -e POCKET_PROTOCOL=http \
     -e POCKET_HOST=0.0.0.0 \
     -e POCKET_PORT=8080 \
     -e CORS_ALLOWED_ORIGINS="http://localhost:3000,https://myapp.com" \
@@ -597,13 +601,26 @@ docker run -it --rm \
 The Docker container automatically updates the frontend configuration (`statics/js/constants.mjs`) to match the server URL.
 
 **How it works:**
-- On container startup, the full URL is built from `POCKET_PROTOCOL`, `POCKET_HOST` and `POCKET_PORT` as `${POCKET_PROTOCOL}://${POCKET_HOST}:${POCKET_PORT}`
-- The `BACKEND_URL` constant in `constants.mjs` is automatically replaced with this URL
+- By default, the full URL is built from `POCKET_HOST` and `POCKET_PORT` as `http://${POCKET_HOST}:${POCKET_PORT}`
+- If `BACKEND_URL` is set, it will be used instead for the frontend configuration
+- The `BACKEND_URL` constant in `constants.mjs` is automatically updated with the appropriate URL
 - This ensures the frontend always connects to the correct backend URL
 
 **Examples:**
-- `POCKET_PROTOCOL=http`, `POCKET_HOST=192.168.1.100`, `POCKET_PORT=8080` → `http://192.168.1.100:8080`
-- `POCKET_PROTOCOL=https`, `POCKET_HOST=myserver.com`, `POCKET_PORT=443` → `https://myserver.com:443`
+
+**Standard Configuration (auto-built URL):**
+- `POCKET_HOST=192.168.1.100`, `POCKET_PORT=8080`
+- Frontend will use: `http://192.168.1.100:8080`
+
+**Behind Proxy/Load Balancer (custom URL):**
+- Server binds to: `POCKET_HOST=0.0.0.0`, `POCKET_PORT=8080`
+- Frontend connects to: `BACKEND_URL=https://api.myserver.com`
+- Useful when the internal server address differs from the public URL
+
+**HTTPS Configuration:**
+- Server binds to: `POCKET_HOST=0.0.0.0`, `POCKET_PORT=8080`
+- Frontend connects to: `BACKEND_URL=https://myserver.com:443`
+- Use this when HTTPS termination happens at the load balancer/reverse proxy
 
 ### Rate Limiting Configuration
 ```rust
