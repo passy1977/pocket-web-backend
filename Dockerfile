@@ -1,6 +1,6 @@
 # Multi-stage Docker build for Pocket Backend with Spring Security
 # Stage 1: Build the application
-FROM debian:trixie as build
+FROM debian:trixie AS build
 
 USER root
 
