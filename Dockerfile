@@ -52,8 +52,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt update && \
 
 # Create user and setup directories
 RUN useradd -m -s /bin/bash pocket
-RUN mkdir -p /var/www/scripts /var/log/pocket
-RUN chown -R pocket:pocket /var/www /var/log/pocket
+RUN mkdir -p /var/www/scripts /var/log/pocket-web
+RUN chown -R pocket:pocket /var/www /var/log/pocket-web
 
 # Copy application files from build stage
 COPY --from=build --chown=pocket:pocket /var/www/target/release/pocket-web-backend /var/www/pocket-web-backend
@@ -61,7 +61,10 @@ COPY --from=build --chown=pocket:pocket /var/www/statics /var/www/statics
 
 # Make CLI tools executable
 RUN chmod +x /var/www/pocket-web-backend
-RUN echo ciao
+
+# Create log file with correct permissions
+RUN touch /var/log/pocket-web/application.log && \
+    chown pocket:pocket /var/log/pocket-web/application.log
 
 # Create startup script that updates constants.mjs and starts the application
 RUN echo '#!/bin/bash' > /var/www/start.sh && \
@@ -78,11 +81,12 @@ RUN echo '#!/bin/bash' > /var/www/start.sh && \
     echo '# Update BACKEND_URL in constants.mjs' >> /var/www/start.sh && \
     echo 'sed -i "s|const BACKEND_URL = '\''[^'\'']*'\'';|const BACKEND_URL = '\''${EFFECTIVE_BACKEND_URL}'\'';|g" /var/www/statics/js/constants.mjs' >> /var/www/start.sh && \
     echo '' >> /var/www/start.sh && \
-    echo '# Start the application' >> /var/www/start.sh && \
+    echo '# Start the application and redirect all output to log file' >> /var/www/start.sh && \
     echo 'exec /var/www/pocket-web-backend \' >> /var/www/start.sh && \
     echo '    ${FULL_ADDRESS} \' >> /var/www/start.sh && \
     echo '    ${POCKET_MAX_THREADS} \' >> /var/www/start.sh && \
-    echo '    ${POCKET_SESSION_EXPIRATION}' >> /var/www/start.sh && \
+    echo '    ${POCKET_SESSION_EXPIRATION} \' >> /var/www/start.sh && \
+    echo '    >> /var/log/pocket-web/application.log 2>&1' >> /var/www/start.sh && \
     chmod +x /var/www/start.sh
 
 # Switch to non-root user
