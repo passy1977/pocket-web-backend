@@ -71,20 +71,14 @@ pub mod server {
     use actix_web::{web, App, HttpServer};
     use std::io;
     use actix_web::middleware::Logger;
-    use crate::constants::conf::PORT;
-    use crate::services::data::Url;
 
-    pub async fn start(url: Url, max_threads: usize) -> io::Result<()> {
+    pub async fn start(binding_address: String, port: u16, max_threads: usize) -> io::Result<()> {
 
         env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
         
         Sessions::share().start_validator();
 
-        if let Some(port) = url.port {
-            println!("Binging at address {}:{}", url.address, port);
-        } else {
-            println!("Binging at address {}:{PORT}", url.address);
-        }
+        println!("Binging at address {binding_address}:{port}");
 
         HttpServer::new(move || {
             let app = App::new()
@@ -109,7 +103,7 @@ pub mod server {
                 .route("/v5/pocket/heartbeat/{session_id}", web::get().to(heartbeat))
                 .service(fs::Files::new("/", "./statics").index_file("index.html"))
             })
-            .bind((url.address, url.port.unwrap_or(PORT)))?
+            .bind((binding_address, port))?
             .workers(max_threads)
             .run()
             .await

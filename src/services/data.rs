@@ -7,22 +7,6 @@ use std::fs::File;
 use std::io::{self, Error, ErrorKind, Read, Write};
 use serde::{Deserialize, Serialize};
 
-pub struct Url {
-    pub protocol: String,
-    pub address: String,
-    pub port: Option<u16>,
-}
-
-impl Default for Url {
-    fn default() -> Self {
-        Self {
-            protocol: "http".to_string(),
-            address: "localhost".to_string(),
-            port: None,
-        }
-    }
-}
-
 #[repr(C)]
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Data {
@@ -33,8 +17,11 @@ pub struct Data {
     #[serde(skip_serializing, skip_deserializing)]
     pub dir_path: PathBuf,
 
-    /// Address on which the server listens
+    /// Binding address
     pub address: String,
+
+    /// Connection port
+    pub port: u16,
 
     #[serde(skip_serializing, skip_deserializing)]
     pub(super) update : bool,
@@ -76,6 +63,7 @@ impl Data {
             file_data_path,
             dir_path,
             address: ADDRESS.to_string(),
+            port: PORT,
             update: false,
             max_threads: MAX_BLOCKING_THREADS,
             session_expiration_time: SESSION_EXPIRATION_TIME
@@ -197,32 +185,4 @@ impl Data {
         Ok(())
     }
 
-    pub fn get_url(&self) -> Result<Url> {
-        let mut ret = Url::default();
-
-        if self.address.starts_with("http://") {
-            ret.protocol = "http".to_string();
-        } else if self.address.starts_with("https://") {
-            ret.protocol = "https".to_string();
-        } else {
-            return Err("Invalid protocol".into());
-        }
-
-        let slices = self.address.split(':').collect::<Vec<_>>();
-        if slices.len() == 0 || slices.len() > 3 {
-            return Err("Invalid address format".into());
-        }
-
-        ret.address = slices[1].trim_start_matches("//").to_string();
-
-        if slices.len() == 3 {
-            if let Ok(port) = slices[2].parse::<u16>() {
-                ret.port = Some(port);
-            } else {
-                return Err("Invalid port".into());
-            }
-        }
-
-        Ok(ret)
-    }
 }

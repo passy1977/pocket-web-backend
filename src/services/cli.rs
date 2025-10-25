@@ -7,8 +7,11 @@ use crate::services::data::Data;
 #[command(name = "pocket-web-backend")]
 #[command(about = "A secure, high-performance web backend built with Rust and Actix Web")]
 pub struct Cli {
-    /// Host address
+    /// Binding address
     pub address: Option<String>,
+
+    /// Connection port
+    pub port: Option<u16>,
 
     /// Maximum number of threads
     pub max_threads: Option<usize>,
@@ -27,6 +30,13 @@ impl Cli {
                     data.address = address.clone();
                     data.update = true;
                 }    
+            }
+        }
+
+        if let Some(port) = cli.port {
+            if data.port != port {
+                data.port = port;
+                data.update = true;
             }
         }
 
