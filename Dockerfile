@@ -70,22 +70,29 @@ RUN touch /var/log/pocket-web/application.log && \
 RUN echo '#!/bin/bash' > /var/www/start.sh && \
     echo 'set -e' >> /var/www/start.sh && \
     echo '' >> /var/www/start.sh && \
-    echo '# Build full address from POCKET_HOST and POCKET_PORT' >> /var/www/start.sh && \
-    echo 'FULL_ADDRESS="http://${POCKET_HOST}:${POCKET_PORT}"' >> /var/www/start.sh && \
-    echo 'echo "Server will run at: ${FULL_ADDRESS}"' >> /var/www/start.sh && \
+    echo '# Log startup parameters' >> /var/www/start.sh && \
+    echo 'echo "Starting Pocket Web Backend with:"' >> /var/www/start.sh && \
+    echo 'echo "  Address: ${POCKET_HOST}"' >> /var/www/start.sh && \
+    echo 'echo "  Port: ${POCKET_PORT}"' >> /var/www/start.sh && \
+    echo 'echo "  Max Threads: ${POCKET_MAX_THREADS}"' >> /var/www/start.sh && \
+    echo 'echo "  Session Expiration: ${POCKET_SESSION_EXPIRATION}s"' >> /var/www/start.sh && \
     echo '' >> /var/www/start.sh && \
-    echo '# Use BACKEND_URL if set, otherwise use FULL_ADDRESS' >> /var/www/start.sh && \
-    echo 'EFFECTIVE_BACKEND_URL="${BACKEND_URL:-$FULL_ADDRESS}"' >> /var/www/start.sh && \
+    echo '# Build full URL with protocol for frontend' >> /var/www/start.sh && \
+    echo 'SERVER_URL="http://${POCKET_HOST}:${POCKET_PORT}"' >> /var/www/start.sh && \
+    echo '' >> /var/www/start.sh && \
+    echo '# Use BACKEND_URL if set, otherwise use SERVER_URL' >> /var/www/start.sh && \
+    echo 'EFFECTIVE_BACKEND_URL="${BACKEND_URL:-$SERVER_URL}"' >> /var/www/start.sh && \
     echo 'echo "Frontend will connect to: ${EFFECTIVE_BACKEND_URL}"' >> /var/www/start.sh && \
     echo '' >> /var/www/start.sh && \
     echo '# Update BACKEND_URL in constants.mjs' >> /var/www/start.sh && \
     echo 'sed -i "s|const BACKEND_URL = '\''[^'\'']*'\'';|const BACKEND_URL = '\''${EFFECTIVE_BACKEND_URL}'\'';|g" /var/www/statics/js/constants.mjs' >> /var/www/start.sh && \
     echo '' >> /var/www/start.sh && \
-    echo '# Start the application and redirect all output to log file' >> /var/www/start.sh && \
+    echo '# Start the application with new parameter format and redirect all output to log file' >> /var/www/start.sh && \
     echo 'exec /var/www/pocket-web-backend \' >> /var/www/start.sh && \
-    echo '    ${FULL_ADDRESS} \' >> /var/www/start.sh && \
-    echo '    ${POCKET_MAX_THREADS} \' >> /var/www/start.sh && \
-    echo '    ${POCKET_SESSION_EXPIRATION} \' >> /var/www/start.sh && \
+    echo '    "${POCKET_HOST}" \' >> /var/www/start.sh && \
+    echo '    "${POCKET_PORT}" \' >> /var/www/start.sh && \
+    echo '    "${POCKET_MAX_THREADS}" \' >> /var/www/start.sh && \
+    echo '    "${POCKET_SESSION_EXPIRATION}" \' >> /var/www/start.sh && \
     echo '    >> /var/log/pocket-web/application.log 2>&1' >> /var/www/start.sh && \
     chmod +x /var/www/start.sh
 
