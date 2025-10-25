@@ -3,6 +3,8 @@ use std::ffi::{CStr, CString};
 use std::hash::Hash;
 use crate::bindings::{free, pocket_aes_decrypt, pocket_aes_encrypt, pocket_sha512_encrypt, pocket_t};
 
+static mut PRINT_ONCE: bool = false;
+
 pub(crate) type Result<T, E = &'static str> = std::result::Result<T, E>;
 
 #[allow(dead_code)]
@@ -138,8 +140,6 @@ where T: PartialEq + Eq + Hash + Clone
     
 //     hex_str
 // }
-
-static mut PRINT_ONCE: bool = false;
 
 pub(crate) fn configure_cors() -> actix_cors::Cors {
     use crate::constants::conf::{CORS_MAX_AGE, CORS_ALLOWED_METHODS, CORS_ALLOWED_HEADERS};
