@@ -213,6 +213,7 @@ impl RateLimiter {
 
 /// Global rate limiter instance
 static RATE_LIMITER: LazyLock<RateLimiter> = LazyLock::new(|| RateLimiter::new());
+static mut PRINT_ONCE: bool = false;
 
 /// Helper function to check rate limits and return error response if necessary
 pub fn check_rate_limit_or_reject(
@@ -221,6 +222,17 @@ pub fn check_rate_limit_or_reject(
     session_id: Option<&str>,
 ) -> Option<HttpResponse> {
     // Extract client IP
+    #[cfg(feature = "no_rate_limit")]
+    {
+        unsafe {
+            if !PRINT_ONCE {
+                println!("\x1b[93mWarning: Rate limiting is disabled via 'no_rate_limit' feature.\x1b[0m");
+                PRINT_ONCE = true;
+            }
+        }
+        return None
+    }
+
     let client_ip = req
         .connection_info()
         .realip_remote_addr()
