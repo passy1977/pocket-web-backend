@@ -5,7 +5,7 @@ use crate::bindings::pocket_stat_t;
 use crate::constants::Stats::*;
 
 pub(crate) mod conf {
-    pub const ADDRESS: &str = "http://0.0.0.0:8080";
+    pub const ADDRESS: &str = "0.0.0.0";
     pub const PORT: u16 = 8080;
     pub const MAX_BLOCKING_THREADS: usize = 2;
     pub const SESSION_EXPIRATION_TIME: u32 = 300; // 5 minutes in seconds

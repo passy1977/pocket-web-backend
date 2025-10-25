@@ -7,6 +7,9 @@ edition = "2024"
 name = "pocket-web-backend"
 path = "src/main.rs"
 
+[features]
+cors_permissive = []
+
 [dependencies]
 clap = { version = "4.5.49", features = ["derive"]  }
 actix-web = "4"

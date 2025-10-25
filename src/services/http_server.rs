@@ -80,21 +80,16 @@ pub mod server {
         
         Sessions::share().start_validator();
 
-        let origin = if let Some(port) = url.port {
-            println!("Server will start at http://{}:{}", url.address, port);
-            format!("{}://{}:{}", url.protocol, url.address, port)
+        if let Some(port) = url.port {
+            println!("Binging at address {}:{}", url.address, port);
         } else {
-            println!("Server will start at http://{}", url.address);
-            format!("{}://{}", url.protocol, url.address)
-        };
-
-
-        println!("Starting server at {origin}");
+            println!("Binging at address {}:{PORT}", url.address);
+        }
 
         HttpServer::new(move || {
             let app = App::new()
                 .wrap(Logger::default())
-                .wrap(configure_cors(origin.clone()))
+                .wrap(configure_cors())
                 .route("/v5/pocket/hello/{session_id}", web::get().to(hello))
                 .route("/v5/pocket/login", web::post().to(login))
                 .route("/v5/pocket/registration", web::post().to(registration))
