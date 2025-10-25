@@ -169,15 +169,16 @@ pub(crate) fn configure_cors() -> actix_cors::Cors {
             .allowed_headers(CORS_ALLOWED_HEADERS.to_vec())
             .max_age(CORS_MAX_AGE);
 
-        for origin in &allowed_origins {
-            cors = cors.allowed_origin(origin.as_str());
-            unsafe {
-                if !PRINT_ONCE {
+        unsafe {
+            if !PRINT_ONCE {
+                for origin in &allowed_origins {
+                    cors = cors.allowed_origin(origin.as_str());
+
                     println!("CORS allowed origin: {}", origin);
-                    PRINT_ONCE = true;
+
                 }
             }
-
+            PRINT_ONCE = true;
         }
     } else {
         cors = Cors::permissive();
