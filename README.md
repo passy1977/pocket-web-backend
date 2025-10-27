@@ -150,11 +150,14 @@ cd pocket-web-backend
 
 ### Build the Project
 ```bash
-# Build in debug mode
+# Build in debug mode (logging enabled by default)
 cargo build
 
-# Build in release mode (recommended for production)
+# Build in release mode (recommended for production, logging disabled)
 cargo build --release
+
+# Build in release mode with logging enabled
+POCKET_ENABLE_LOGS=1 cargo build --release
 ```
 
 ### Run Tests

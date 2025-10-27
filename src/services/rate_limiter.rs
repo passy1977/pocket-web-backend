@@ -40,7 +40,7 @@ impl RateLimit {
     }
     
     pub fn heartbeat_limit() -> Self {
-        Self::new(20, 60) // 12 heartbeats every minute
+        Self::new(30, 60) // 12 heartbeats every minute
     }
 }
 
@@ -213,6 +213,7 @@ impl RateLimiter {
 
 /// Global rate limiter instance
 static RATE_LIMITER: LazyLock<RateLimiter> = LazyLock::new(|| RateLimiter::new());
+#[cfg(feature = "no_rate_limit")]
 static mut PRINT_ONCE: bool = false;
 
 /// Helper function to check rate limits and return error response if necessary

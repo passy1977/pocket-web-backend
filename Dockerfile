@@ -31,7 +31,9 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 ENV PATH="/home/pocket/.cargo/bin:$PATH"
 # Source the cargo environment and run rustup commands
 RUN /bin/bash -c "source $HOME/.cargo/env && rustup default stable && rustup update"
-RUN /bin/bash -c "source $HOME/.cargo/env && cargo build --release"
+# Build with optional logging support (set POCKET_ENABLE_LOGS=1 to enable logs in release)
+ARG POCKET_ENABLE_LOGS=0
+RUN /bin/bash -c "source $HOME/.cargo/env && POCKET_ENABLE_LOGS=${POCKET_ENABLE_LOGS} cargo build --release"
 RUN cp /var/www/target/release/pocket-web-backend /var/www
 RUN /bin/bash -c "source $HOME/.cargo/env && rustup self uninstall -y"
 

@@ -7,8 +7,18 @@ fn main() {
     let profile = env::var("PROFILE").unwrap_or_else(|_| "debug".to_string());
     let is_release = profile == "release";
     
+    // Check if logging should be enabled via environment variable
+    let enable_logs = env::var("POCKET_ENABLE_LOGS")
+        .unwrap_or_else(|_| "0".to_string())
+        .parse::<i32>()
+        .unwrap_or(0) != 0;
+    
     println!("cargo:warning=Building with profile: {} (CMake build type: {})", 
              profile, if is_release { "Release" } else { "Debug" });
+    
+    if enable_logs {
+        println!("cargo:warning=Logging ENABLED via POCKET_ENABLE_LOGS environment variable");
+    }
 
     let mut config = Config::new("bridge");
     
@@ -25,8 +35,8 @@ fn main() {
         config.define("CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO", "-Wl,--no-gc-sections");
         config.define("CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO", "-Wl,--no-gc-sections");
         
-        // Disable all logging and debugging features
-        config.define("POCKET_ENABLE_LOG", "OFF");
+        // Logging control: Enable if POCKET_ENABLE_LOGS is set, otherwise OFF in release
+        config.define("POCKET_ENABLE_LOG", if enable_logs { "ON" } else { "OFF" });
         config.define("POCKET_DISABLE_LOCK", "ON");
         config.define("POCKET_ENABLE_TEST", "OFF");
         config.define("POCKET_ENABLE_AES", "ON");
