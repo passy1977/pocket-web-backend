@@ -29,6 +29,9 @@ using namespace services;
 #include "pocket-pods/user.hpp"
 using pods::user;
 
+#include "pocket-services/network.hpp"
+using services::network;
+
 #include "pocket-bridge/pocket.h"
 #include "pocket-bridge/user.h"
 #include "pocket-bridge/constants.h"
@@ -510,6 +513,15 @@ bool pocket_heartbeat(const pocket_t* self)
     }
 
     return session->heartbeat(user);
+}
+
+void pocket_set_cors_token(pocket_t* self, const char* token)
+{
+    if (self == nullptr || self->session == nullptr)
+    {
+        return;
+    }
+    network::set_auth_header(string{"X-API-Key: "} + token);
 }
 
 const char* pocket_aes_decrypt(const pocket_t* self, const char encrypted[])

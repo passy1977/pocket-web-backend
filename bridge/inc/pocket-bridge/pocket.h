@@ -54,6 +54,7 @@ bool pocket_group_controller_data_import(pocket_t* self, const char* full_path_f
 bool pocket_group_controller_data_import_legacy(pocket_t* self, const char* full_path_file_import);
 bool pocket_is_no_network(const pocket_t* self);
 bool pocket_heartbeat(const pocket_t* self);
+void pocket_set_cors_token(pocket_t* self, const char* token);
 
 const char* pocket_aes_decrypt(const pocket_t* self, const char encrypted[]);
 const char* pocket_aes_encrypt(const pocket_t* self, const char plain[]);
