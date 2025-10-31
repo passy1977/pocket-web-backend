@@ -638,9 +638,6 @@ unsafe extern "C" {
     pub fn pocket_heartbeat(self_: *const pocket_t) -> bool;
 }
 unsafe extern "C" {
-    pub fn pocket_set_cors_token(self_: *mut pocket_t, token: *const ::std::os::raw::c_char);
-}
-unsafe extern "C" {
     pub fn pocket_aes_decrypt(
         self_: *const pocket_t,
         encrypted: *const ::std::os::raw::c_char,
