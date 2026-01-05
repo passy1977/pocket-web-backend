@@ -9,3 +9,5 @@ bridge/build/
 
 cmake-build-debug/
 cmake-build-release/
+
+Cargo.lock
