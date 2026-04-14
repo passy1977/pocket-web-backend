@@ -1,9 +1,10 @@
 use std::{error, fmt};
 use std::ffi::{CStr, CString};
 use std::hash::Hash;
+use std::sync::atomic::{AtomicBool, Ordering};
 use crate::bindings::{free, pocket_aes_decrypt, pocket_aes_encrypt, pocket_sha512_encrypt, pocket_t};
 
-static mut PRINT_ONCE: bool = false;
+static PRINT_ONCE: AtomicBool = AtomicBool::new(false);
 
 pub(crate) type Result<T, E = &'static str> = std::result::Result<T, E>;
 
@@ -169,26 +170,28 @@ pub(crate) fn configure_cors() -> actix_cors::Cors {
             .allowed_headers(CORS_ALLOWED_HEADERS.to_vec())
             .max_age(CORS_MAX_AGE);
 
-        unsafe {
-            if !PRINT_ONCE {
-                for origin in &allowed_origins {
-                    cors = cors.allowed_origin(origin.as_str());
+        if !PRINT_ONCE.swap(true, Ordering::SeqCst) {
+            for origin in &allowed_origins {
+                cors = cors.allowed_origin(origin.as_str());
 
-                    println!("CORS allowed origin: {}", origin);
+                println!("CORS allowed origin: {}", origin);
 
-                }
             }
-            PRINT_ONCE = true;
         }
     } else {
-        cors = Cors::permissive();
-        unsafe {
-            if !PRINT_ONCE {
+        #[cfg(feature = "cors_permissive")]
+        {
+            cors = Cors::permissive();
+            if !PRINT_ONCE.swap(true, Ordering::SeqCst) {
                 eprintln!("\x1b[93mWARNING: No CORS_ALLOWED_ORIGINS specified. CORS is set to permissive mode.\x1b[0m");
-                PRINT_ONCE = true;
             }
         }
-
+        #[cfg(not(feature = "cors_permissive"))]
+        {
+            if !PRINT_ONCE.swap(true, Ordering::SeqCst) {
+                eprintln!("\x1b[93mWARNING: No CORS_ALLOWED_ORIGINS specified. Only same-origin requests will be allowed.\x1b[0m");
+            }
+        }
     }
 
     cors

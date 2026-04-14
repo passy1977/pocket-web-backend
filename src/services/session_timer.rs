@@ -50,7 +50,7 @@ impl SessionTimer {
     }
     
     pub fn stop(&mut self) {
-        let _ = self.channel.send(false);
+        let _ = self.channel.send(true);
          
         if let Some(handle) = self.handle.take() {
             let _ = handle.join();
