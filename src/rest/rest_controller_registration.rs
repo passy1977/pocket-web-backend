@@ -99,16 +99,11 @@ impl RestController {
                 .build()
         }
         
-        let mut data = String::new();
-        data.push_str(email.as_str());
-        data.push_str("|");
-        data.push_str(passwd.as_str());
-            
         HttpResponseHelper::ok()
             .path("/login")
             .title("Login")
             .session_id(session.session_id)
-            .data(data)
+            .data(email)
             .build()
     }
     

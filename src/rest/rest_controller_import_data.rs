@@ -62,6 +62,7 @@ impl RestController {
             }
 
             if field.name().unwrap_or("") == "file" {
+                const MAX_UPLOAD_SIZE: usize = 5 * 1024 * 1024; // 5 MB
                 while let Some(chunk) = field.next().await {
                     let chunk = match chunk {
                         Ok(chunk) => chunk,
@@ -74,6 +75,12 @@ impl RestController {
 
                     if let Ok(chunk_string) = String::from_utf8(chunk.to_vec()) {
                         file.push_str(&chunk_string);
+                    }
+
+                    if file.len() > MAX_UPLOAD_SIZE {
+                        return HttpResponseHelper::not_acceptable()
+                            .error("File size exceeds maximum allowed (5 MB)")
+                            .build();
                     }
                 }
             }

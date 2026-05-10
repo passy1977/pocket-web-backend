@@ -214,7 +214,7 @@ impl RateLimiter {
 /// Global rate limiter instance
 static RATE_LIMITER: LazyLock<RateLimiter> = LazyLock::new(|| RateLimiter::new());
 #[cfg(feature = "no_rate_limit")]
-static mut PRINT_ONCE: bool = false;
+static PRINT_ONCE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 
 /// Helper function to check rate limits and return error response if necessary
 pub fn check_rate_limit_or_reject(
@@ -225,11 +225,8 @@ pub fn check_rate_limit_or_reject(
     // Extract client IP
     #[cfg(feature = "no_rate_limit")]
     {
-        unsafe {
-            if !PRINT_ONCE {
-                println!("\x1b[93mWarning: Rate limiting is disabled via 'no_rate_limit' feature.\x1b[0m");
-                PRINT_ONCE = true;
-            }
+        if !PRINT_ONCE.swap(true, std::sync::atomic::Ordering::SeqCst) {
+            println!("\x1b[93mWarning: Rate limiting is disabled via 'no_rate_limit' feature.\x1b[0m");
         }
         return None
     }
