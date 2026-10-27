@@ -1,4 +1,4 @@
-use rand::{Rng, SeedableRng};
+use rand::{RngExt, SeedableRng};
 use rand::rngs::StdRng;
 use sha2::{Sha256, Digest};
 use std::time::{SystemTime, UNIX_EPOCH};

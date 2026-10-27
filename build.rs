@@ -113,6 +113,8 @@ fn main() {
         .clang_arg("-Ibridge/inc")
         .clang_arg("-Ibridge/pocket-lib/inc")
         .clang_arg("-std=c17")
+        // Skip libc allocators that clash with the Rust runtime symbols.
+        .blocklist_function("malloc|realloc")
         // Tell cargo to invalidate the built crate whenever any of the
         // included header files changed.
         .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
